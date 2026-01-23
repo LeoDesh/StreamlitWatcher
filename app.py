@@ -1,8 +1,3 @@
-from garmin.home import setup_pages
+import streamlit as st
 
-def main():
-    setup_pages()
-
-
-if __name__ == "__main__":
-    main()
+st.title("Start Page")
