@@ -4,24 +4,23 @@ import plotly.graph_objects as go
 from matplotlib import figure
 from matplotlib.ticker import MaxNLocator
 from garmin.utils.pace_calculations import get_pace_bins_labels_for_dataframe
-
+from typing import List
 
 def get_empty_figure() -> figure:
     return plt.figure()
 
-def get_df_distributions(df: pd.DataFrame, column: str) -> figure:
+def get_df_distributions(df: pd.DataFrame, column: str,bins:List[int]) -> figure:
     fig, ax = plt.subplots()
     ax.hist(
         df[column],
-        bins=40,
-        range=(1.3, 1.8),
-        color="skyblue",
+        bins=bins,
         edgecolor="black",
     )
     ax.set_title(f"Histogram of {column}")
-    ax.set_xlabel(column)
-    ax.set_ylabel("Frequency")
-
+    ax.set_xlabel(f"{column} in km")
+    ax.set_ylabel("Count")
+    ax.set_xticks(bins)
+    ax.tick_params(axis="x", rotation=45)
     return fig
 
 
@@ -55,6 +54,24 @@ def get_df_count_from_column_histogram(df: pd.DataFrame,column:str):
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     #ax.xaxis.set_major_locator(MaxNLocator(counts["YEAR"]))
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    return fig
+
+def get_df_sum_from_column(df:pd.DataFrame,groupby_column:str,value_column:str):
+    return df.groupby(groupby_column)[[value_column]].sum() 
+
+def get_df_bar_chart(df:pd.DataFrame,groupby_column:str,value_column:str):
+    df = get_df_sum_from_column(df,groupby_column,value_column)
+    df = df.reset_index()
+    fig, ax = plt.subplots()
+    ax.bar(
+        df[groupby_column],
+        df[value_column]
+    )
+    ax.set_title(f"Barchart of {value_column} per {groupby_column}")
+    ax.set_xlabel(groupby_column)
+    ax.set_ylabel(value_column)
+    ax.set_xticks(df[groupby_column])
+    ax.tick_params(axis="x", rotation=45)
     return fig
 
 def get_df_pace_histogram(

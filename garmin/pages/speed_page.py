@@ -10,10 +10,7 @@ import pandas as pd
 from datetime import date, timedelta
 import math
 
-st.set_page_config(
-    page_title="Speed",   # Friendly name for the sidebar and browser tab
-    page_icon="📊"       # Icon for the page
-)
+
 
 def setup_date_range_selection(df: pd.DataFrame) -> Tuple[date, date]:
     date_min = df["DATE"].min().date()
@@ -72,7 +69,7 @@ def setup_pace_histogram(df: pd.DataFrame, number_of_bins: int):
 
 def main():
     df = DATA
-    st.title("Speed Plots")
+    st.title("Speed Overview")
     start_date, end_date = setup_date_range_selection(df)
     min_pace, max_pace = setup_pace_range_selection()
     min_distance, max_distance = setup_distance_range_selection(df)

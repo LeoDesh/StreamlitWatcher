@@ -10,10 +10,7 @@ import pandas as pd
 import math
 
 
-st.set_page_config(
-    page_title="Units",   # Friendly name for the sidebar and browser tab
-    page_icon="📋"       # Icon for the page
-)
+
 
 def setup_date_range_selection(df: pd.DataFrame) -> Tuple[int, int]:
     min_year: int = df["YEAR"].min()
