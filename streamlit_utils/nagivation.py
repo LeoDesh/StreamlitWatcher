@@ -1,0 +1,41 @@
+import streamlit as st
+from garmin.constants import DATA
+from pathlib import Path
+
+#":material/monitoring:"
+PAGE_CONFIG = {
+    "home":{"icon":":material/home:","default":True},
+    "distance":{"icon":":material/route:"},
+    "units":{"icon":":material/table_view:"},
+    "speed":{"icon":":material/speed:"},
+    "latest_activities":{"icon":":material/search:"},
+}
+    
+def get_pages():
+    base_config = {"icon":":material/monitoring:"}
+    streamlit_pages = []
+    for file in Path("views").iterdir():
+        if not file.suffix == ".py":
+            continue
+        index,file_name = file.stem.split("__")
+        index = int(index)
+        page_name = " ".join(file.capitalize() for file in file_name.split("_"))
+        initial_config = base_config if not PAGE_CONFIG.get(file_name) else PAGE_CONFIG.get(file_name)
+        config = initial_config | {"title":page_name,"page":file}
+        streamlit_page = st.Page(**config)
+        streamlit_pages.append(streamlit_page)
+    return st.navigation(streamlit_pages,position="top")
+        
+
+def define_sidebar():
+    with st.sidebar:
+        st.title("Last Update 26.01.2026")
+        min_date = DATA["DATE"].min().strftime("%d.%m.%Y")
+        max_date = DATA["DATE"].max().strftime("%d.%m.%Y")
+        time_hours = DATA["TIME_IN_MINUTES"].sum() // 60
+        distance = round(DATA["DISTANCE"].sum(),2)
+        st.write(f"Last Recorded Run: {max_date}")
+        st.write(f"Total Distance: {distance} km")
+        st.write(f"Total Time: {time_hours} h")
+        st.write(f"First Recorded Run: {min_date}")
+
