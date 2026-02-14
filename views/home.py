@@ -35,7 +35,7 @@ def get_highlights_data(df: pd.DataFrame, columns: List[str], idx: int):
 def construct_highlights(df: pd.DataFrame):
     attrs_columns = ["DISTANCE", "SPEED", "CALORIES", "TIME","AVG_HEART_RATE"]
     columns = ["DISTANCE", "SPEED"]
-    headers = ["Largest Distance Stats", "Largest Speed Stats"]
+    headers = ["Highest Distance Stats", "Highest Speed Stats"]
     for col, header in zip(columns, headers):
         idx = df[col].values.argmax()
         date = df.loc[idx,["DATE"]].values[0].date()
@@ -49,7 +49,7 @@ def construct_highlights(df: pd.DataFrame):
 
 
 def construct_header():
-    st.title("Overview")
+    st.title("Overview",text_alignment="center")
 
 
 def construct_overall_statistics(df: pd.DataFrame):
@@ -69,8 +69,12 @@ def main():
     construct_header()
     df = DATA
     construct_highlights(df)
-    construct_year_statistics(df)
-    construct_overall_statistics(df)
+    with st.container():
+        col_1,col_2 = st.columns(2)
+        with col_1: 
+            construct_year_statistics(df)
+        with col_2:
+            construct_overall_statistics(df)
 
 
 if __name__ == "__main__":

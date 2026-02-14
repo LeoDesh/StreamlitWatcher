@@ -14,13 +14,15 @@ def show_latest_activities(df: pd.DataFrame,rows:int=20):
     for idx,row_dict in enumerate(df_dict):
         date = row_dict["DATE"].date()
         date_str = f"{date.strftime('%d.%m.%Y')}"
-        st.header(f"{idx+1}: {date_str}")
-        cols = st.columns(len(attrs_columns))
-        for col, description in zip(cols, attrs_columns):
-            col.metric(description, row_dict[description])
+        with st.container(border=True,horizontal_alignment="center"):
+            st.header(f"{idx+1}: {date_str}")
+            cols = st.columns(len(attrs_columns))
+            for col, description in zip(cols, attrs_columns):
+                col.metric(description, row_dict[description])
 
 
 def main():
+    st.header("Latest Activities",text_alignment="center")
     show_latest_activities(DATA)
 
 if __name__ == '__main__':

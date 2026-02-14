@@ -10,7 +10,7 @@ def get_empty_figure() -> figure:
     return plt.figure()
 
 def get_df_distributions(df: pd.DataFrame, column: str,bins:List[int]) -> figure:
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(4,3))
     ax.hist(
         df[column],
         bins=bins,
@@ -31,7 +31,7 @@ def get_df_count_year_month_histogram(df: pd.DataFrame):
         .reset_index(name="count")
         .sort_values(["YEAR", "MONTH"])
     )
-    fig,ax = plt.subplots()
+    fig,ax = plt.subplots(figsize=(8,3))
     ax.bar(counts.apply(lambda r: f"{r.YEAR}-{r.MONTH:02d}", axis=1), counts["count"])
     ax.set_xlabel("YEAR-MONTH")
     ax.set_ylabel("Count")
@@ -47,7 +47,7 @@ def get_df_count_from_column_histogram(df: pd.DataFrame,column:str):
         .sort_values([column])
     )
     counts[column] = counts[column].astype(str)
-    fig,ax = plt.subplots()
+    fig,ax = plt.subplots(figsize=(4,3))
     ax.bar(counts[column], counts["count"])
     ax.set_xlabel(column)
     ax.set_ylabel("Count")
@@ -62,7 +62,7 @@ def get_df_sum_from_column(df:pd.DataFrame,groupby_column:str,value_column:str):
 def get_df_bar_chart(df:pd.DataFrame,groupby_column:str,value_column:str):
     df = get_df_sum_from_column(df,groupby_column,value_column)
     df = df.reset_index()
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(4,3))
     ax.bar(
         df[groupby_column],
         df[value_column]
@@ -77,7 +77,7 @@ def get_df_bar_chart(df:pd.DataFrame,groupby_column:str,value_column:str):
 def get_df_pace_histogram(
     df: pd.DataFrame, pace_float_column: str, number_of_bins: int
 ) -> figure:
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(4,3))
     bins,labels = get_pace_bins_labels_for_dataframe(df,number_of_bins,pace_float_column)
     df = df.copy()
     df.loc[:,"binned"] = pd.cut(df[pace_float_column], bins=bins, labels=labels)

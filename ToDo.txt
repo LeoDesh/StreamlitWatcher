@@ -1,0 +1,3 @@
+##configure navigation + icons settings + app settings (apart from Wide Screen, Colors, Theme)
+##Filter Latest Activites. 
+##Home top 3 Distance Runs, Top 3 Speed Runs. (Add Pace? 5:04 Add a function to produce this layout?) Add Containers

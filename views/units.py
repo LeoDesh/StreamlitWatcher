@@ -5,7 +5,9 @@ from garmin.plots.visualization import (
     get_df_count_from_column_histogram,
     get_empty_figure,
 )
+from streamlit_utils.chart_helpers import place_figure
 from typing import Tuple
+from matplotlib.figure import Figure
 import pandas as pd
 import math
 
@@ -47,15 +49,12 @@ def setup_distance_range_selection(df: pd.DataFrame) -> Tuple[int, int]:
     )
     return (chosen_distance_min, chosen_distance_max)
 
-
-
-
 def setup_running_year_month_histogram(df: pd.DataFrame):
     if df.empty:
         fig = get_empty_figure()
     else:
         fig = get_df_count_year_month_histogram(df)
-    st.pyplot(fig)
+    place_figure(fig)
 
 
 def setup_running_year_histogram(df: pd.DataFrame):
@@ -63,14 +62,14 @@ def setup_running_year_histogram(df: pd.DataFrame):
         fig = get_empty_figure()
     else:
         fig = get_df_count_from_column_histogram(df,"YEAR")
-    st.pyplot(fig)
+    place_figure(fig)
 
 def setup_running_month_histogram(df: pd.DataFrame):
     if df.empty:
         fig = get_empty_figure()
     else:
         fig = get_df_count_from_column_histogram(df,"MONTH")
-    st.pyplot(fig)
+    place_figure(fig)
 
 
 def main():
@@ -78,9 +77,13 @@ def main():
     st.title("Unit Plots")
     start_year, end_year = setup_date_range_selection(df)
     df = df[(df["YEAR"] >= start_year) & (df["YEAR"] <= end_year)]
-    setup_running_year_histogram(df)
-    setup_running_month_histogram(df)
-    setup_running_year_month_histogram(df)
+    per_year_plot,per_month_plot,per_year_month_plot = st.tabs(["Per Year","Per Month"," Per Year Month"])
+    with per_year_plot:
+        setup_running_year_histogram(df)
+    with per_month_plot:
+        setup_running_month_histogram(df)
+    with per_year_month_plot:
+        setup_running_year_month_histogram(df)
     
 
 
