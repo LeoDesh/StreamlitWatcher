@@ -12,6 +12,7 @@ PAGE_CONFIG = {
 }
     
 def get_pages():
+    st.set_page_config(layout="wide")
     base_config = {"icon":":material/monitoring:"}
     streamlit_pages = []
     for file in Path("views").iterdir():
@@ -29,7 +30,7 @@ def get_pages():
 
 def define_sidebar():
     with st.sidebar:
-        st.title("Last Update 26.01.2026")
+        st.title("Last Update 14.02.2026")
         min_date = DATA["DATE"].min().strftime("%d.%m.%Y")
         max_date = DATA["DATE"].max().strftime("%d.%m.%Y")
         time_hours = DATA["TIME_IN_MINUTES"].sum() // 60

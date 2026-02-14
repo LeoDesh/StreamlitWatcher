@@ -7,6 +7,8 @@ import math
 def parse_str_int(value: str | int) -> int:
     if isinstance(value, int):
         return value
+    if value.find("--") > -1:
+        return 0
     return int(value.replace(",", ""))
 
 
@@ -75,6 +77,8 @@ def transform_activity_minutes_to_duration_format(duration_in_minutes: float) ->
 
 
 def transform_str_to_date(date_str: str) -> datetime:
+    if isinstance(date_str,datetime):
+        return date_str
     src_format = "%Y-%m-%d %H:%M:%S"  # 2026-01-02 13:50:51
     return datetime.strptime(date_str, src_format)
 

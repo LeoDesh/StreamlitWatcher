@@ -1,3 +1,5 @@
 ##app settings (apart from Wide Screen, Colors, Theme)
-##Filter Latest Activites. 
+##Filter Latest Activities. 
 ##Add Filters with Expander
+##Centralize Headers
+##Add Type hints

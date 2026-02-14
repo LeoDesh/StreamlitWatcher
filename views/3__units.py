@@ -74,7 +74,7 @@ def setup_running_month_histogram(df: pd.DataFrame):
 
 def main():
     df = DATA
-    st.title("Unit Plots")
+    st.title("Units",text_alignment="center")
     start_year, end_year = setup_date_range_selection(df)
     df = df[(df["YEAR"] >= start_year) & (df["YEAR"] <= end_year)]
     per_year_plot,per_month_plot,per_year_month_plot = st.tabs(["Per Year","Per Month"," Per Year Month"])

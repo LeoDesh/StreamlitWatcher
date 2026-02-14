@@ -40,10 +40,10 @@ GARMIN_COLUMNS = {
     "Titel": Activity.TITLE,
     "Distanz": Activity.DISTANCE,
     "Kalorien": Activity.CALORIES,
-    "Zeit": Activity.TIME,
+    "Gesamtzeit": Activity.TIME,
     "Ø Herzfrequenz": Activity.AVG_HEART_RATE,
     "Maximale Herzfrequenz": Activity.MAX_HEART_RATE,
-    "Ø Pace": Activity.AVERAGE_PACE,
-    "Beste Pace": Activity.MAX_PACE,
+    "Ø Geschwindigkeit": Activity.AVERAGE_PACE,
+    "Maximale Geschwindigkeit": Activity.MAX_PACE,
     "Schritte": Activity.STEPS,
 }

@@ -11,14 +11,14 @@ from functools import cache
 def import_file(file: Path) -> pd.DataFrame:
     validate_csv_file(file)
     df = read_file(file)
-    return rename_df_columns(df)
-    
+    df = rename_df_columns(df)
+    return transform_dataframe(df)
 
 
 def get_running_data(file:Path) -> pd.DataFrame:
     df = import_file(file)
-    df = filter_garmin_df(df)
-    return transform_dataframe(df)
+    return filter_garmin_df(df)
+    
 
 def read_file(file: Path) -> pd.DataFrame:
     return pd.read_csv(str(file))
