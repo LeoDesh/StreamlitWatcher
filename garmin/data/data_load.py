@@ -5,14 +5,20 @@ from garmin.utils.misc import transform_str_to_date,parse_str_int
 from garmin.data.file_verification import validate_csv_file
 from garmin.utils.pace_calculations import transform_pace_to_speed,transform_pace_to_pace_float
 from garmin.utils.misc import parse_activity_duration_to_minutes
+from functools import cache
 
+@cache
 def import_file(file: Path) -> pd.DataFrame:
     validate_csv_file(file)
     df = read_file(file)
-    df = rename_df_columns(df)
+    return rename_df_columns(df)
+    
+
+
+def get_running_data(file:Path) -> pd.DataFrame:
+    df = import_file(file)
     df = filter_garmin_df(df)
     return transform_dataframe(df)
-
 
 def read_file(file: Path) -> pd.DataFrame:
     return pd.read_csv(str(file))

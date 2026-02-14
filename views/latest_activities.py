@@ -8,7 +8,7 @@ def get_highlights_data(df: pd.DataFrame, columns: List[str], idx: int):
 
 
 def show_latest_activities(df: pd.DataFrame,rows:int=20):
-    attrs_columns = ["DISTANCE", "SPEED", "CALORIES", "TIME","AVG_HEART_RATE"]
+    attrs_columns = ["DISTANCE","AVERAGE_PACE", "SPEED", "CALORIES", "TIME","AVG_HEART_RATE"]
     df:pd.DataFrame = df.head(rows)
     df_dict = df.to_dict(orient="records")
     for idx,row_dict in enumerate(df_dict):

@@ -32,19 +32,21 @@ def get_highlights_data(df: pd.DataFrame, columns: List[str], idx: int):
     return df.loc[idx, columns].values
 
 
-def construct_highlights(df: pd.DataFrame):
-    attrs_columns = ["DISTANCE", "SPEED", "CALORIES", "TIME","AVG_HEART_RATE"]
-    columns = ["DISTANCE", "SPEED"]
-    headers = ["Highest Distance Stats", "Highest Speed Stats"]
-    for col, header in zip(columns, headers):
-        idx = df[col].values.argmax()
-        date = df.loc[idx,["DATE"]].values[0].date()
-        date_str = f"{date.strftime('%d.%m.%Y')}"
-        st.header(f"{header}: {date_str}")
-        cols = st.columns(len(attrs_columns))
-        data = get_highlights_data(df, attrs_columns, idx)
-        for col, value, description in zip(cols, data, attrs_columns):
-            col.metric(description, value)
+def construct_column_highlights(df: pd.DataFrame,column:str,amount:int=3):
+    attrs_columns = ["DISTANCE","AVERAGE_PACE" ,"SPEED","CALORIES", "TIME","AVG_HEART_RATE"]
+    header = f"Top {amount} Highest {column.capitalize()} Stats"
+    
+    with st.expander(header,expanded=True):
+        df = df.sort_values(by=column,ascending=False)
+        df = df.head(amount).reset_index()
+        for idx in range(amount):
+            date = df.loc[idx,"DATE"].date()
+            date_str = f"{date.strftime('%d.%m.%Y')}"
+            st.header(f"{date_str}")
+            cols = st.columns(len(attrs_columns))
+            data = get_highlights_data(df, attrs_columns, idx)
+            for col, value, description in zip(cols, data, attrs_columns):
+                col.metric(description, value)
 
 
 
@@ -68,7 +70,8 @@ def construct_year_statistics(df:pd.DataFrame):
 def main():
     construct_header()
     df = DATA
-    construct_highlights(df)
+    construct_column_highlights(df,"DISTANCE")
+    construct_column_highlights(df,"SPEED")
     with st.container():
         col_1,col_2 = st.columns(2)
         with col_1: 
