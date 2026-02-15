@@ -1,5 +1,3 @@
 ##app settings (apart from Wide Screen, Colors, Theme)
-##Filter Latest Activities. 
-##Add Filters with Expander
-##Centralize Headers
 ##Add Type hints
+##Activity Calender (horizontal bar chart)

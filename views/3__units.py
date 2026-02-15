@@ -17,13 +17,14 @@ import math
 def setup_date_range_selection(df: pd.DataFrame) -> Tuple[int, int]:
     min_year: int = df["YEAR"].min()
     max_year: int = df["YEAR"].max()
-    start_year, end_year = st.sidebar.slider(
-        "Select date range:",
-        min_value=min_year,
-        max_value=max_year,
-        value=(min_year, max_year),
-    )
-    return (start_year, end_year)
+    with st.expander("Date Range"):
+        start_year, end_year = st.slider(
+            "Select date range:",
+            min_value=min_year,
+            max_value=max_year,
+            value=(min_year, max_year),
+        )
+        return (start_year, end_year)
 
 
 def setup_pace_range_selection() -> Tuple[int, int]:
@@ -74,7 +75,7 @@ def setup_running_month_histogram(df: pd.DataFrame):
 
 def main():
     df = DATA
-    st.title("Units",text_alignment="center")
+    st.title("Units Overview",text_alignment="center")
     start_year, end_year = setup_date_range_selection(df)
     df = df[(df["YEAR"] >= start_year) & (df["YEAR"] <= end_year)]
     per_year_plot,per_month_plot,per_year_month_plot = st.tabs(["Per Year","Per Month"," Per Year Month"])

@@ -1,5 +1,6 @@
 import streamlit as st
 from garmin.constants import FULL_DATA
+from garmin.statistics.pandas_helper import filter_dataframe,get_unique_values_per_column
 import pandas as pd
 from typing import List,Any
 
@@ -34,9 +35,18 @@ def show_latest_activities(df: pd.DataFrame,rows:int=20):
                 col.metric(description, value)
 
 
+def get_filters():
+    unique_values_dict = get_unique_values_per_column(FULL_DATA,["ACTIVITY_TYPE"])
+    filters = {}
+    with st.expander("Activity Filter",expanded=False):
+        for key,groups in unique_values_dict.items():
+            filters[key] = st.multiselect(key,options=groups,default=groups)
+    return filters
 def main():
     st.header("Latest Activities",text_alignment="center")
-    show_latest_activities(FULL_DATA)
+    filters = get_filters()
+    df = filter_dataframe(FULL_DATA,filters)
+    show_latest_activities(df)
 
 if __name__ == '__main__':
     main()
