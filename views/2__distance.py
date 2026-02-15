@@ -6,7 +6,7 @@ from streamlit_utils.chart_helpers import place_figure
 import pandas as pd
 import math
 
-def construct_header():
+def construct_header()-> None:
     st.title("Distance Overview")
 
 
@@ -15,7 +15,7 @@ def setup_bar_chart(df: pd.DataFrame, groupby_column: str) -> Figure:
     return get_df_bar_chart(df, groupby_column, value_column)
     
 
-def calculate_bins(min_value:int,max_value:int,factor:int):
+def calculate_bins(min_value:int,max_value:int,factor:int) -> list[float]:
     steps = int(float(max_value-min_value) // factor)
     return [min_value + factor*idx for idx in range(steps+2)]
 

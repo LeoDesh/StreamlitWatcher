@@ -35,3 +35,6 @@ def filter_dataframe(df:pd.DataFrame,filter_kwargs:dict[str,Any]) -> pd.DataFram
         else:
             mask &= df[col] == val
     return df[mask]
+
+def get_highlights_data(df: pd.DataFrame, columns: List[str], idx: int):
+    return df.loc[idx, columns].values

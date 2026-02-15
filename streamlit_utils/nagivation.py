@@ -28,15 +28,15 @@ def get_pages():
     return st.navigation(streamlit_pages,position="top")
         
 
-def define_sidebar():
+def define_sidebar() -> None:
     with st.sidebar:
         st.title("Last Update 14.02.2026")
         min_date = DATA["DATE"].min().strftime("%d.%m.%Y")
         max_date = DATA["DATE"].max().strftime("%d.%m.%Y")
         time_hours = DATA["TIME_IN_MINUTES"].sum() // 60
         distance = round(DATA["DISTANCE"].sum(),2)
-        st.write(f"Last Recorded Run: {max_date}")
-        st.write(f"Total Distance: {distance} km")
-        st.write(f"Total Time: {time_hours} h")
-        st.write(f"First Recorded Run: {min_date}")
+        st.metric(label = "Last Recorded Run",value=max_date)
+        st.metric(label="Total Distance",value= f"{distance} km")
+        st.metric(label="Total Time",value= f"{time_hours} h")
+        st.metric(label = "First Recorded Run",value=min_date)
 

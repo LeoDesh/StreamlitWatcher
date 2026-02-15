@@ -55,12 +55,12 @@ def setup_number_of_bins() -> int:
     return st.number_input("Number of Bins", 5, 30, 15)
 
 
-def setup_line_plot(df: pd.DataFrame):
+def setup_line_plot(df: pd.DataFrame) -> None:
     return create_plotly_pace_chart(df, x_col="DATE", y_col="SPEED",y_text_col="AVERAGE_PACE",y_col_2="AVG_HEART_RATE")
     
 
 
-def setup_pace_histogram(df: pd.DataFrame, number_of_bins: int):
+def setup_pace_histogram(df: pd.DataFrame, number_of_bins: int) -> None:
     if df.empty:
         fig = get_empty_figure()
     else:

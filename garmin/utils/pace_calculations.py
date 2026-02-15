@@ -36,7 +36,7 @@ def verify_pace_format(pace_str: str) -> bool:
         return True
     return False
 
-def get_pace_bins_labels_for_dataframe(df:pd.DataFrame,number_of_bins:int,pace_float_column:str):
+def get_pace_bins_labels_for_dataframe(df:pd.DataFrame,number_of_bins:int,pace_float_column:str) -> tuple[list[float],list[str]]:
     bins = calculate_bins_values_dataframe(df, number_of_bins, pace_float_column)
     pace_str_bins = [transform_pace_float_to_pace(bin) for bin in bins]
     pins_set = set()

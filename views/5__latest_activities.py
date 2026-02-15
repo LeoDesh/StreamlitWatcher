@@ -4,9 +4,6 @@ from garmin.statistics.pandas_helper import filter_dataframe,get_unique_values_p
 import pandas as pd
 from typing import List,Any
 
-def get_highlights_data(df: pd.DataFrame, columns: List[str], idx: int):
-    return df.loc[idx, columns].values
-
 
 def clean_up_dict(data:dict[str,Any]) -> dict[str,Any]:
     pace = data["AVERAGE_PACE"]
@@ -34,7 +31,6 @@ def show_latest_activities(df: pd.DataFrame,rows:int=20):
                 value = row_dict.get(description,"")
                 col.metric(description, value)
 
-
 def get_filters():
     unique_values_dict = get_unique_values_per_column(FULL_DATA,["ACTIVITY_TYPE"])
     filters = {}
@@ -42,6 +38,7 @@ def get_filters():
         for key,groups in unique_values_dict.items():
             filters[key] = st.multiselect(key,options=groups,default=groups)
     return filters
+
 def main():
     st.header("Latest Activities",text_alignment="center")
     filters = get_filters()

@@ -7,7 +7,6 @@ from garmin.plots.visualization import (
 )
 from streamlit_utils.chart_helpers import place_figure
 from typing import Tuple
-from matplotlib.figure import Figure
 import pandas as pd
 import math
 
@@ -50,7 +49,7 @@ def setup_distance_range_selection(df: pd.DataFrame) -> Tuple[int, int]:
     )
     return (chosen_distance_min, chosen_distance_max)
 
-def setup_running_year_month_histogram(df: pd.DataFrame):
+def setup_running_year_month_histogram(df: pd.DataFrame) -> None:
     if df.empty:
         fig = get_empty_figure()
     else:
@@ -58,14 +57,14 @@ def setup_running_year_month_histogram(df: pd.DataFrame):
     place_figure(fig)
 
 
-def setup_running_year_histogram(df: pd.DataFrame):
+def setup_running_year_histogram(df: pd.DataFrame)-> None:
     if df.empty:
         fig = get_empty_figure()
     else:
         fig = get_df_count_from_column_histogram(df,"YEAR")
     place_figure(fig)
 
-def setup_running_month_histogram(df: pd.DataFrame):
+def setup_running_month_histogram(df: pd.DataFrame)-> None:
     if df.empty:
         fig = get_empty_figure()
     else:

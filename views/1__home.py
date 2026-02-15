@@ -1,6 +1,6 @@
 import streamlit as st
 from garmin.constants import DATA
-from garmin.statistics.pandas_helper import get_overview_table,get_grouped_table
+from garmin.statistics.pandas_helper import get_overview_table,get_grouped_table,get_highlights_data
 from garmin.utils.pace_calculations import transform_pace_float_to_pace
 from garmin.utils.misc import transform_activity_minutes_to_duration_format
 import pandas as pd
@@ -9,7 +9,7 @@ from typing import List
 
 
 
-def get_overview_page_df(df: pd.DataFrame):
+def get_overview_page_df(df: pd.DataFrame) -> pd.DataFrame:
     pace = get_overview_table(df, "PACE_FLOAT")
     distance = get_overview_table(df, "DISTANCE")
     speed = get_overview_table(df, "SPEED")
@@ -20,19 +20,14 @@ def get_overview_page_df(df: pd.DataFrame):
     final_df = final_df.round(2)
     return final_df
 
-def get_year_overview_table(df:pd.DataFrame):
+def get_year_overview_table(df:pd.DataFrame) -> pd.DataFrame:
     df = get_grouped_table(df,["YEAR"],["DISTANCE","TIME_IN_MINUTES","CALORIES"])
     df = df.rename(columns={'TIME_IN_MINUTES': 'TIME'})
     df["TIME"] = df["TIME"].apply(lambda x: transform_activity_minutes_to_duration_format(x))
     return df
 
 
-
-def get_highlights_data(df: pd.DataFrame, columns: List[str], idx: int):
-    return df.loc[idx, columns].values
-
-
-def construct_column_highlights(df: pd.DataFrame,column:str,amount:int=3):
+def construct_column_highlights(df: pd.DataFrame,column:str,amount:int=3) -> None:
     attrs_columns = ["DISTANCE","AVERAGE_PACE" ,"SPEED","CALORIES", "TIME","AVG_HEART_RATE"]
     header = f"Top {amount} Highest {column.capitalize()} Stats"
     
@@ -50,17 +45,17 @@ def construct_column_highlights(df: pd.DataFrame,column:str,amount:int=3):
 
 
 
-def construct_header():
+def construct_header()-> None:
     st.title("Overview",text_alignment="center")
 
 
-def construct_overall_statistics(df: pd.DataFrame):
+def construct_overall_statistics(df: pd.DataFrame)-> None:
     st.header("Statistics of an individual run")
     final_df = get_overview_page_df(df)
     #st.dataframe(final_df)
     st.markdown(final_df.to_html(), unsafe_allow_html=True)
 
-def construct_year_statistics(df:pd.DataFrame):
+def construct_year_statistics(df:pd.DataFrame)-> None:
     st.header("Metrics Overview per Year")
     df = get_year_overview_table(df)
     #st.dataframe(df.reset_index(drop=True))

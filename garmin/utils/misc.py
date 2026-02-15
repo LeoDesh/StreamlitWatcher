@@ -83,24 +83,24 @@ def transform_str_to_date(date_str: str) -> datetime:
     return datetime.strptime(date_str, src_format)
 
 
-def calculate_bins_values_dataframe(df: pd.DataFrame, number_of_bins: int, column: str):
+def calculate_bins_values_dataframe(df: pd.DataFrame, number_of_bins: int, column: str) -> list[float]:
     min_value, max_value = df[column].min(), df[column].max()
     return calculate_bins_from_min_max_value(min_value, max_value, number_of_bins)
 
 
 def calculate_bins_from_min_max_value(
     min_value: float | int, max_value: float | int, number_of_bins: int
-):
+) -> list[float]:
     step = (max_value - min_value) / number_of_bins
     return [min_value + step * idx for idx in range(number_of_bins + 1)]
 
 
-def split_lines_with_comma(line: str, sep: str = ","):
+def split_lines_with_comma(line: str, sep: str = ",") -> list[str]:
     line = replace_comma_in_number(line)
     return line.split(sep)
 
 
-def replace_comma_in_number(line: str):
+def replace_comma_in_number(line: str) -> str:
     pattern = r"\d+,\d{3}"
     matches = get_all_regex_matches(pattern, line)
     for match in matches:

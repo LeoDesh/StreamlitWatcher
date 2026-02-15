@@ -1,3 +1,2 @@
 ##app settings (apart from Wide Screen, Colors, Theme)
-##Add Type hints
 ##Activity Calender (horizontal bar chart)

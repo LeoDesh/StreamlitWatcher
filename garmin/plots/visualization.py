@@ -1,12 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from matplotlib import figure
+from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 from garmin.utils.pace_calculations import get_pace_bins_labels_for_dataframe,transform_speed_to_pace
 from typing import List
 
-def calculate_ticker_values(values:list[float]):
+def calculate_ticker_values(values:List[float]) -> List[float]:
     sample_number = len(values)
     y_numbers = 7
     if sample_number <= y_numbers:
@@ -15,15 +15,15 @@ def calculate_ticker_values(values:list[float]):
     max_val = max(values) + 1
     return sorted(list(set([min_val + (max_val-min_val)/y_numbers*k for k in range(y_numbers+1)])))
 
-def get_empty_figure() -> figure:
+def get_empty_figure() -> Figure:
     return plt.figure()
 
-def get_df_distributions(df: pd.DataFrame, column: str,bins:List[int]) -> figure:
+def get_df_distributions(df: pd.DataFrame, column: str,bins:List[int]) -> Figure:
     fig, ax = plt.subplots(figsize=(4,3))
     ax.hist(
         df[column],
         bins=bins,
-        edgecolor="black",
+        rwidth=0.8
     )
     ax.set_title(f"Histogram of {column}")
     ax.set_xlabel(f"{column} in km")
@@ -33,7 +33,7 @@ def get_df_distributions(df: pd.DataFrame, column: str,bins:List[int]) -> figure
     return fig
 
 
-def get_df_count_year_month_histogram(df: pd.DataFrame):
+def get_df_count_year_month_histogram(df: pd.DataFrame) -> Figure:
     counts = (
         df.groupby(["YEAR", "MONTH"])
         .size()
@@ -48,7 +48,7 @@ def get_df_count_year_month_histogram(df: pd.DataFrame):
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     return fig
 
-def get_df_count_from_column_histogram(df: pd.DataFrame,column:str):
+def get_df_count_from_column_histogram(df: pd.DataFrame,column:str) -> Figure:
     counts = (
         df.groupby([column])
         .size()
@@ -65,10 +65,10 @@ def get_df_count_from_column_histogram(df: pd.DataFrame,column:str):
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     return fig
 
-def get_df_sum_from_column(df:pd.DataFrame,groupby_column:str,value_column:str):
+def get_df_sum_from_column(df:pd.DataFrame,groupby_column:str,value_column:str) -> pd.DataFrame:
     return df.groupby(groupby_column)[[value_column]].sum() 
 
-def get_df_bar_chart(df:pd.DataFrame,groupby_column:str,value_column:str):
+def get_df_bar_chart(df:pd.DataFrame,groupby_column:str,value_column:str) -> Figure:
     df = get_df_sum_from_column(df,groupby_column,value_column)
     df = df.reset_index()
     fig, ax = plt.subplots(figsize=(4,3))
@@ -85,7 +85,7 @@ def get_df_bar_chart(df:pd.DataFrame,groupby_column:str,value_column:str):
 
 def get_df_pace_histogram(
     df: pd.DataFrame, pace_float_column: str, number_of_bins: int
-) -> figure:
+) -> Figure:
     fig, ax = plt.subplots(figsize=(4,3))
     bins,labels = get_pace_bins_labels_for_dataframe(df,number_of_bins,pace_float_column)
     df = df.copy()
