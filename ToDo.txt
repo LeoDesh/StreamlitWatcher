@@ -1,2 +1,2 @@
 ##app settings (apart from Wide Screen, Colors, Theme)
-##Activity Calender (horizontal bar chart)
+##Add Emojis to Names (tabs)

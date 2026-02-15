@@ -4,7 +4,6 @@ from garmin.statistics.pandas_helper import get_overview_table,get_grouped_table
 from garmin.utils.pace_calculations import transform_pace_float_to_pace
 from garmin.utils.misc import transform_activity_minutes_to_duration_format
 import pandas as pd
-from typing import List
 
 
 
@@ -37,11 +36,12 @@ def construct_column_highlights(df: pd.DataFrame,column:str,amount:int=3) -> Non
         for idx in range(amount):
             date = df.loc[idx,"DATE"].date()
             date_str = f"{date.strftime('%d.%m.%Y')}"
-            st.header(f"{date_str}")
-            cols = st.columns(len(attrs_columns))
-            data = get_highlights_data(df, attrs_columns, idx)
-            for col, value, description in zip(cols, data, attrs_columns):
-                col.metric(description, value)
+            with st.container(border=True):
+                st.header(f"{date_str}")
+                cols = st.columns(len(attrs_columns))
+                data = get_highlights_data(df, attrs_columns, idx)
+                for col, value, description in zip(cols, data, attrs_columns):
+                    col.metric(description, value)
 
 
 

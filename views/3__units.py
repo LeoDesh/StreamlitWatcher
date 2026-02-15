@@ -11,8 +11,6 @@ import pandas as pd
 import math
 
 
-
-
 def setup_date_range_selection(df: pd.DataFrame) -> Tuple[int, int]:
     min_year: int = df["YEAR"].min()
     max_year: int = df["YEAR"].max()
@@ -49,6 +47,7 @@ def setup_distance_range_selection(df: pd.DataFrame) -> Tuple[int, int]:
     )
     return (chosen_distance_min, chosen_distance_max)
 
+
 def setup_running_year_month_histogram(df: pd.DataFrame) -> None:
     if df.empty:
         fig = get_empty_figure()
@@ -57,34 +56,40 @@ def setup_running_year_month_histogram(df: pd.DataFrame) -> None:
     place_figure(fig)
 
 
-def setup_running_year_histogram(df: pd.DataFrame)-> None:
+def setup_running_year_histogram(df: pd.DataFrame) -> None:
     if df.empty:
         fig = get_empty_figure()
     else:
-        fig = get_df_count_from_column_histogram(df,"YEAR")
+        fig = get_df_count_from_column_histogram(df, "YEAR")
     place_figure(fig)
 
-def setup_running_month_histogram(df: pd.DataFrame)-> None:
+
+def setup_running_month_histogram(df: pd.DataFrame) -> None:
     if df.empty:
         fig = get_empty_figure()
     else:
-        fig = get_df_count_from_column_histogram(df,"MONTH")
+        fig = get_df_count_from_column_histogram(df, "MONTH")
     place_figure(fig)
 
 
 def main():
     df = DATA
-    st.title("Units Overview",text_alignment="center")
+    st.title("Units Overview", text_alignment="center")
     start_year, end_year = setup_date_range_selection(df)
     df = df[(df["YEAR"] >= start_year) & (df["YEAR"] <= end_year)]
-    per_year_plot,per_month_plot,per_year_month_plot = st.tabs(["Per Year","Per Month"," Per Year Month"])
+    per_year_plot, per_month_plot, per_year_month_plot = st.tabs(
+        [
+            ":material/calendar_today: Per Year",
+            ":material/calendar_month: Per Month",
+            ":material/calendar_view_week: Per Year & Month",
+        ]
+    )
     with per_year_plot:
         setup_running_year_histogram(df)
     with per_month_plot:
         setup_running_month_histogram(df)
     with per_year_month_plot:
         setup_running_year_month_histogram(df)
-    
 
 
 if __name__ == "__main__":

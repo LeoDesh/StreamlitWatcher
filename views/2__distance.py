@@ -28,7 +28,7 @@ def setup_histogram(df:pd.DataFrame):
 def main():
     construct_header()
     df = DATA
-    histogram_km,barchart_km_year,barchart_km_month = st.tabs(["Histogram by 'km'","'km' per Year","'km' per Month"])
+    histogram_km,barchart_km_year,barchart_km_month = st.tabs([":material/bar_chart: Histogram by 'km'",":material/overview: 'km' per Year",":material/analytics: 'km' per Month"])
     with histogram_km:
         fig = setup_histogram(df)
         place_figure(fig)

@@ -90,7 +90,7 @@ def main():
         & (df["DISTANCE"] <= max_distance)
         & (df["DISTANCE"] >= min_distance)
     ]
-    line_plot_tab,histogram_tab = st.tabs(["Speed Chart","Histogram Chart"])
+    line_plot_tab,histogram_tab = st.tabs([":material/multiline_chart: Speed Chart",":material/bar_chart: Histogram Chart"])
     with line_plot_tab:
         fig = setup_line_plot(df)
         place_figure(fig)
