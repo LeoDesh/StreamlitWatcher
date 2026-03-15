@@ -3,12 +3,11 @@ from typing import List, Any
 
 
 def get_overview_table(df: pd.DataFrame, column: str) -> pd.DataFrame:
-    df = df[column].agg(["mean", "median", "min", "max"]).T
+    df = df[column].agg(["mean", "median", "max"]).T
     df.index = df.index.map(
         {
             "mean": "Average",
             "median": "Median",
-            "min": "Min",
             "max": "Max",
         }
     )
@@ -63,5 +62,5 @@ def get_pivot_dataframe(
         columns=agg_columns,
         values=value_column,
         aggfunc=agg_func,
-        fill_value=0
+        fill_value=0,
     )
