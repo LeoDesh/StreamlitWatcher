@@ -34,7 +34,7 @@ def setup_pace_range_selection() -> Tuple[int, int]:
         "Select pace range (min/km):",
         min_value=pace_min,
         max_value=pace_max,
-        value=(pace_min, pace_max),
+        value=(pace_min, 8),
     )
     return (chosen_pace_min, chosen_pace_max)
 

@@ -9,7 +9,6 @@ from garmin.statistics.pandas_helper import (
 from garmin.plots.visualization import create_gantt_chart, create_heat_map
 from streamlit_utils.chart_helpers import place_figure
 import pandas as pd
-from datetime import date
 from typing import Any
 
 

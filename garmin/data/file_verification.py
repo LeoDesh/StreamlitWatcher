@@ -1,5 +1,5 @@
 from pathlib import Path
-from garmin.utils.misc import split_lines_with_comma
+#from garmin.utils.misc import split_lines_with_comma
 
 def validate_file_type(file: Path) -> bool:
     if not file.is_file():
@@ -18,7 +18,7 @@ def validate_structure_of_csv_file(file: Path) -> bool:
 
 
 def analyze_lines(lines: list[str], sep=",") -> bool:
-    line_sizes = [len(split_lines_with_comma(line,sep)) for line in lines]
+    line_sizes = [len(list(line.split(sep))) for line in lines]
     return all(x == line_sizes[0] for x in line_sizes)
 
 

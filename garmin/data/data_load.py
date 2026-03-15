@@ -42,7 +42,6 @@ def transform_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     df["MONTH"] = df["DATE"].apply(lambda x: x.month)
     df["YEAR"] = df["DATE"].apply(lambda x: x.year)
     df["STEPS"] = df["STEPS"].apply(lambda x: parse_str_int(x))
-    df["CALORIES"] = df["CALORIES"].apply(lambda x: parse_str_int(x))
     df["SPEED"] = df["AVERAGE_PACE"].apply(lambda x:transform_pace_to_speed(x))
     df["PACE_FLOAT"] = df["AVERAGE_PACE"].apply(lambda x:round(transform_pace_to_pace_float(x),2))
     df["TIME_IN_MINUTES"] = df["TIME"].apply(lambda x:parse_activity_duration_to_minutes(x))

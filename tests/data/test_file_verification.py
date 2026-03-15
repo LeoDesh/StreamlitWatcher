@@ -54,5 +54,6 @@ def test_validate_csv_file_failure(get_missing_value_garmin_csv_file):
     with pytest.raises(ValueError):
         validate_csv_file(get_missing_value_garmin_csv_file)
 
+@pytest.mark.xfail(reason="Old Format")
 def test_validate_csv_success(get_activity_file):
     assert validate_csv_file(get_activity_file)

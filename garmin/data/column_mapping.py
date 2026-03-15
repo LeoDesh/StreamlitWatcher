@@ -6,7 +6,6 @@ from typing import Dict
 class Activity(StrEnum):
     ACTIVITY_TYPE = auto()
     DATE = auto()
-    FAVOURITE = auto()
     TITLE = auto()
     DISTANCE = auto()
     CALORIES = auto()
@@ -21,7 +20,6 @@ class Activity(StrEnum):
 TRANSLATION_DICT: Dict[Activity, str] = {
     Activity.ACTIVITY_TYPE: "Aktivitätstyp",
     Activity.DATE: "Datum",
-    Activity.FAVOURITE:"Favorit",
     Activity.TITLE: "Titel",
     Activity.DISTANCE: "Distanz",
     Activity.CALORIES: "Kalorien",
@@ -36,7 +34,6 @@ TRANSLATION_DICT: Dict[Activity, str] = {
 GARMIN_COLUMNS = {
     "Aktivitätstyp": Activity.ACTIVITY_TYPE,
     "Datum": Activity.DATE,
-    "Favorit":Activity.FAVOURITE,
     "Titel": Activity.TITLE,
     "Distanz": Activity.DISTANCE,
     "Kalorien": Activity.CALORIES,

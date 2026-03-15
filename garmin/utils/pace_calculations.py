@@ -3,7 +3,7 @@ import pandas as pd
 import math
 
 def transform_speed_to_pace(speed:float) -> str:
-    pace_float = float(60) / speed
+    pace_float = float(60) / speed if speed > 0 else 0
     return transform_pace_float_to_pace(pace_float)
 
 def transform_pace_to_speed(pace_str: str) -> float:
@@ -51,3 +51,11 @@ def get_pace_bins_labels_for_dataframe(df:pd.DataFrame,number_of_bins:int,pace_f
         for idx in range(len(calc_bins)-1)
     ]
     return (calc_bins,labels)
+
+def transform_seconds_to_hour_minutes_seconds_format(seconds:int):
+    hours = int(seconds // 3600)
+    seconds -= hours*3600
+    minutes =  int(seconds // 60)
+    seconds -= minutes*60
+    seconds =  int(round(seconds,0))
+    return f"{hours:02}:{minutes:02}:{seconds:02}"

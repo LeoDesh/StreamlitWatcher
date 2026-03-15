@@ -28,9 +28,9 @@ def get_pages():
     return st.navigation(streamlit_pages,position="top")
         
 
-def define_sidebar() -> None:
+def define_sidebar(update_date_str:str) -> None:
     with st.sidebar:
-        st.title("Last Update 14.02.2026")
+        st.title(f"Last Update {update_date_str}")
         min_date = DATA["DATE"].min().strftime("%d.%m.%Y")
         max_date = DATA["DATE"].max().strftime("%d.%m.%Y")
         time_hours = DATA["TIME_IN_MINUTES"].sum() // 60
