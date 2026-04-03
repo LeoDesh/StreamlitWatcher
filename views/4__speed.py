@@ -72,15 +72,13 @@ def main():
     df = DATA
     st.title("Speed Overview")
     with st.expander("Filters"):
-        date_range_col,pace_col,distance_col,bins_col = st.columns(4)
+        date_range_col,pace_col,distance_col = st.columns(3)
         with date_range_col:
             start_date, end_date = setup_date_range_selection(df)
         with pace_col:
             min_pace, max_pace = setup_pace_range_selection()
         with distance_col:
             min_distance, max_distance = setup_distance_range_selection(df)
-        with bins_col:
-            number_of_bins = setup_number_of_bins()
 
     df = df[
         (df["DATE"] >= pd.Timestamp(start_date))
@@ -95,7 +93,7 @@ def main():
         fig = setup_line_plot(df)
         place_figure(fig)
     with histogram_tab:
-        fig= setup_pace_histogram(df, number_of_bins)
+        fig= setup_pace_histogram(df, 15)
         place_figure(fig)
 
 if __name__ == "__main__":

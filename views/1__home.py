@@ -8,7 +8,7 @@ from garmin.statistics.pandas_helper import (
 from garmin.utils.pace_calculations import (
     transform_speed_to_pace,
 )
-from garmin.utils.misc import transform_activity_minutes_to_duration_format
+from garmin.utils.misc import transform_activity_minutes_to_duration_format, prettify
 import pandas as pd
 
 
@@ -21,17 +21,28 @@ def get_overview_page_df(df: pd.DataFrame) -> pd.DataFrame:
     )
     time["TIME"] = time["TIME"].apply(transform_activity_minutes_to_duration_format)
     pace = speed["SPEED"].apply(transform_speed_to_pace).to_frame(name="PACE")
-    final_df = pd.concat([pace, distance, speed, calories,time], axis=1)
+    final_df = pd.concat([pace, distance, speed, calories, time], axis=1)
     final_df = final_df.round(2)
     return final_df
 
 
 def get_year_overview_table(df: pd.DataFrame) -> pd.DataFrame:
-    df = get_grouped_table(df, ["YEAR"], ["DISTANCE", "TIME_IN_MINUTES", "CALORIES"])
-    df = df.rename(columns={"TIME_IN_MINUTES": "TIME"})
+    df = get_grouped_table(
+        df, ["YEAR"], ["DISTANCE", "TIME_IN_MINUTES", "CALORIES", "AVG_HEART_RATE"]
+    )
+    df["AVG._KM"] = df.apply(
+        lambda row: round(row["DISTANCE"] / row["Count"], 1), axis=1
+    )
+    df["AVG_HEART_RATE"] = df.apply(
+        lambda row: round(row["AVG_HEART_RATE"] / row["Count"], 0), axis=1
+    )
+    df = df.rename(
+        columns={"TIME_IN_MINUTES": "TIME", "AVG_HEART_RATE": "AVG._HEART_RATE"}
+    )
     df["TIME"] = df["TIME"].apply(
         lambda x: transform_activity_minutes_to_duration_format(x)
     )
+    df.columns = [prettify(col) for col in df.columns]
     return df
 
 
@@ -65,10 +76,12 @@ def construct_header() -> None:
 
 
 def construct_overall_statistics(df: pd.DataFrame) -> None:
-    st.header("Statistics of an individual run")
-    final_df = get_overview_page_df(df)
-    # st.dataframe(final_df)
-    st.markdown(final_df.to_html(), unsafe_allow_html=True)
+    st.header("Statistics of a run")
+    final_df:pd.DataFrame = get_overview_page_df(df)
+    final_df = final_df.T
+    final_df.index.name = "Category"
+    final_df = final_df.reset_index()
+    st.markdown(final_df.to_html(index=False), unsafe_allow_html=True)
 
 
 def construct_year_statistics(df: pd.DataFrame) -> None:
@@ -84,7 +97,7 @@ def main():
     construct_column_highlights(df, "DISTANCE")
     construct_column_highlights(df, "SPEED")
     with st.container():
-        col_1, col_2 = st.columns(2)
+        col_1, col_2 = st.columns([3, 2])
         with col_1:
             construct_year_statistics(df)
         with col_2:

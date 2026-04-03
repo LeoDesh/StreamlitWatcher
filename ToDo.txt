@@ -1,2 +1,1 @@
 ##app settings (apart from Wide Screen, Colors, Theme)
-##Add Emojis to Names (tabs)

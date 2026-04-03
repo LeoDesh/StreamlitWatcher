@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px
+from itertools import pairwise
+from plotly.subplots import make_subplots
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 from garmin.utils.pace_calculations import (
@@ -98,21 +100,71 @@ def get_df_bar_chart(
 def get_df_pace_histogram(
     df: pd.DataFrame, pace_float_column: str, number_of_bins: int
 ) -> Figure:
-    fig, ax = plt.subplots(figsize=(4, 3))
     bins, labels = get_pace_bins_labels_for_dataframe(
         df, number_of_bins, pace_float_column
     )
     df = df.copy()
     df.loc[:, "binned"] = pd.cut(df[pace_float_column], bins=bins, labels=labels)
-    counts = df["binned"].value_counts().sort_index()
-    counts.plot(kind="bar", ax=ax)
-    ax.set_xlabel("Pace Ranges (min/km)")
-    ax.set_ylabel("Count")
-    ax.set_title("Histogram of Paces")
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
-    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    fig = go.Figure()
+    counts = df["binned"].value_counts().sort_index().reset_index()
+    counts.columns = ["Timeframe", "Amount"]
+    fig.add_bar(
+        x=counts["Timeframe"], y=counts["Amount"], name="Runs distributed by pace"
+    )
+    fig.update_layout(
+        xaxis_title="(min/km)",
+        yaxis_title="Amount",
+        title={"text": "Pace Distribution", "font": {"size": 20}},
+    )
+    fig.update_xaxes(tickangle=45)
+
     return fig
 
+def get_df_km_histogram(
+    df: pd.DataFrame, trg_col: str, bins:list[int]
+) -> Figure:
+    labels = [f"{current_km}-{next_km} km" for current_km,next_km in pairwise(bins)]
+    df = df.copy()
+    df.loc[:, "binned"] = pd.cut(df[trg_col], bins=bins,labels=labels)
+    fig = go.Figure()
+    counts = df["binned"].value_counts().sort_index().reset_index()
+
+    counts.columns = [trg_col, "Amount"]
+    fig.add_bar(
+        x=counts[trg_col], y=counts["Amount"], name="Runs distributed by km"
+    )
+    fig.update_layout(
+        xaxis_title="km",
+        yaxis_title="Amount",
+        title={"text": "km Distribution", "font": {"size": 20}},
+    )
+    fig.update_xaxes(tickangle=45)
+    return fig
+
+def create_bar_chart(df,x_col:str,y_col:str,month:bool) -> Figure:
+    fig = go.Figure()
+    fig.add_bar(
+        x=df[x_col], y=df[y_col],
+    )
+    fig.update_layout(
+        xaxis_title=x_col,
+        yaxis_title="Amount",
+        title={"text": f"km run per {x_col}", "font": {"size": 20}},
+    )
+    if month:
+        fig.update_xaxes(
+            tickmode = 'array',
+            tickvals = list(range(1, 13)), 
+            ticktext = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 
+                        'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'], 
+            tickangle = 45 
+        )
+    else: 
+        fig.update_xaxes(
+            tickmode = 'array',
+            tickangle = 45 
+        )
+    return fig
 
 def create_plotly_line_chart(df: pd.DataFrame, x_col: str, y_col: str) -> go.Figure:
     fig = go.Figure()
@@ -150,7 +202,7 @@ def create_plotly_pace_chart(
     values = df[y_col].tolist()
     tickvals = calculate_ticker_values(values)
     ticktext = [transform_speed_to_pace(speed) for speed in tickvals]
-    fig = go.Figure()
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
         go.Scatter(
             x=df[x_col],
@@ -158,27 +210,31 @@ def create_plotly_pace_chart(
             mode="lines+markers",
             # mode="lines",
             name=y_col,
+            connectgaps=False,
             line=dict(width=2.5, color="blue"),
             customdata=df[y_text_col],
             hovertemplate="Speed: %{y} km/h<br>" + "Pace: %{customdata}<extra></extra>",
             yaxis="y1",
-        )
+        ),
+        secondary_y=False,
     )
     fig.add_trace(
         go.Scatter(
             x=df[x_col],
             y=df[y_col_2],
             mode="lines+markers",
-            opacity=0.5,
+            opacity=0.25,
             name=y_col_2,
+            connectgaps=False,
             line=dict(width=2.5, color="red"),
             hovertemplate="HPM: %{y}",
             yaxis="y2",
-        )
+        ),
+        secondary_y=True,
     )
 
     fig.update_layout(
-        title={"text": y_col, "font": {"size": 30}},
+        title={"text": "Pace and Heartbeat Per Minute", "font": {"size": 20}},
         xaxis_title="Date",
         yaxis1=dict(
             title="Pace min/km",
@@ -201,10 +257,10 @@ def create_plotly_pace_chart(
             bgcolor="rgba(240,240,240,0.6)",
             bordercolor="lightgray",
             borderwidth=1,
-            x=0,
-            y=1,
+            x=0.5,
+            y=1.2,
         ),
-        margin=dict(l=40, r=20, t=60, b=40),
+        margin=dict(l=10, r=20, t=60, b=10),
     )
     return fig
 
@@ -219,25 +275,30 @@ def create_gantt_chart(
         y=category_col,
         color=category_col,
     )
-    fig.update_layout(height=400, bargap=0.2,yaxis_title=None)
+    fig.update_layout(height=400, bargap=0.2, yaxis_title=None)
     return fig
 
 
-def create_heat_map(df: pd.DataFrame,title:str) -> go.Figure:
-    #df.columns = pd.to_datetime(df.columns, format="%Y.%m")
+def create_heat_map(df: pd.DataFrame, title: str) -> go.Figure:
+    # df.columns = pd.to_datetime(df.columns, format="%Y.%m")
     fig = px.imshow(
         df,
         color_continuous_scale="Viridis",  # modern blue gradient
         text_auto=True,  # show values inside cells
-        aspect="auto"
+        aspect="auto",
     )
 
     fig.update_layout(
-        
-        title=f"Heatmap {title}",xaxis_title="Month",yaxis_title="Year", template="plotly_white",width=1200
+        title=f"Heatmap {title}",
+        xaxis_title="Month",
+        yaxis_title="Year",
+        template="plotly_white",
+        width=1200,
     )
-    fig.update_xaxes(tickangle=45,  tickformat="%Y.%m", # Zeigt nur Monat und Jahr
-    dtick="M1"
-    #categoryarray=df.columns
+    fig.update_xaxes(
+        tickangle=45,
+        tickformat="%Y.%m",  # Zeigt nur Monat und Jahr
+        dtick="M1",
+        # categoryarray=df.columns
     )
     return fig

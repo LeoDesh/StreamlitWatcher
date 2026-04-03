@@ -41,8 +41,12 @@ def filter_garmin_df(df: pd.DataFrame):
     df = df.reset_index()
     return df
 
+def transform_activity(activity:str,title:str):
+    return "Fußball" if activity == "Cardio" and "FB" in title else activity
+        
 
 def transform_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    df["ACTIVITY_TYPE"] = df.apply(lambda row: transform_activity(row["ACTIVITY_TYPE"],row["TITLE"]) ,axis=1)
     df["DATE"] = df["DATE"].apply(transform_str_to_date)
     df["HOUR"] = df["DATE"].apply(lambda x: x.hour)
     df["MONTH"] = df["DATE"].apply(lambda x: x.month)
