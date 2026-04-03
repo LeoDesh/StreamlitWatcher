@@ -5,7 +5,7 @@ from garmin.plots.visualization import (
     create_bar_chart,
     create_heat_map,
 )
-from matplotlib.figure import Figure
+from plotly.graph_objects import Figure
 from streamlit_utils.chart_helpers import place_figure
 import pandas as pd
 import math

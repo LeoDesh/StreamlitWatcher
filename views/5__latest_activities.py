@@ -111,7 +111,11 @@ def main():
     st.header("Latest Activities", text_alignment="center")
     df = FULL_DATA.copy()
     activity_tab, gantt_chart_tab, heat_tab = st.tabs(
-        [":material/table_view: Activity", ":material/view_timeline: Gantt Chart", ":material/apps: Heat Map"]
+        [
+            ":material/table_view: Activity Overview",
+            ":material/view_timeline: Activity Breakdown",
+            ":material/apps: Activity Frequency",
+        ]
     )
     with activity_tab:
         filters = get_activity_filters()
