@@ -8,13 +8,12 @@ from garmin.utils.pace_calculations import (
     get_pace_bins_labels_for_dataframe,
     transform_speed_to_pace,
 )
-from typing import List
+from typing import List, Callable
 
 
-def calculate_ticker_values(values: List[float]) -> List[float]:
+def calculate_ticker_values(values: List[float], max_numb: int = 7) -> List[float]:
     sample_number = len(values)
-    y_numbers = 7
-    if sample_number <= y_numbers:
+    if sample_number <= max_numb:
         return values
     min_val = min(values) - 1
     max_val = max(values) + 1
@@ -22,13 +21,12 @@ def calculate_ticker_values(values: List[float]) -> List[float]:
         list(
             set(
                 [
-                    min_val + (max_val - min_val) / y_numbers * k
-                    for k in range(y_numbers + 1)
+                    (min_val + (max_val - min_val) / max_numb * k)
+                    for k in range(max_numb + 1)
                 ]
             )
         )
     )
-
 
 
 def get_df_sum_from_column(
@@ -37,17 +35,52 @@ def get_df_sum_from_column(
     return df.groupby(groupby_column)[[value_column]].sum()
 
 
+def bin_label_heartbeat(df: pd.DataFrame, number_of_bins: int, trg_column: str):
+    values = df[trg_column].tolist()
+    bin_values = [
+        int(value) for value in calculate_ticker_values(values, number_of_bins)
+    ]
+    labels = [
+        f"{current_value}-{next_value}"
+        for current_value, next_value in pairwise(bin_values)
+    ]
+    return (bin_values, labels)
+
+
+def categorize_df_column(
+    df: pd.DataFrame,
+    trg_column: str,
+    number_of_bins: int,
+    bins_labels_func: Callable[[pd.DataFrame, int, str], tuple[list, list]],
+):
+    bins, labels = bins_labels_func(df, number_of_bins, trg_column)
+    df = df.copy()
+    df.loc[:, f"new_{trg_column}"] = pd.cut(df[trg_column], bins=bins, labels=labels)
+    df[trg_column] = df[f"new_{trg_column}"]
+    return df
+
+
+def create_df_pivot_hpm_pace(df):
+    df = categorize_df_column(df, "PACE_FLOAT", 8, get_pace_bins_labels_for_dataframe)
+    df = categorize_df_column(df, "AVG_HEART_RATE", 8, bin_label_heartbeat)
+    df = df.pivot_table(
+        index="AVG_HEART_RATE",
+        columns="PACE_FLOAT",
+        values="DISTANCE",
+        aggfunc="count",
+        observed=False,
+    )
+    return ((df / df.sum(axis=0)) * 100).round(2)
+
 
 def get_df_pace_histogram(
     df: pd.DataFrame, pace_float_column: str, number_of_bins: int
 ) -> Figure:
-    bins, labels = get_pace_bins_labels_for_dataframe(
-        df, number_of_bins, pace_float_column
-    )
-    df = df.copy()
-    df.loc[:, "binned"] = pd.cut(df[pace_float_column], bins=bins, labels=labels)
     fig = Figure()
-    counts = df["binned"].value_counts().sort_index().reset_index()
+    df = categorize_df_column(
+        df, pace_float_column, number_of_bins, get_pace_bins_labels_for_dataframe
+    )
+    counts = df[pace_float_column].value_counts().sort_index().reset_index()
     counts.columns = ["Timeframe", "Amount"]
     fig.add_bar(
         x=counts["Timeframe"], y=counts["Amount"], name="Runs distributed by pace"
@@ -61,19 +94,16 @@ def get_df_pace_histogram(
 
     return fig
 
-def get_df_km_histogram(
-    df: pd.DataFrame, trg_col: str, bins:list[int]
-) -> Figure:
-    labels = [f"{current_km}-{next_km} km" for current_km,next_km in pairwise(bins)]
+
+def get_df_km_histogram(df: pd.DataFrame, trg_col: str, bins: list[int]) -> Figure:
+    labels = [f"{current_km}-{next_km} km" for current_km, next_km in pairwise(bins)]
     df = df.copy()
-    df.loc[:, "binned"] = pd.cut(df[trg_col], bins=bins,labels=labels)
+    df.loc[:, "binned"] = pd.cut(df[trg_col], bins=bins, labels=labels)
     fig = Figure()
     counts = df["binned"].value_counts().sort_index().reset_index()
 
     counts.columns = [trg_col, "Amount"]
-    fig.add_bar(
-        x=counts[trg_col], y=counts["Amount"], name="Runs distributed by km"
-    )
+    fig.add_bar(x=counts[trg_col], y=counts["Amount"], name="Runs distributed by km")
     fig.update_layout(
         xaxis_title="km",
         yaxis_title="Amount",
@@ -82,13 +112,16 @@ def get_df_km_histogram(
     fig.update_xaxes(tickangle=45)
     return fig
 
+
 def get_empty_figure() -> Figure:
     return Figure()
 
-def create_bar_chart(df,x_col:str,y_col:str,month:bool) -> Figure:
+
+def create_bar_chart(df, x_col: str, y_col: str, month: bool) -> Figure:
     fig = Figure()
     fig.add_bar(
-        x=df[x_col], y=df[y_col],
+        x=df[x_col],
+        y=df[y_col],
     )
     fig.update_layout(
         xaxis_title=x_col,
@@ -97,18 +130,28 @@ def create_bar_chart(df,x_col:str,y_col:str,month:bool) -> Figure:
     )
     if month:
         fig.update_xaxes(
-            tickmode = 'array',
-            tickvals = list(range(1, 13)), 
-            ticktext = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 
-                        'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'], 
-            tickangle = 45 
+            tickmode="array",
+            tickvals=list(range(1, 13)),
+            ticktext=[
+                "Jan",
+                "Feb",
+                "Mär",
+                "Apr",
+                "Mai",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Okt",
+                "Nov",
+                "Dez",
+            ],
+            tickangle=45,
         )
-    else: 
-        fig.update_xaxes(
-            tickmode = 'array',
-            tickangle = 45 
-        )
+    else:
+        fig.update_xaxes(tickmode="array", tickangle=45)
     return fig
+
 
 def create_plotly_line_chart(df: pd.DataFrame, x_col: str, y_col: str) -> Figure:
     fig = Figure()

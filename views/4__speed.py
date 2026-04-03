@@ -3,14 +3,15 @@ from garmin.constants import DATA
 from garmin.plots.visualization import (
     get_df_pace_histogram,
     get_empty_figure,
-    create_plotly_pace_chart
+    create_plotly_pace_chart,
+    create_df_pivot_hpm_pace,
+    create_heat_map,
 )
 from streamlit_utils.chart_helpers import place_figure
 from typing import Tuple
 import pandas as pd
 from datetime import date, timedelta
 import math
-
 
 
 def setup_date_range_selection(df: pd.DataFrame) -> Tuple[date, date]:
@@ -56,8 +57,13 @@ def setup_number_of_bins() -> int:
 
 
 def setup_line_plot(df: pd.DataFrame) -> None:
-    return create_plotly_pace_chart(df, x_col="DATE", y_col="SPEED",y_text_col="AVERAGE_PACE",y_col_2="AVG_HEART_RATE")
-    
+    return create_plotly_pace_chart(
+        df,
+        x_col="DATE",
+        y_col="SPEED",
+        y_text_col="AVERAGE_PACE",
+        y_col_2="AVG_HEART_RATE",
+    )
 
 
 def setup_pace_histogram(df: pd.DataFrame, number_of_bins: int) -> None:
@@ -72,7 +78,7 @@ def main():
     df = DATA
     st.title("Speed Overview")
     with st.expander("Filters"):
-        date_range_col,pace_col,distance_col = st.columns(3)
+        date_range_col, pace_col, distance_col = st.columns(3)
         with date_range_col:
             start_date, end_date = setup_date_range_selection(df)
         with pace_col:
@@ -88,13 +94,24 @@ def main():
         & (df["DISTANCE"] <= max_distance)
         & (df["DISTANCE"] >= min_distance)
     ]
-    line_plot_tab,histogram_tab = st.tabs([":material/multiline_chart: Speed Chart",":material/bar_chart: Histogram Chart"])
+    line_plot_tab, histogram_tab, pace_hpm_tab = st.tabs(
+        [
+            ":material/multiline_chart: Speed Chart",
+            ":material/bar_chart: Histogram Chart",
+            ":material/analytics: Pace and HPM",
+        ]
+    )
     with line_plot_tab:
         fig = setup_line_plot(df)
         place_figure(fig)
     with histogram_tab:
-        fig= setup_pace_histogram(df, 15)
+        fig = setup_pace_histogram(df, 15)
         place_figure(fig)
+    with pace_hpm_tab:
+        pivot_df = create_df_pivot_hpm_pace(df)
+        fig = create_heat_map(pivot_df, "Title")
+        place_figure(fig)
+
 
 if __name__ == "__main__":
     main()
