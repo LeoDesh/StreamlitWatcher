@@ -1,10 +1,10 @@
 import streamlit as st
 from garmin.constants import DATA
+from garmin.utils.pace_calculations import create_df_pivot_hpm_pace
 from garmin.plots.visualization import (
     get_df_pace_histogram,
     get_empty_figure,
     create_plotly_pace_chart,
-    create_df_pivot_hpm_pace,
     create_heat_map,
 )
 from streamlit_utils.chart_helpers import place_figure
@@ -76,7 +76,7 @@ def setup_pace_histogram(df: pd.DataFrame, number_of_bins: int) -> None:
 
 def main():
     df = DATA
-    st.title("Speed Overview")
+    st.title("Pace Overview")
     with st.expander("Filters"):
         date_range_col, pace_col, distance_col = st.columns(3)
         with date_range_col:
@@ -94,11 +94,11 @@ def main():
         & (df["DISTANCE"] <= max_distance)
         & (df["DISTANCE"] >= min_distance)
     ]
-    line_plot_tab, histogram_tab, pace_hpm_tab = st.tabs(
+    histogram_tab, line_plot_tab, pace_hpm_tab = st.tabs(
         [
-            ":material/multiline_chart: Speed Chart",
-            ":material/bar_chart: Histogram Chart",
-            ":material/analytics: Pace and HPM",
+            ":material/bar_chart: Pace Histogram",
+            ":material/multiline_chart: Pace and HPM Comparison",
+            ":material/analytics: Pace and HPM Correlation",
         ]
     )
     with line_plot_tab:
@@ -109,7 +109,7 @@ def main():
         place_figure(fig)
     with pace_hpm_tab:
         pivot_df = create_df_pivot_hpm_pace(df)
-        fig = create_heat_map(pivot_df, "Title")
+        fig = create_heat_map(pivot_df, "Pace & HPM Correlation")
         place_figure(fig)
 
 

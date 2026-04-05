@@ -2,6 +2,8 @@ from datetime import datetime
 import re
 import pandas as pd
 import math
+from itertools import pairwise
+from typing import Callable
 
 
 def parse_str_int(value: str | int) -> int:
@@ -30,6 +32,55 @@ def search_with_regex(regex_pattern: str, target_str, idx: int = 0) -> str:
     return ""
 
 
+def get_df_sum_from_column(
+    df: pd.DataFrame, groupby_column: str, value_column: str
+) -> pd.DataFrame:
+    return df.groupby(groupby_column)[[value_column]].sum()
+
+
+def calculate_ticker_values(values: list[float], max_numb: int = 7) -> list[float]:
+    sample_number = len(values)
+    if sample_number <= max_numb:
+        return values
+    min_val = min(values) - 1
+    max_val = max(values) + 1
+    return sorted(
+        list(
+            set(
+                [
+                    (min_val + (max_val - min_val) / max_numb * k)
+                    for k in range(max_numb + 1)
+                ]
+            )
+        )
+    )
+
+
+def bin_label_heartbeat(df: pd.DataFrame, number_of_bins: int, trg_column: str):
+    values = df[trg_column].tolist()
+    bin_values = [
+        int(value) for value in calculate_ticker_values(values, number_of_bins)
+    ]
+    labels = [
+        f"{current_value}-{next_value}"
+        for current_value, next_value in pairwise(bin_values)
+    ]
+    return (bin_values, labels)
+
+
+def categorize_df_column(
+    df: pd.DataFrame,
+    trg_column: str,
+    number_of_bins: int,
+    bins_labels_func: Callable[[pd.DataFrame, int, str], tuple[list, list]],
+):
+    bins, labels = bins_labels_func(df, number_of_bins, trg_column)
+    df = df.copy()
+    df.loc[:, f"new_{trg_column}"] = pd.cut(df[trg_column], bins=bins, labels=labels)
+    df[trg_column] = df[f"new_{trg_column}"]
+    return df
+
+
 def verify_activity_duration(duration_str: str) -> bool:
     regex_pattern = r"\d{2}:[0-5]\d:[0-5]\d(\.\d+)?"
     if get_all_regex_matches(regex_pattern, duration_str):
@@ -37,8 +88,10 @@ def verify_activity_duration(duration_str: str) -> bool:
     return False
     # 00:02:56.8
 
-def prettify(text:str) -> str:
+
+def prettify(text: str) -> str:
     return " ".join(part.capitalize() for part in text.split("_"))
+
 
 def parse_activity_duration_to_minutes(duration_str: str) -> float:
     if not verify_activity_duration(duration_str):
@@ -79,13 +132,15 @@ def transform_activity_minutes_to_duration_format(duration_in_minutes: float) ->
 
 
 def transform_str_to_date(date_str: str) -> datetime:
-    if isinstance(date_str,datetime):
+    if isinstance(date_str, datetime):
         return date_str
     src_format = "%Y-%m-%d %H:%M:%S"  # 2026-01-02 13:50:51
     return datetime.strptime(date_str, src_format)
 
 
-def calculate_bins_values_dataframe(df: pd.DataFrame, number_of_bins: int, column: str) -> list[float]:
+def calculate_bins_values_dataframe(
+    df: pd.DataFrame, number_of_bins: int, column: str
+) -> list[float]:
     min_value, max_value = df[column].min(), df[column].max()
     return calculate_bins_from_min_max_value(min_value, max_value, number_of_bins)
 
