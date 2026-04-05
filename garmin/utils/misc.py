@@ -1,9 +1,10 @@
-from datetime import datetime
-import re
-import pandas as pd
 import math
+import re
+from datetime import datetime
 from itertools import pairwise
 from typing import Callable
+
+import pandas as pd
 
 
 def parse_str_int(value: str | int) -> int:
@@ -38,22 +39,27 @@ def get_df_sum_from_column(
     return df.groupby(groupby_column)[[value_column]].sum()
 
 
+def calculate_bins_from_min_max_value(
+    min_value: float | int, max_value: float | int, number_of_bins: int
+) -> list[float]:
+    step = (max_value - min_value) / number_of_bins
+    return sorted(
+        list(set([min_value + step * idx for idx in range(number_of_bins + 1)]))
+    )
+
+
+def calculate_int_bins(min_value: int, max_value: int, factor: int) -> list[float]:
+    steps = int(float(max_value - min_value) // factor)
+    return [min_value + factor * idx for idx in range(steps + 2)]
+
+
 def calculate_ticker_values(values: list[float], max_numb: int = 7) -> list[float]:
     sample_number = len(values)
     if sample_number <= max_numb:
         return values
-    min_val = min(values) - 1
-    max_val = max(values) + 1
-    return sorted(
-        list(
-            set(
-                [
-                    (min_val + (max_val - min_val) / max_numb * k)
-                    for k in range(max_numb + 1)
-                ]
-            )
-        )
-    )
+    min_val = min(values) * 1.02
+    max_val = max(values) * 0.98
+    return calculate_bins_from_min_max_value(min_val, max_val, max_numb)
 
 
 def bin_label_heartbeat(df: pd.DataFrame, number_of_bins: int, trg_column: str):
@@ -136,20 +142,6 @@ def transform_str_to_date(date_str: str) -> datetime:
         return date_str
     src_format = "%Y-%m-%d %H:%M:%S"  # 2026-01-02 13:50:51
     return datetime.strptime(date_str, src_format)
-
-
-def calculate_bins_values_dataframe(
-    df: pd.DataFrame, number_of_bins: int, column: str
-) -> list[float]:
-    min_value, max_value = df[column].min(), df[column].max()
-    return calculate_bins_from_min_max_value(min_value, max_value, number_of_bins)
-
-
-def calculate_bins_from_min_max_value(
-    min_value: float | int, max_value: float | int, number_of_bins: int
-) -> list[float]:
-    step = (max_value - min_value) / number_of_bins
-    return [min_value + step * idx for idx in range(number_of_bins + 1)]
 
 
 def split_lines_with_comma(line: str, sep: str = ",") -> list[str]:

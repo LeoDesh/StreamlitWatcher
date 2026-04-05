@@ -1,15 +1,17 @@
+from typing import Any
+
+import pandas as pd
 import streamlit as st
+
 from garmin.constants import FULL_DATA
-from garmin.statistics.pandas_helper import (
+from garmin.plots.visualization import create_gantt_chart, create_heat_map
+from garmin.utils.pandas_helpers import (
     filter_dataframe,
-    get_unique_values_per_column,
     get_gantt_df,
     get_pivot_dataframe,
+    get_unique_values_per_column,
 )
-from garmin.plots.visualization import create_gantt_chart, create_heat_map
 from streamlit_utils.chart_helpers import place_figure
-import pandas as pd
-from typing import Any
 
 
 def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:
@@ -86,7 +88,7 @@ def show_activities_timeline(df: pd.DataFrame):
 
 
 def show_heat_map(df: pd.DataFrame, category: str):
-    if category == "Gesamt":
+    if category == "Alle":
         filters = {}
     else:
         filters = {"ACTIVITY_TYPE": "Laufen"}
@@ -104,7 +106,7 @@ def show_heat_map(df: pd.DataFrame, category: str):
 
 
 def heatmap_filter() -> str:
-    return st.selectbox("Category", ["Laufen", "Gesamt"], index=0)
+    return st.selectbox("Category", ["Laufen", "Alle"], index=0)
 
 
 def main():

@@ -1,5 +1,7 @@
 from pathlib import Path
-#from garmin.utils.misc import split_lines_with_comma
+
+# from garmin.utils.misc import split_lines_with_comma
+
 
 def validate_file_type(file: Path) -> bool:
     if not file.is_file():
@@ -10,8 +12,8 @@ def validate_file_type(file: Path) -> bool:
 
 
 def validate_structure_of_csv_file(file: Path) -> bool:
-    with open(str(file), "r",encoding="utf-8") as f:
-        lines = [line for line in f.readlines() ]
+    with open(str(file), "r", encoding="utf-8") as f:
+        lines = [line for line in f.readlines()]
         if not check_for_valid_container(lines):
             return False
         return analyze_lines(lines)

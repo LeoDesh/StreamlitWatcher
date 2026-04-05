@@ -1,6 +1,7 @@
 from enum import auto
-from strenum import StrEnum
 from typing import Dict
+
+from strenum import StrEnum
 
 
 class Activity(StrEnum):

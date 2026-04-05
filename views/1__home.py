@@ -1,15 +1,16 @@
+import pandas as pd
 import streamlit as st
+
 from garmin.constants import DATA
-from garmin.statistics.pandas_helper import (
-    get_overview_table,
-    get_grouped_table,
-    get_highlights_data,
-)
+from garmin.utils.misc import prettify, transform_activity_minutes_to_duration_format
 from garmin.utils.pace_calculations import (
     transform_speed_to_pace,
 )
-from garmin.utils.misc import transform_activity_minutes_to_duration_format, prettify
-import pandas as pd
+from garmin.utils.pandas_helpers import (
+    get_grouped_table,
+    get_highlights_data,
+    get_overview_table,
+)
 
 
 def get_overview_page_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -77,7 +78,7 @@ def construct_header() -> None:
 
 def construct_overall_statistics(df: pd.DataFrame) -> None:
     st.header("Statistics of a run")
-    final_df:pd.DataFrame = get_overview_page_df(df)
+    final_df: pd.DataFrame = get_overview_page_df(df)
     final_df = final_df.T
     final_df.index.name = "Category"
     final_df = final_df.reset_index()

@@ -1,7 +1,8 @@
+import math
+
 from garmin.utils.misc import (
     get_all_regex_matches,
 )
-import math
 
 
 def transform_speed_to_pace(speed: float) -> str:

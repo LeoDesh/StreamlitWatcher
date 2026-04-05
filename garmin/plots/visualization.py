@@ -1,14 +1,17 @@
+from itertools import pairwise
+from typing import Any
+
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objects as go
 from plotly.graph_objects import Figure
-import plotly.express as px
-from itertools import pairwise
+
+from garmin.plots.config import X_AXIS_BASE_CONFIG, X_AXIS_MONTH_CONFIG
+from garmin.utils.misc import calculate_ticker_values, categorize_df_column, prettify
 from garmin.utils.pace_calculations import (
     transform_speed_to_pace,
-    get_pace_bins_labels_for_dataframe,
 )
-from garmin.utils.misc import categorize_df_column, calculate_ticker_values, prettify
-from garmin.plots.config import X_AXIS_BASE_CONFIG, X_AXIS_MONTH_CONFIG
+from garmin.utils.pandas_helpers import get_pace_bins_labels_for_dataframe
 
 
 def get_df_pace_histogram(
@@ -47,40 +50,28 @@ def get_empty_figure() -> Figure:
     return Figure()
 
 
-def create_bar_chart(df, x_col: str, y_col: str, month: bool) -> Figure:
+def create_bar_chart(
+    df: pd.DataFrame, x_col: str, y_col: str, *, x_axis_config: dict[str, Any]
+) -> Figure:
     fig = Figure()
     fig.add_bar(
         x=df[x_col],
         y=df[y_col],
     )
     fig.update_layout(
-        xaxis_title=x_col,
+        xaxis=x_axis_config | {"title": x_col},
         yaxis_title="Amount",
         title={"text": f"km run per {x_col}", "font": {"size": 20}},
     )
-    if month:
-        fig.update_xaxes(
-            tickmode="array",
-            tickvals=list(range(1, 13)),
-            ticktext=[
-                "Jan",
-                "Feb",
-                "Mär",
-                "Apr",
-                "Mai",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Okt",
-                "Nov",
-                "Dez",
-            ],
-            tickangle=45,
-        )
-    else:
-        fig.update_xaxes(tickmode="array", tickangle=45)
     return fig
+
+
+def create_bar_chart_month_axis(df: pd.DataFrame, x_col: str, y_col: str):
+    return create_bar_chart(df, x_col, y_col, x_axis_config=X_AXIS_MONTH_CONFIG)
+
+
+def create_bar_chart_ordinary_axis(df: pd.DataFrame, x_col: str, y_col: str):
+    return create_bar_chart(df, x_col, y_col, x_axis_config=X_AXIS_BASE_CONFIG)
 
 
 def create_plotly_pace_chart(
@@ -89,7 +80,7 @@ def create_plotly_pace_chart(
     values = df[y_col].tolist()
     tickvals = calculate_ticker_values(values)
     ticktext = [transform_speed_to_pace(speed) for speed in tickvals]
-    fig = Figure()  # make_subplots(specs=[[{"secondary_y": True}]])
+    fig = Figure()
     fig.add_trace(
         go.Scatter(
             x=df[x_col],
@@ -176,14 +167,9 @@ def create_heat_map(df: pd.DataFrame, title: str) -> Figure:
 
     fig.update_layout(
         title=title,
-        xaxis_title=index_name,
-        yaxis_title=columns_name,
+        xaxis=X_AXIS_MONTH_CONFIG | {"title": columns_name},
+        yaxis_title=index_name,
         template="plotly_white",
         width=1200,
-    )
-    fig.update_xaxes(
-        tickangle=45,
-        tickformat="%Y.%m",
-        dtick="M1",
     )
     return fig

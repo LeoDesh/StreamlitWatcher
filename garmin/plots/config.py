@@ -15,4 +15,5 @@ X_AXIS_MONTH_CONFIG = {
         "Nov",
         "Dez",
     ],
+    "tickangle": 45,
 }

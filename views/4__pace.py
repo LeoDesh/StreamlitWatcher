@@ -1,17 +1,19 @@
+import math
+from datetime import date, timedelta
+from typing import Tuple
+
+import pandas as pd
 import streamlit as st
+
 from garmin.constants import DATA
-from garmin.utils.pace_calculations import create_df_pivot_hpm_pace
 from garmin.plots.visualization import (
+    create_heat_map,
+    create_plotly_pace_chart,
     get_df_pace_histogram,
     get_empty_figure,
-    create_plotly_pace_chart,
-    create_heat_map,
 )
+from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace
 from streamlit_utils.chart_helpers import place_figure
-from typing import Tuple
-import pandas as pd
-from datetime import date, timedelta
-import math
 
 
 def setup_date_range_selection(df: pd.DataFrame) -> Tuple[date, date]:
@@ -109,7 +111,7 @@ def main():
         place_figure(fig)
     with pace_hpm_tab:
         pivot_df = create_df_pivot_hpm_pace(df)
-        fig = create_heat_map(pivot_df, "Pace & HPM Correlation")
+        fig = create_heat_map(pivot_df, "Pace & HPM Correlation in %")
         place_figure(fig)
 
 

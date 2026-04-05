@@ -1,14 +1,19 @@
-from pathlib import Path
-import pandas as pd
-from garmin.data.column_mapping import GARMIN_COLUMNS
-from garmin.utils.misc import transform_str_to_date, parse_str_int
-from garmin.data.file_verification import validate_csv_file
-from garmin.utils.pace_calculations import (
-    transform_pace_to_speed,
-    transform_pace_to_pace_float,
-)
-from garmin.utils.misc import parse_activity_duration_to_minutes
 from functools import cache
+from pathlib import Path
+
+import pandas as pd
+
+from garmin.data.column_mapping import GARMIN_COLUMNS
+from garmin.data.file_verification import validate_csv_file
+from garmin.utils.misc import (
+    parse_activity_duration_to_minutes,
+    parse_str_int,
+    transform_str_to_date,
+)
+from garmin.utils.pace_calculations import (
+    transform_pace_to_pace_float,
+    transform_pace_to_speed,
+)
 
 MIN_YEAR = 2022
 
