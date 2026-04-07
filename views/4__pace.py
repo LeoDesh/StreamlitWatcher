@@ -7,7 +7,7 @@ import streamlit as st
 
 from garmin.constants import DATA
 from garmin.plots.visualization import (
-    create_heat_map,
+    create_heat_map_ordinary,
     create_plotly_pace_chart,
     get_df_pace_histogram,
     get_empty_figure,
@@ -111,7 +111,7 @@ def main():
         place_figure(fig)
     with pace_hpm_tab:
         pivot_df = create_df_pivot_hpm_pace(df)
-        fig = create_heat_map(pivot_df, "Pace & HPM Correlation in %")
+        fig = create_heat_map_ordinary(pivot_df, "Pace & HPM Correlation in %")
         place_figure(fig)
 
 

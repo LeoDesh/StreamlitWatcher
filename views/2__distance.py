@@ -5,7 +5,7 @@ import streamlit as st
 
 from garmin.constants import DATA
 from garmin.plots.visualization import (
-    create_heat_map,
+    create_heat_map_monthly_axis,
     get_df_km_histogram,
 )
 from garmin.utils.misc import calculate_int_bins
@@ -27,7 +27,7 @@ def setup_heatmap(df: pd.DataFrame):
     pivot_df = df.pivot_table(
         values="DISTANCE", index="YEAR", columns="MONTH", aggfunc="sum"
     ).fillna(0)
-    return create_heat_map(pivot_df, "Distance in km per (Month, Year)")
+    return create_heat_map_monthly_axis(pivot_df, "Distance in km per (Month, Year)")
 
 
 def main():

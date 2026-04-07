@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 from garmin.constants import FULL_DATA
-from garmin.plots.visualization import create_gantt_chart, create_heat_map
+from garmin.plots.visualization import create_gantt_chart, create_heat_map_monthly_axis
 from garmin.utils.pandas_helpers import (
     filter_dataframe,
     get_gantt_df,
@@ -101,7 +101,7 @@ def show_heat_map(df: pd.DataFrame, category: str):
         filters=filters,
     ).reset_index()
     pivot_df = pivot_df.set_index("YEAR")
-    fig = create_heat_map(pivot_df, category)
+    fig = create_heat_map_monthly_axis(pivot_df, category)
     place_figure(fig)
 
 

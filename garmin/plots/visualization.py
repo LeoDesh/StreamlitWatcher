@@ -155,7 +155,9 @@ def create_gantt_chart(
     return fig
 
 
-def create_heat_map(df: pd.DataFrame, title: str) -> Figure:
+def create_heat_map(
+    df: pd.DataFrame, title: str, *, x_axis_kwargs: dict[str, Any]
+) -> Figure:
     index_name = prettify(df.index.name)
     columns_name = prettify(df.columns.name)
     fig = px.imshow(
@@ -164,12 +166,19 @@ def create_heat_map(df: pd.DataFrame, title: str) -> Figure:
         text_auto=True,
         aspect="auto",
     )
-
     fig.update_layout(
         title=title,
-        xaxis=X_AXIS_MONTH_CONFIG | {"title": columns_name},
+        xaxis=x_axis_kwargs | {"title": columns_name},
         yaxis_title=index_name,
         template="plotly_white",
         width=1200,
     )
     return fig
+
+
+def create_heat_map_ordinary(df: pd.DataFrame, title: str) -> Figure:
+    return create_heat_map(df, title, x_axis_kwargs=X_AXIS_BASE_CONFIG)
+
+
+def create_heat_map_monthly_axis(df: pd.DataFrame, title: str) -> Figure:
+    return create_heat_map(df, title, x_axis_kwargs=X_AXIS_MONTH_CONFIG)

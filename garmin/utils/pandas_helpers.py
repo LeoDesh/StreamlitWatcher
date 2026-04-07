@@ -67,7 +67,9 @@ def create_df_pivot_hpm_pace(df) -> pd.DataFrame:
         aggfunc="count",
         observed=False,
     )
-    return ((df / df.sum(axis=0)) * 100).round(2)
+    df = ((df / df.sum(axis=0)) * 100).round(2)
+    df = df.dropna(axis=1, how="all").fillna(0)
+    return df
 
 
 def get_overview_table(df: pd.DataFrame, column: str) -> pd.DataFrame:
