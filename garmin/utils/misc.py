@@ -7,7 +7,7 @@ from typing import Callable
 import pandas as pd
 
 
-def parse_str_int(value: str | int) -> int:
+def parse_str_to_int(value: str | int) -> int:
     if isinstance(value, int):
         return value
     if value.find("--") > -1:
@@ -156,3 +156,18 @@ def replace_comma_in_number(line: str) -> str:
         replacement_match = match.replace(",", "")
         line = line.replace(match, replacement_match)
     return line
+
+
+def parse_indoor_cycling_title(line: str):
+    pattern = r"(\d+([\.,]\s*\d+)?)\s*KM"
+    value = search_with_regex(pattern, line.upper(), 1)
+    return transform_str_to_float(value)
+
+
+def transform_str_to_float(value: str):
+    value = value.replace(" ", "")
+    value = value.replace(",", ".")
+    try:
+        return float(value)
+    except TypeError:
+        return value

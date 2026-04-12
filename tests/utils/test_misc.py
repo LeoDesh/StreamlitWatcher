@@ -1,32 +1,36 @@
+import sys
+from datetime import datetime
+
+import pytest
+
 from garmin.utils.misc import (
-    parse_str_int,
-    get_regex_match,
-    get_all_regex_matches,
-    transform_str_to_date,
     calculate_bins_from_min_max_value,
-    replace_comma_in_number,
-    verify_activity_duration,
-    parse_activity_duration_to_minutes,
     calculate_minutes,
+    get_all_regex_matches,
+    get_regex_match,
+    parse_activity_duration_to_minutes,
     parse_hours_from_activity_duration,
     parse_minutes_from_activity_duration,
     parse_seconds_from_activity_duration,
-    transform_activity_minutes_to_duration_format,
+    parse_str_to_int,
+    replace_comma_in_number,
     search_with_regex,
+    transform_activity_minutes_to_duration_format,
+    transform_str_to_date,
+    verify_activity_duration,
 )
-import pytest
-from datetime import datetime
-import sys 
+
 print(sys.path)
 
-def test_parse_str_int_identity():
+
+def test_parse_str_to_int_identity():
     value = 5
-    assert parse_str_int(value) == 5
+    assert parse_str_to_int(value) == 5
 
 
-def test_parse_str_int_str_with_comma():
+def test_parse_str_to_int_str_with_comma():
     value = "5,453"
-    parsed_value = parse_str_int(value)
+    parsed_value = parse_str_to_int(value)
     assert parsed_value == 5453
 
 
@@ -144,14 +148,21 @@ def test_parse_minutes_from_activity_duration(get_duration_str):
 def test_parse_seconds_from_activity_duration(get_duration_str):
     assert parse_seconds_from_activity_duration(get_duration_str) == 56
 
+
 def test_calculate_minutes():
-    hours,minutes,seconds = (2,54,40)
-    assert calculate_minutes(hours,minutes,seconds) == pytest.approx(174.66667)
+    hours, minutes, seconds = (2, 54, 40)
+    assert calculate_minutes(hours, minutes, seconds) == pytest.approx(174.66667)
+
 
 def test_parse_activity_duration_to_minutes(get_duration_str):
-    assert parse_activity_duration_to_minutes(get_duration_str) == pytest.approx(242.93333)
-    #"04:02:56.8"
+    assert parse_activity_duration_to_minutes(get_duration_str) == pytest.approx(
+        242.93333
+    )
+    # "04:02:56.8"
+
 
 def test_transform_activity_minutes_to_duration_format(get_duration_str):
     duration_in_minutes = parse_activity_duration_to_minutes(get_duration_str)
-    assert transform_activity_minutes_to_duration_format(duration_in_minutes) == "04:02:56"
+    assert (
+        transform_activity_minutes_to_duration_format(duration_in_minutes) == "04:02:56"
+    )
