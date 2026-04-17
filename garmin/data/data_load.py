@@ -18,6 +18,7 @@ from garmin.utils.pace_calculations import (
 )
 
 MIN_YEAR = 2022
+MIN_DISTANCE = 2.5
 
 
 @cache
@@ -47,7 +48,7 @@ def rename_df_columns(df: pd.DataFrame) -> pd.DataFrame:
 def filter_garmin_df(df: pd.DataFrame):
     df = df[df["AVERAGE_PACE"] != "--"]
     df = df[df["ACTIVITY_TYPE"] == "Laufen"]
-    df = df[df["DISTANCE"] >= 3]
+    df = df[df["DISTANCE"] >= MIN_DISTANCE]
     df = df.reset_index()
     return df
 

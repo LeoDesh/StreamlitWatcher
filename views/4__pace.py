@@ -14,6 +14,7 @@ from garmin.plots.visualization import (
 )
 from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace
 from streamlit_utils.chart_helpers import place_figure
+from streamlit_utils.config import Icons
 
 
 def setup_date_range_selection(df: pd.DataFrame) -> Tuple[date, date]:
@@ -98,9 +99,9 @@ def main():
     ]
     histogram_tab, line_plot_tab, pace_hpm_tab = st.tabs(
         [
-            ":material/bar_chart: Pace Histogram",
-            ":material/multiline_chart: Pace and HPM Comparison",
-            ":material/analytics: Pace and HPM Correlation",
+            f"{Icons.bar_chart} Pace Histogram",
+            f"{Icons.line_chart} Pace and HPM Comparison",
+            f"{Icons.analytics} Pace and HPM Correlation",
         ]
     )
     with line_plot_tab:

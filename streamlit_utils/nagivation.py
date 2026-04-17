@@ -3,20 +3,12 @@ from pathlib import Path
 import streamlit as st
 
 from garmin.constants import DATA
-
-# ":material/monitoring:"
-PAGE_CONFIG = {
-    "home": {"icon": ":material/home:", "default": True},
-    "distance": {"icon": ":material/route:"},
-    "units": {"icon": ":material/table_view:"},
-    "speed": {"icon": ":material/speed:"},
-    "latest_activities": {"icon": ":material/search:"},
-}
+from streamlit_utils.config import PAGE_CONFIG, Icons
 
 
 def get_pages():
     st.set_page_config(layout="wide")
-    base_config = {"icon": ":material/monitoring:"}
+    base_config = {"icon": Icons.monitoring}
     streamlit_pages = []
     for file in Path("views").iterdir():
         if not file.suffix == ".py":

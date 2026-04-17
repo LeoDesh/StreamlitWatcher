@@ -1,21 +1,21 @@
-from enum import auto
+from enum import StrEnum
 from typing import Dict
 
-from strenum import StrEnum
+# from strenum import StrEnum
 
 
 class Activity(StrEnum):
-    ACTIVITY_TYPE = auto()
-    DATE = auto()
-    TITLE = auto()
-    DISTANCE = auto()
-    CALORIES = auto()
-    TIME = auto()
-    AVG_HEART_RATE = auto()
-    MAX_HEART_RATE = auto()
-    AVERAGE_PACE = auto()
-    MAX_PACE = auto()
-    STEPS = auto()
+    ACTIVITY_TYPE = "ACTIVITY_TYPE"
+    DATE = "DATE"
+    TITLE = "TITLE"
+    DISTANCE = "DISTANCE"
+    CALORIES = "CALORIES"
+    TIME = "TIME"
+    AVG_HEART_RATE = "AVG_HEART_RATE"
+    MAX_HEART_RATE = "MAX_HEART_RATE"
+    AVERAGE_PACE = "AVERAGE_PACE"
+    MAX_PACE = "MAX_PACE"
+    STEPS = "STEPS"
 
 
 TRANSLATION_DICT: Dict[Activity, str] = {

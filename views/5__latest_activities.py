@@ -12,6 +12,7 @@ from garmin.utils.pandas_helpers import (
     get_unique_values_per_column,
 )
 from streamlit_utils.chart_helpers import place_figure
+from streamlit_utils.config import Icons
 
 
 def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:
@@ -114,9 +115,9 @@ def main():
     df = FULL_DATA.copy()
     activity_tab, gantt_chart_tab, heat_tab = st.tabs(
         [
-            ":material/table_view: Activity Overview",
-            ":material/view_timeline: Activity Breakdown",
-            ":material/apps: Activity Frequency",
+            f"{Icons.table} Activity Overview",
+            f"{Icons.timeline} Activity Breakdown",
+            f"{Icons.apps} Activity Frequency",
         ]
     )
     with activity_tab:

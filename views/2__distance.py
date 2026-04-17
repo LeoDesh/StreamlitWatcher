@@ -10,6 +10,7 @@ from garmin.plots.visualization import (
 )
 from garmin.utils.misc import calculate_int_bins
 from streamlit_utils.chart_helpers import place_figure
+from streamlit_utils.config import Icons
 
 
 def construct_header() -> None:
@@ -35,8 +36,8 @@ def main():
     df = DATA
     histogram_tab, heatmap_tab = st.tabs(
         [
-            ":material/bar_chart: Histogram by 'km'",
-            ":material/analytics: Month Year Distribution",
+            f"{Icons.bar_chart} Histogram by 'km'",
+            f"{Icons.analytics} Month Year Distribution",
         ]
     )
     with histogram_tab:
