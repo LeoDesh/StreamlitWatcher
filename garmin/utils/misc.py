@@ -57,8 +57,8 @@ def calculate_ticker_values(values: list[float], max_numb: int = 7) -> list[floa
     sample_number = len(values)
     if sample_number <= max_numb:
         return values
-    min_val = min(values) * 1.02
-    max_val = max(values) * 0.98
+    min_val = min(values) * 0.98
+    max_val = max(values) * 1.02
     return calculate_bins_from_min_max_value(min_val, max_val, max_numb)
 
 
