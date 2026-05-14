@@ -1,11 +1,12 @@
+import pytest
+
 from garmin.data.file_verification import (
     analyze_lines,
-    validate_file_type,
-    validate_csv_file,
-    validate_structure_of_csv_file,
     check_for_valid_container,
+    validate_csv_file,
+    validate_file_type,
+    validate_structure_of_csv_file,
 )
-import pytest
 
 
 def test_check_for_valid_container_iterable_no_container():
@@ -54,6 +55,9 @@ def test_validate_csv_file_failure(get_missing_value_garmin_csv_file):
     with pytest.raises(ValueError):
         validate_csv_file(get_missing_value_garmin_csv_file)
 
-@pytest.mark.xfail(reason="Old Format")
+
+@pytest.mark.xfail(
+    reason="Old Format. ',' in Steps probably causing issues compared to new version"
+)
 def test_validate_csv_success(get_activity_file):
     assert validate_csv_file(get_activity_file)
