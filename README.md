@@ -10,5 +10,5 @@
 - loads, translates and operates on the data
 
 ### Updating data
-- workaround.py fakes login to get auth tokens
-- download.py takes the auth tokens to get the data
+- USE to UPDATE: download.py takes the auth tokens to get the data
+- ONLY ONCE: workaround.py fakes login to get auth tokens
