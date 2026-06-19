@@ -1,4 +1,3 @@
-import sys
 from datetime import datetime
 
 import pytest
@@ -10,6 +9,7 @@ from garmin.utils.misc import (
     get_regex_match,
     parse_activity_duration_to_minutes,
     parse_hours_from_activity_duration,
+    parse_indoor_cycling_title,
     parse_minutes_from_activity_duration,
     parse_seconds_from_activity_duration,
     parse_str_to_int,
@@ -19,8 +19,6 @@ from garmin.utils.misc import (
     transform_str_to_date,
     verify_activity_duration,
 )
-
-print(sys.path)
 
 
 def test_parse_str_to_int_identity():
@@ -166,3 +164,18 @@ def test_transform_activity_minutes_to_duration_format(get_duration_str):
     assert (
         transform_activity_minutes_to_duration_format(duration_in_minutes) == "04:02:56"
     )
+
+
+@pytest.mark.parametrize(
+    "title,expected",
+    [
+        ("24,5 km", 24.5),
+        ("23 km", 23),
+        ("km", ""),
+        ("27.5 KM", 27.5),
+        ("Something Else", ""),
+        ("Something 28", ""),
+    ],
+)
+def test_parse_indoor_cycling_title(title: str, expected: str | float):
+    assert parse_indoor_cycling_title(title) == expected

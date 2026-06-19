@@ -169,5 +169,5 @@ def transform_str_to_float(value: str):
     value = value.replace(",", ".")
     try:
         return float(value)
-    except TypeError:
+    except (TypeError, ValueError):
         return value

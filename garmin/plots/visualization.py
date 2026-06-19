@@ -22,7 +22,11 @@ def get_df_pace_histogram(
     )
     counts = df[pace_float_column].value_counts().sort_index().reset_index()
     counts.columns = ["Minute per km", "Amount"]
-    return create_histogram(counts, "Pace Distribution")
+    return create_histogram(
+        counts,
+        "Pace Distribution",
+        hovertemplate="%{y} units exercised within pace of %{x} min/km<extra></extra>",
+    )
 
 
 def get_df_km_histogram(df: pd.DataFrame, trg_col: str, bins: list[int]) -> Figure:
@@ -31,10 +35,14 @@ def get_df_km_histogram(df: pd.DataFrame, trg_col: str, bins: list[int]) -> Figu
     df.loc[:, "binned"] = pd.cut(df[trg_col], bins=bins, labels=labels)
     counts = df["binned"].value_counts().sort_index().reset_index()
     counts.columns = ["km", "Amount"]
-    return create_histogram(counts, "km Distribution")
+    return create_histogram(
+        counts,
+        "km Distribution",
+        hovertemplate="%{y} units exercised within range of %{x} km<extra></extra>",
+    )
 
 
-def create_histogram(df: pd.DataFrame, title: str):
+def create_histogram(df: pd.DataFrame, title: str, hovertemplate: str):
     x_col, y_col = df.columns
     fig = Figure()
     fig.add_bar(x=df[x_col], y=df[y_col])
@@ -43,6 +51,7 @@ def create_histogram(df: pd.DataFrame, title: str):
         yaxis_title=y_col,
         title={"text": title, "font": {"size": 20}},
     )
+    fig.update_traces(hovertemplate=hovertemplate)
     return fig
 
 
@@ -156,7 +165,7 @@ def create_gantt_chart(
 
 
 def create_heat_map(
-    df: pd.DataFrame, title: str, *, x_axis_kwargs: dict[str, Any]
+    df: pd.DataFrame, title: str, *, x_axis_kwargs: dict[str, Any], hovertemplate: str
 ) -> Figure:
     index_name = prettify(df.index.name)
     columns_name = prettify(df.columns.name)
@@ -173,12 +182,20 @@ def create_heat_map(
         template="plotly_white",
         width=1200,
     )
+    fig.update_traces(hovertemplate=hovertemplate)
     return fig
 
 
 def create_heat_map_ordinary(df: pd.DataFrame, title: str) -> Figure:
-    return create_heat_map(df, title, x_axis_kwargs=X_AXIS_BASE_CONFIG)
+    hovertemplate = "With Avg. Heart Rate %{y}: %{z:.2f} % chance of a run with Pace %{x}<extra></extra>"
+    return create_heat_map(
+        df, title, x_axis_kwargs=X_AXIS_BASE_CONFIG, hovertemplate=hovertemplate
+    )
 
 
-def create_heat_map_monthly_axis(df: pd.DataFrame, title: str) -> Figure:
-    return create_heat_map(df, title, x_axis_kwargs=X_AXIS_MONTH_CONFIG)
+def create_heat_map_monthly_axis(
+    df: pd.DataFrame, title: str, hovertemplate: str
+) -> Figure:
+    return create_heat_map(
+        df, title, x_axis_kwargs=X_AXIS_MONTH_CONFIG, hovertemplate=hovertemplate
+    )

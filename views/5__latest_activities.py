@@ -1,10 +1,11 @@
 from typing import Any
 
-import pandas as pd
 import streamlit as st
+from pandas import DataFrame
 
 from garmin.constants import FULL_DATA
 from garmin.plots.visualization import create_gantt_chart, create_heat_map_monthly_axis
+from garmin.utils.misc import prettify
 from garmin.utils.pandas_helpers import (
     filter_dataframe,
     get_gantt_df,
@@ -16,9 +17,8 @@ from streamlit_utils.config import Icons
 
 
 def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:
-    pace = data["AVERAGE_PACE"]
-    if pace == "--":
-        data["SPEED"] = "--"
+    pace = data["Average Pace"]
+    data["Speed"] = "--" if pace == "--" else data["Speed"]
 
 
 def construct_activity_header(date_str: str, activity_type: str, activity_title: str):
@@ -27,23 +27,23 @@ def construct_activity_header(date_str: str, activity_type: str, activity_title:
     return f"{date_str} -- {activity_type} -- {activity_title}"
 
 
-def show_latest_activities(df: pd.DataFrame, rows: int = 20):
+def show_latest_activities(df: DataFrame, rows: int = 20):
     attrs_columns = [
-        "DISTANCE",
-        "AVERAGE_PACE",
-        "SPEED",
-        "CALORIES",
-        "TIME",
-        "AVG_HEART_RATE",
+        "Distance",
+        "Average Pace",
+        "Speed",
+        "Calories",
+        "Time",
+        "Avg Heart Rate",
     ]
-    df: pd.DataFrame = df.head(rows)
+    df: DataFrame = df.head(rows)
     df_dict = df.to_dict(orient="records")
     for idx, row_dict in enumerate(df_dict):
         clean_up_dict(row_dict)
-        date = row_dict["DATE"].date()
+        date = row_dict["Date"].date()
         date_str = date.strftime("%d.%m.%Y")
         activity_title = construct_activity_header(
-            date_str, row_dict["ACTIVITY_TYPE"], row_dict["TITLE"]
+            date_str, row_dict["Activity Type"], row_dict["Title"]
         )
         with st.container(border=True, horizontal_alignment="center"):
             st.header(f"{idx + 1}: {activity_title}")
@@ -53,8 +53,8 @@ def show_latest_activities(df: pd.DataFrame, rows: int = 20):
                 col.metric(description, value)
 
 
-def get_activity_filters():
-    unique_values_dict = get_unique_values_per_column(FULL_DATA, ["ACTIVITY_TYPE"])
+def get_activity_filters(df: DataFrame):
+    unique_values_dict = get_unique_values_per_column(df, ["Activity Type"])
     filters = {}
     with st.expander("Activity Filter", expanded=False):
         for key, groups in unique_values_dict.items():
@@ -62,8 +62,8 @@ def get_activity_filters():
     return filters
 
 
-def get_gantt_filters():
-    unique_values_dict = get_unique_values_per_column(FULL_DATA, ["YEAR"])
+def get_gantt_filters(df: DataFrame):
+    unique_values_dict = get_unique_values_per_column(df, ["Year"])
     filters = {}
     with st.expander("Chart Filter", expanded=False):
         for key, groups in unique_values_dict.items():
@@ -72,7 +72,7 @@ def get_gantt_filters():
 
 
 def get_heatmap_filters():
-    unique_values_dict = get_unique_values_per_column(FULL_DATA, ["ACTIVITY_TYPE"])
+    unique_values_dict = get_unique_values_per_column(FULL_DATA, ["Activity Type"])
     filters = {}
     with st.expander("Heatmap Choice", expanded=False):
         for key, groups in unique_values_dict.items():
@@ -82,37 +82,41 @@ def get_heatmap_filters():
     return filters
 
 
-def show_activities_timeline(df: pd.DataFrame):
-    gantt_df = get_gantt_df(df, "DATE")
-    fig = create_gantt_chart(gantt_df, "DATE", "DATE_END", "ACTIVITY_TYPE")
+def show_activities_timeline(df: DataFrame):
+    gantt_df = get_gantt_df(df, "Date")
+    fig = create_gantt_chart(gantt_df, "Date", "Date End", "Activity Type")
     place_figure(fig)
 
 
-def show_heat_map(df: pd.DataFrame, category: str):
-    if category == "Alle":
-        filters = {}
-    else:
-        filters = {"ACTIVITY_TYPE": "Laufen"}
+def show_heat_map(df: DataFrame, category: str):
+    filters = {} if category == "Alle" else {"Activity Type": "Laufen"}
     pivot_df = get_pivot_dataframe(
         df,
-        "YEAR",
-        "MONTH",
-        value_column="SPEED",
+        "Year",
+        "Month",
+        value_column="Speed",
         agg_func="size",
         filters=filters,
     ).reset_index()
-    pivot_df = pivot_df.set_index("YEAR")
-    fig = create_heat_map_monthly_axis(pivot_df, category)
+    pivot_df = pivot_df.set_index("Year")
+    fig = create_heat_map_monthly_axis(
+        pivot_df, category, hovertemplate="%{y}, %{x}: %{z:.0f} Units <extra></extra>"
+    )
     place_figure(fig)
 
 
-def heatmap_filter() -> str:
-    return st.selectbox("Category", ["Laufen", "Alle"], index=0)
+def heatmap_filter() -> tuple[str, bool]:
+    selection_col, metric_col, _ = st.columns([2, 2, 8])
+    selection = selection_col.selectbox("Category", ["Laufen", "Alle"], index=0)
+    metric_choice = metric_col.toggle("Units", value=True)
+    return (selection, metric_choice)
 
 
 def main():
     st.header("Latest Activities", text_alignment="center")
     df = FULL_DATA.copy()
+    # st.write(df)
+    df.columns = [prettify(col) for col in df.columns]
     activity_tab, gantt_chart_tab, heat_tab = st.tabs(
         [
             f"{Icons.table} Activity Overview",
@@ -121,15 +125,15 @@ def main():
         ]
     )
     with activity_tab:
-        filters = get_activity_filters()
-        activity_df = filter_dataframe(FULL_DATA, filters)
+        filters = get_activity_filters(df)
+        activity_df = filter_dataframe(df, filters)
         show_latest_activities(activity_df)
     with gantt_chart_tab:
-        gantt_filters = get_gantt_filters()
+        gantt_filters = get_gantt_filters(df)
         gantt_df = filter_dataframe(df, gantt_filters)
         show_activities_timeline(gantt_df)
     with heat_tab:
-        category = heatmap_filter()
+        category, _ = heatmap_filter()
         show_heat_map(df, category)
 
 

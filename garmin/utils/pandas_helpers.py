@@ -90,6 +90,7 @@ def get_unique_values_per_column(
 
 
 def filter_dataframe(df: pd.DataFrame, filter_kwargs: dict[str, Any]) -> pd.DataFrame:
+    df = df.copy()
     mask = pd.Series(True, index=df.index)
     for col, val in filter_kwargs.items():
         if isinstance(val, (list, tuple, set)):
@@ -105,7 +106,7 @@ def get_highlights_data(df: pd.DataFrame, columns: list[str], idx: int):
 
 def get_gantt_df(df: pd.DataFrame, date_column: str) -> pd.DataFrame:
     df[date_column] = pd.to_datetime(df[date_column])
-    df["DATE_END"] = df[date_column] + pd.Timedelta(days=1)
+    df["Date End"] = df[date_column] + pd.Timedelta(days=1)
     return df
 
 

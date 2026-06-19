@@ -54,7 +54,13 @@ def filter_garmin_df(df: pd.DataFrame):
 
 
 def transform_activity(activity: str, title: str):
-    return "Fußball" if activity == "Cardio" and "FB" in title else activity
+    if activity != "Cardio":
+        return activity
+    if "FB" in title:
+        return "Fußball"
+    elif "Schwimmen" in title:
+        return "Schwimmen"
+    return activity
 
 
 def add_pace(activity: str, title: str, pace: str):

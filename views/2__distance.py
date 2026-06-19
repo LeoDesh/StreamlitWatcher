@@ -8,7 +8,7 @@ from garmin.plots.visualization import (
     create_heat_map_monthly_axis,
     get_df_km_histogram,
 )
-from garmin.utils.misc import calculate_int_bins
+from garmin.utils.misc import calculate_int_bins, prettify
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
 
@@ -25,10 +25,16 @@ def setup_histogram(df: pd.DataFrame):
 
 
 def setup_heatmap(df: pd.DataFrame):
+    df = df.copy()
+    df.columns = [prettify(col) for col in df.columns]
     pivot_df = df.pivot_table(
-        values="DISTANCE", index="YEAR", columns="MONTH", aggfunc="sum"
+        values="Distance", index="Year", columns="Month", aggfunc="sum"
     ).fillna(0)
-    return create_heat_map_monthly_axis(pivot_df, "Distance in km per (Month, Year)")
+    return create_heat_map_monthly_axis(
+        pivot_df,
+        "Distance in km per (Month, Year)",
+        hovertemplate="%{y}, %{x}: %{z:.2f} km <extra></extra>",
+    )
 
 
 def main():
