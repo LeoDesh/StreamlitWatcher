@@ -6,6 +6,7 @@ import pandas as pd
 from garmin.data.column_mapping import GARMIN_COLUMNS
 from garmin.data.file_verification import validate_csv_file
 from garmin.utils.misc import (
+    parse_activity_duration_to_hours,
     parse_activity_duration_to_minutes,
     parse_indoor_cycling_title,
     parse_str_to_int,
@@ -90,14 +91,13 @@ def transform_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     df["HOUR"] = df["DATE"].apply(lambda x: x.hour)
     df["MONTH"] = df["DATE"].apply(lambda x: x.month)
     df["YEAR"] = df["DATE"].apply(lambda x: x.year)
-    df["STEPS"] = df["STEPS"].apply(lambda x: parse_str_to_int(x))
-    df["SPEED"] = df["AVERAGE_PACE"].apply(lambda x: transform_pace_to_speed(x))
+    df["STEPS"] = df["STEPS"].apply(parse_str_to_int)
+    df["SPEED"] = df["AVERAGE_PACE"].apply(transform_pace_to_speed)
     df["PACE_FLOAT"] = df["AVERAGE_PACE"].apply(
         lambda x: round(transform_pace_to_pace_float(x), 2)
     )
-    df["TIME_IN_MINUTES"] = df["TIME"].apply(
-        lambda x: parse_activity_duration_to_minutes(x)
-    )
+    df["TIME_IN_MINUTES"] = df["TIME"].apply(parse_activity_duration_to_minutes)
+    df["TIME_IN_HOURS"] = df["TIME"].apply(parse_activity_duration_to_hours)
     df["DISTANCE"] = df.apply(
         lambda row: add_distance(
             row["ACTIVITY_TYPE"],

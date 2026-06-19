@@ -88,25 +88,34 @@ def show_activities_timeline(df: DataFrame):
     place_figure(fig)
 
 
-def show_heat_map(df: DataFrame, category: str):
+def show_heat_map(df: DataFrame, category: str, unit_choice: bool):
     filters = {} if category == "Alle" else {"Activity Type": "Laufen"}
+    df["Time In Hours"] = round(df["Time In Hours"], 2)
     pivot_df = get_pivot_dataframe(
         df,
         "Year",
         "Month",
-        value_column="Speed",
-        agg_func="size",
+        value_column="Speed" if unit_choice else "Time In Hours",
+        agg_func="size" if unit_choice else "sum",
         filters=filters,
     ).reset_index()
     pivot_df = pivot_df.set_index("Year")
+    template = "%{z:.0f} Units" if unit_choice else "%{z:.2f} Hours"
+    title = (
+        "Overview of Sports Units Done per Month"
+        if unit_choice
+        else "Overview of Hours spent on Sports per Month"
+    )
     fig = create_heat_map_monthly_axis(
-        pivot_df, category, hovertemplate="%{y}, %{x}: %{z:.0f} Units <extra></extra>"
+        pivot_df,
+        title,
+        hovertemplate="%{y}, %{x}: " + template + " <extra></extra>",
     )
     place_figure(fig)
 
 
 def heatmap_filter() -> tuple[str, bool]:
-    selection_col, metric_col, _ = st.columns([2, 2, 8])
+    selection_col, metric_col, _ = st.columns([2, 2, 8], gap="large")
     selection = selection_col.selectbox("Category", ["Laufen", "Alle"], index=0)
     metric_choice = metric_col.toggle("Units", value=True)
     return (selection, metric_choice)
@@ -115,7 +124,6 @@ def heatmap_filter() -> tuple[str, bool]:
 def main():
     st.header("Latest Activities", text_alignment="center")
     df = FULL_DATA.copy()
-    # st.write(df)
     df.columns = [prettify(col) for col in df.columns]
     activity_tab, gantt_chart_tab, heat_tab = st.tabs(
         [
@@ -133,8 +141,8 @@ def main():
         gantt_df = filter_dataframe(df, gantt_filters)
         show_activities_timeline(gantt_df)
     with heat_tab:
-        category, _ = heatmap_filter()
-        show_heat_map(df, category)
+        category, unit_choice = heatmap_filter()
+        show_heat_map(df, category, unit_choice)
 
 
 if __name__ == "__main__":

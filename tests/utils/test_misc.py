@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from datetime import datetime
 
 import pytest
@@ -20,6 +21,8 @@ from garmin.utils.misc import (
     verify_activity_duration,
 )
 
+REGEX_TEXT = "545 343 754"
+
 
 def test_parse_str_to_int_identity():
     value = 5
@@ -32,50 +35,72 @@ def test_parse_str_to_int_str_with_comma():
     assert parsed_value == 5453
 
 
-def test_get_all_regex_match(get_regex_text):
-    text = get_regex_text
-    pattern = r"\d{3}"
-    assert get_all_regex_matches(pattern, text) == list(text.split(" "))
+@pytest.mark.parametrize(
+    "pattern,expected",
+    [
+        (r"\d{3}", list(REGEX_TEXT.split())),  # simply get all numbers
+        (r"\d{4}", []),  # nothing found, empty list
+    ],
+)
+def test_get_all_regex_match(pattern: str, expected: list[str]):
+    assert get_all_regex_matches(pattern, REGEX_TEXT) == expected
 
 
-def test_get_all_regex_match_empty(get_regex_text):
-    text = get_regex_text
-    pattern = r"\d{4}"
-    assert get_all_regex_matches(pattern, text) == []
+@pytest.mark.parametrize(
+    "pattern,idx,expected,expected_context",
+    [
+        (
+            r"\d{3}",
+            1,
+            "343",
+            nullcontext(),
+        ),  # simply get all numbers
+        (
+            r"\d{3}",
+            3,
+            "343",
+            pytest.raises(IndexError),
+        ),  # not enough matches
+        (
+            r"\d{4}",
+            0,
+            "545",
+            pytest.raises(IndexError),
+        ),  # no match
+    ],
+)
+def test_get_regex_match(pattern: str, idx: int, expected: str, expected_context):
+    with expected_context:
+        value = get_regex_match(pattern, REGEX_TEXT, idx)
+        assert value == expected
 
 
-def test_get_regex_match(get_regex_text):
-    text = get_regex_text
-    pattern = r"\d{3}"
-    idx = 1
-    assert get_regex_match(pattern, text, idx) == "343"
-
-
-def test_get_regex_match_failure(get_regex_text):
-    text = get_regex_text
-    pattern = r"\d{4}"
-    idx = 2
-    with pytest.raises(IndexError):
-        get_regex_match(pattern, text, idx) == "343"
-
-
-def test_search_with_regex_default(get_regex_text):
-    text = get_regex_text
-    pattern = r"(\d{3})\s\d{3}\s(\d{3})"
-    assert search_with_regex(pattern, text) == text
-
-
-def test_search_with_regex_with_idx(get_regex_text):
-    text = get_regex_text
-    pattern = r"(\d{3})\s\d{3}\s(\d{3})"
-    assert search_with_regex(pattern, text, 1) == "545"
-
-
-def test_search_with_regex_out_of_range(get_regex_text):
-    text = get_regex_text
-    pattern = r"(\d{3})\s\d{3}\s(\d{3})"
-    with pytest.raises(IndexError):
-        search_with_regex(pattern, text, 4)
+@pytest.mark.parametrize(
+    "pattern,idx,expected,expected_context",
+    [
+        (
+            r"(\d{3})\s\d{3}\s(\d{3})",
+            0,
+            REGEX_TEXT,
+            nullcontext(),
+        ),  # full string
+        (
+            r"(\d{3})\s\d{3}\s(\d{3})",
+            1,
+            "545",
+            nullcontext(),
+        ),  # first match
+        (
+            r"(\d{3})\s\d{3}\s(\d{3})",
+            4,
+            None,
+            pytest.raises(IndexError),
+        ),  # not enough matched values
+    ],
+)
+def test_search_with_regex(pattern: str, idx: int, expected: str, expected_context):
+    with expected_context:
+        assert search_with_regex(pattern, REGEX_TEXT, idx) == expected
 
 
 def test_transform_str_to_date_correct_format():
@@ -98,41 +123,46 @@ def test_calculate_bins_values_from_min_max():
     )
 
 
-def test_transform_number_to_comma():
-    line = 'Laufen,"10,454",10,654,87'
-    new_line = replace_comma_in_number(line)
-    assert new_line == 'Laufen,"10454",10654,87'
-
-
-def test_transform_number_to_comma_untouched():
-    line = 'Laufen,"10,454",10,45,87'
-    new_line = replace_comma_in_number(line)
-    assert new_line == 'Laufen,"10454",10,45,87'
-
-
-def test_transform_number_to_comma_side_effect():
-    line = 'Laufen,"10,454",10,45,874'
-    new_line = replace_comma_in_number(line)
-    assert new_line == 'Laufen,"10454",10,45874'
+@pytest.mark.parametrize(
+    "line,expected",
+    [
+        (
+            'Laufen,"10,454",10,654,87',
+            'Laufen,"10454",10654,87',
+        ),  # Transform Number to comma
+        (
+            'Laufen,"10,454",10,45,87',
+            'Laufen,"10454",10,45,87',
+        ),  # Transform First Number, Second remains untouched
+        (
+            'Laufen,"10,454",10,45,874',
+            'Laufen,"10454",10,45874',
+        ),  # Transform First Number, Sideeffect for Second number
+    ],
+)
+def test_transform_number_to_comma(line: str, expected: str):
+    assert replace_comma_in_number(line) == expected
 
 
 def test_verify_duration_correct(get_duration_str):
     assert verify_activity_duration(get_duration_str)
 
 
-def test_verify_duration_minutes_part_incorrect():
-    duration_str = "04:61:56.8"
-    assert not verify_activity_duration(duration_str)
-
-
-def test_verify_duration_seconds_part_incorrect():
-    duration_str = "04:51:65.8"
-    assert not verify_activity_duration(duration_str)
-
-
-def test_verify_duration_without_dot():
-    duration_str = "04:51:54"
-    assert verify_activity_duration(duration_str)
+@pytest.mark.parametrize(
+    "duration_str,expected",
+    [
+        ("04:61:56.8", False),  # Minutes Part incorrect
+        ("04:51:65.8", False),  # Seconds Part incorrect
+        ("04:51:54", True),  # Simple Time Display
+        ("04:51:60", True),  # Full 60 Seconds Fine, if no dot
+        ("04:51:60.5", False),  # Cannot be 60 seconds and a bit
+        ("04:60:00", True),  # Full 60 Minutes Fine, if no seconds
+        ("04:60:01.5", False),  # Cannot be 60 Minutes and a second
+        ("04:60:00.0", True),  # Full 60 Minutes Fine, if no seconds, hundreth
+    ],
+)
+def test_verify_duration_minutes_part_incorrect(duration_str, expected):
+    assert verify_activity_duration(duration_str) is expected
 
 
 def test_parse_hours_from_activity_duration(get_duration_str):

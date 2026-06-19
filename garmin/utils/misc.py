@@ -6,6 +6,8 @@ from typing import Callable
 
 import pandas as pd
 
+TIME_PATTERN = r"(\d{2}):([0-5]\d|60):([0-5]\d|60)(\.\d+)?"
+
 
 def parse_str_to_int(value: str | int) -> int:
     if isinstance(value, int):
@@ -88,10 +90,15 @@ def categorize_df_column(
 
 
 def verify_activity_duration(duration_str: str) -> bool:
-    regex_pattern = r"\d{2}:[0-5]\d:[0-5]\d(\.\d+)?"
-    if get_all_regex_matches(regex_pattern, duration_str):
-        return True
-    return False
+    if not get_all_regex_matches(TIME_PATTERN, duration_str):
+        return False
+    minutes = parse_minutes_from_activity_duration(duration_str)
+    seconds = parse_seconds_from_activity_duration(duration_str)
+    hundreth = search_with_regex(r"\.(\d+)", duration_str, 1)
+    hundreth = int(hundreth) if hundreth else 0
+    if minutes == 60 and seconds > 0:
+        return False
+    return False if seconds == 60 and hundreth > 0 else True
     # 00:02:56.8
 
 
@@ -105,29 +112,43 @@ def parse_activity_duration_to_minutes(duration_str: str) -> float:
     hours = parse_hours_from_activity_duration(duration_str)
     minutes = parse_minutes_from_activity_duration(duration_str)
     seconds = parse_seconds_from_activity_duration(duration_str)
+    print(hours, minutes, seconds)
     return calculate_minutes(hours, minutes, seconds)
 
 
+def parse_activity_duration_to_hours(duration_str: str) -> float:
+    if not verify_activity_duration(duration_str):
+        return 0.0
+    hours = parse_hours_from_activity_duration(duration_str)
+    minutes = parse_minutes_from_activity_duration(duration_str)
+    seconds = parse_seconds_from_activity_duration(duration_str)
+    return calculate_hours(hours, minutes, seconds)
+
+
 def parse_hours_from_activity_duration(duration_str: str) -> float:
-    regex_pattern = r"(\d{2}):[0-5]\d:[0-5]\d(\.\d+)?"
+    regex_pattern = TIME_PATTERN
     hours = search_with_regex(regex_pattern, duration_str, 1)
     return int(hours)
 
 
 def parse_minutes_from_activity_duration(duration_str: str) -> float:
-    regex_pattern = r"\d{2}:([0-5]\d):[0-5]\d(\.\d+)?"
-    minutes = search_with_regex(regex_pattern, duration_str, 1)
+    regex_pattern = TIME_PATTERN
+    minutes = search_with_regex(regex_pattern, duration_str, 2)
     return int(minutes)
 
 
 def parse_seconds_from_activity_duration(duration_str: str) -> float:
-    regex_pattern = r"\d{2}:[0-5]\d:([0-5]\d)(\.\d+)?"
-    seconds = search_with_regex(regex_pattern, duration_str, 1)
+    regex_pattern = TIME_PATTERN
+    seconds = search_with_regex(regex_pattern, duration_str, 3)
     return int(seconds)
 
 
 def calculate_minutes(hours: float, minutes: float, seconds: float) -> float:
     return round(hours * 60 + minutes + seconds / 60, 5)
+
+
+def calculate_hours(hours: float, minutes: float, seconds: float) -> float:
+    return round(hours + minutes / 60 + seconds / 3600, 5)
 
 
 def transform_activity_minutes_to_duration_format(duration_in_minutes: float) -> str:
@@ -140,7 +161,7 @@ def transform_activity_minutes_to_duration_format(duration_in_minutes: float) ->
 def transform_str_to_date(date_str: str) -> datetime:
     if isinstance(date_str, datetime):
         return date_str
-    src_format = "%Y-%m-%d %H:%M:%S"  # 2026-01-02 13:50:51
+    src_format = "%Y-%m-%d %H:%M:%S"
     return datetime.strptime(date_str, src_format)
 
 
