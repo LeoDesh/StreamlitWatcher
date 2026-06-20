@@ -41,6 +41,9 @@ def test_import_file_fail(get_missing_value_garmin_csv_file):
         ("Cardio", "Bad Gams Schwimmen", "Schwimmen"),
         ("Cardio", "Fußball", "Cardio"),
         ("Laufen", "FB Training 28.05.2024", "Laufen"),
+        ("Cardio", "Heute Tenis", "Cardio"),
+        ("Cardio", "Tennis", "Tennis"),
+        ("Cardio", "Padel Tennis", "Tennis"),
     ],
 )
 def test_transform_activity(activity: str, title: str, expected: str):
