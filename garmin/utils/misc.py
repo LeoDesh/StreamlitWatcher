@@ -112,7 +112,6 @@ def parse_activity_duration_to_minutes(duration_str: str) -> float:
     hours = parse_hours_from_activity_duration(duration_str)
     minutes = parse_minutes_from_activity_duration(duration_str)
     seconds = parse_seconds_from_activity_duration(duration_str)
-    print(hours, minutes, seconds)
     return calculate_minutes(hours, minutes, seconds)
 
 

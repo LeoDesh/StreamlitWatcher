@@ -112,6 +112,7 @@ def main():
         place_figure(fig)
     with pace_hpm_tab:
         pivot_df = create_df_pivot_hpm_pace(df)
+        pivot_df.columns.name = "Pace km/min"
         fig = create_heat_map_ordinary(pivot_df, "Pace & HPM Correlation in %")
         place_figure(fig)
 

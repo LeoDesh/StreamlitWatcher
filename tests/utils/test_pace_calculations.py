@@ -1,22 +1,23 @@
-from garmin.utils.pace_calculations import (
-    transform_pace_to_speed,
-    transform_pace_to_pace_float,
-    transform_pace_float_to_pace,
-    verify_pace_format,
-    transform_pace_to_minutes_seconds,
-    transform_speed_to_pace,
-)
 import pytest
 
+from garmin.utils.pace_calculations import (
+    transform_pace_float_to_pace,
+    transform_pace_to_pace_float,
+    transform_pace_to_speed,
+    transform_speed_to_pace,
+    verify_pace_format,
+)
 
-def test_transform_pace_to_speed():
-    pace_str = "5:00"
-    assert transform_pace_to_speed(pace_str) == pytest.approx(12)
 
-
-def test_transform_pace_to_speed_approx():
-    pace_str = "5:15"
-    assert transform_pace_to_speed(pace_str) == pytest.approx(11.43)
+@pytest.mark.parametrize(
+    "pace_str,expected",
+    [
+        ("5:00", pytest.approx(12)),
+        ("5:15", pytest.approx(11.43)),
+    ],
+)
+def test_transform_pace_to_speed(pace_str: str, expected):
+    assert transform_pace_to_speed(pace_str) == expected
 
 
 def test_transform_pace_str_to_pace_float():
@@ -48,16 +49,13 @@ def test_transform_speed_to_pace():
     assert transform_speed_to_pace(speed) == "10:54"
 
 
-def test_verify_pace_format_correct():
-    pace_str = "14:53"
-    assert verify_pace_format(pace_str)
-
-
-def test_verify_pace_format_leading_zero_digit():
-    pace_str = "04:53"
-    assert verify_pace_format(pace_str)
-
-
-def test_verify_pace_format_incorrect():
-    pace_str = "a14:53"
-    assert not verify_pace_format(pace_str)
+@pytest.mark.parametrize(
+    "pace_str,expected",
+    [
+        ("14:53", True),
+        ("04:53", True),
+        ("a14:53", False),
+    ],
+)
+def test_verify_pace_format_correct(pace_str: str, expected: bool):
+    assert verify_pace_format(pace_str) is expected

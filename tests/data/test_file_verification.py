@@ -9,34 +9,30 @@ from garmin.data.file_verification import (
 )
 
 
-def test_check_for_valid_container_iterable_no_container():
-    container = "container"
-    assert not check_for_valid_container(container)
+@pytest.mark.parametrize(
+    "container,expected",
+    [
+        ("container", False),
+        (set(), False),
+        (["1", "4", "7"], True),
+    ],
+)
+def test_check_for_valid_container_iterable_no_container(
+    container: str | list | set, expected: bool
+):
+    assert check_for_valid_container(container) is expected
 
 
-def test_check_for_valid_container_iterable_empty_container():
-    container = set()
-    assert not check_for_valid_container(container)
-
-
-def test_check_for_valid_container_iterable_container():
-    container = ["1", "4", "7"]
-    assert check_for_valid_container(container)
-
-
-def test_analyze_lines_different_amount_per_lines():
-    lines = ["1,3,4", "1,34"]
-    assert not analyze_lines(lines)
-
-
-def test_analyze_lines_wrong_delimiter():
-    lines = ["1;3;4", "1,3;4;5"]
-    assert not analyze_lines(lines)
-
-
-def test_analyze_lines_success():
-    lines = ["1,3,4", "1,3,4"]
-    assert analyze_lines(lines)
+@pytest.mark.parametrize(
+    "lines,expected",
+    [
+        (["1,3,4", "1,34"], False),
+        (["1;3;4", "1,3;4;5"], False),
+        (["1,3,4", "1,3,4"], True),
+    ],
+)
+def test_analyze_lines_different_amount_per_lines(lines: list[str], expected: bool):
+    assert analyze_lines(lines) is expected
 
 
 def test_validate_csv_file_type_success(get_missing_value_garmin_csv_file):
