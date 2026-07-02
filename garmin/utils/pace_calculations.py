@@ -46,3 +46,8 @@ def transform_seconds_to_hour_minutes_seconds_format(seconds: int):
     seconds -= minutes * 60
     seconds = int(round(seconds, 0))
     return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+
+def transform_hours_minutes_seconds_format_to_hours(time_format: str) -> float:
+    hours, minutes, seconds = time_format.split(":")
+    return round(int(hours) + float(minutes) / 60 + float(seconds) / 3600, 1)

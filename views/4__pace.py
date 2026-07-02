@@ -104,11 +104,11 @@ def main():
             f"{Icons.analytics} Pace and HPM Correlation",
         ]
     )
-    with line_plot_tab:
-        fig = setup_line_plot(df)
-        place_figure(fig)
     with histogram_tab:
         fig = setup_pace_histogram(df, 15)
+        place_figure(fig)
+    with line_plot_tab:
+        fig = setup_line_plot(df)
         place_figure(fig)
     with pace_hpm_tab:
         pivot_df = create_df_pivot_hpm_pace(df)

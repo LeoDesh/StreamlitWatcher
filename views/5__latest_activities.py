@@ -3,7 +3,7 @@ from typing import Any
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import FULL_DATA
+from garmin.constants import ACTIVITY_ATTR_COLUMNS, FULL_DATA
 from garmin.plots.visualization import create_gantt_chart, create_heat_map_monthly_axis
 from garmin.utils.misc import prettify
 from garmin.utils.pandas_helpers import (
@@ -14,6 +14,7 @@ from garmin.utils.pandas_helpers import (
 )
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
+from streamlit_utils.utils import create_metrics_container
 
 
 def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:
@@ -28,15 +29,7 @@ def construct_activity_header(date_str: str, activity_type: str, activity_title:
 
 
 def show_latest_activities(df: DataFrame, rows: int = 20):
-    attrs_columns = [
-        "Distance",
-        "Average Pace",
-        "Speed",
-        "Calories",
-        "Time",
-        "Avg Heart Rate",
-    ]
-    df: DataFrame = df.head(rows)
+    df = df.head(rows)
     df_dict = df.to_dict(orient="records")
     for idx, row_dict in enumerate(df_dict):
         clean_up_dict(row_dict)
@@ -45,12 +38,13 @@ def show_latest_activities(df: DataFrame, rows: int = 20):
         activity_title = construct_activity_header(
             date_str, row_dict["Activity Type"], row_dict["Title"]
         )
-        with st.container(border=True, horizontal_alignment="center"):
-            st.header(f"{idx + 1}: {activity_title}")
-            cols = st.columns(len(attrs_columns))
-            for col, description in zip(cols, attrs_columns):
-                value = row_dict.get(description, "")
-                col.metric(description, value)
+        header = f"{idx + 1}: {activity_title}"
+        activity = {
+            attr: value
+            for attr, value in row_dict.items()
+            if attr in ACTIVITY_ATTR_COLUMNS
+        }
+        create_metrics_container(header, activity)
 
 
 def get_activity_filters(df: DataFrame):
@@ -67,7 +61,7 @@ def get_gantt_filters(df: DataFrame):
     filters = {}
     with st.expander("Chart Filter", expanded=False):
         for key, groups in unique_values_dict.items():
-            filters[key] = st.multiselect(key, options=groups, default=groups)
+            filters[key] = st.multiselect(key, options=groups, default=groups[0])
     return filters
 
 

@@ -17,7 +17,7 @@ jobs:
 
     # 2. uv installieren und Python-Version aus pyproject.toml lesen
     - name: Set up uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         # Aktiviert das Caching für extrem schnelle Folgeläufe
         enable-cache: true

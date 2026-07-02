@@ -37,7 +37,7 @@ def get_df_km_histogram(df: pd.DataFrame, trg_col: str, bins: list[int]) -> Figu
     counts.columns = ["km", "Amount"]
     return create_histogram(
         counts,
-        "km Distribution",
+        "Distribution of kilometres run per unit",
         hovertemplate="%{y} units exercised within range of %{x} km<extra></extra>",
     )
 
@@ -60,7 +60,13 @@ def get_empty_figure() -> Figure:
 
 
 def create_bar_chart(
-    df: pd.DataFrame, x_col: str, y_col: str, *, x_axis_config: dict[str, Any]
+    df: pd.DataFrame,
+    x_col: str,
+    y_col: str,
+    *,
+    x_axis_config: dict[str, Any],
+    y_title: str = "km run per",
+    hovertemplate: str = "",
 ) -> Figure:
     fig = Figure()
     fig.add_bar(
@@ -68,19 +74,47 @@ def create_bar_chart(
         y=df[y_col],
     )
     fig.update_layout(
-        xaxis=x_axis_config | {"title": x_col},
+        xaxis=x_axis_config | {"title": prettify(x_col)},
         yaxis_title="Amount",
-        title={"text": f"km run per {x_col}", "font": {"size": 20}},
+        title={"text": f"{y_title} {x_col}", "font": {"size": 20}},
     )
+    if hovertemplate:
+        fig.update_traces(hovertemplate=hovertemplate)
     return fig
 
 
-def create_bar_chart_month_axis(df: pd.DataFrame, x_col: str, y_col: str):
-    return create_bar_chart(df, x_col, y_col, x_axis_config=X_AXIS_MONTH_CONFIG)
+def create_bar_chart_month_axis(
+    df: pd.DataFrame,
+    x_col: str,
+    y_col: str,
+    y_title: str = "km run per",
+    hovertemplate: str = "",
+):
+    return create_bar_chart(
+        df,
+        x_col,
+        y_col,
+        x_axis_config=X_AXIS_MONTH_CONFIG,
+        y_title=y_title,
+        hovertemplate=hovertemplate,
+    )
 
 
-def create_bar_chart_ordinary_axis(df: pd.DataFrame, x_col: str, y_col: str):
-    return create_bar_chart(df, x_col, y_col, x_axis_config=X_AXIS_BASE_CONFIG)
+def create_bar_chart_ordinary_axis(
+    df: pd.DataFrame,
+    x_col: str,
+    y_col: str,
+    y_title: str = "km run per",
+    hovertemplate: str = "",
+):
+    return create_bar_chart(
+        df,
+        x_col,
+        y_col,
+        x_axis_config=X_AXIS_BASE_CONFIG,
+        y_title=y_title,
+        hovertemplate=hovertemplate,
+    )
 
 
 def create_plotly_pace_chart(
@@ -96,7 +130,7 @@ def create_plotly_pace_chart(
             y=df[y_col],
             mode="lines+markers",
             # mode="lines",
-            name=y_col,
+            name=prettify(y_col),
             connectgaps=False,
             line=dict(width=2.5, color="blue"),
             customdata=df[y_text_col],
@@ -110,7 +144,7 @@ def create_plotly_pace_chart(
             y=df[y_col_2],
             mode="lines+markers",
             opacity=0.25,
-            name=y_col_2,
+            name=prettify(y_col_2),
             connectgaps=False,
             line=dict(width=2.5, color="red"),
             hovertemplate="HPM: %{y}",

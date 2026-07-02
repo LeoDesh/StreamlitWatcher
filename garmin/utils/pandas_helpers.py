@@ -1,7 +1,8 @@
+from datetime import date
 from itertools import pairwise
-from typing import Any
+from typing import Any, Literal
 
-import pandas as pd
+from pandas import DataFrame, Series, Timedelta, date_range, to_datetime
 
 from garmin.utils.misc import (
     calculate_bins_from_min_max_value,
@@ -12,12 +13,12 @@ from garmin.utils.pace_calculations import transform_pace_float_to_pace
 
 
 def get_df_sum_from_column(
-    df: pd.DataFrame, groupby_column: str, value_column: str
-) -> pd.DataFrame:
+    df: DataFrame, groupby_column: str, value_column: str
+) -> DataFrame:
     return df.groupby(groupby_column)[[value_column]].sum()
 
 
-def bin_label_heartbeat(df: pd.DataFrame, number_of_bins: int, trg_column: str):
+def bin_label_heartbeat(df: DataFrame, number_of_bins: int, trg_column: str):
     values = df[trg_column].tolist()
     bin_values = [
         int(value) for value in calculate_ticker_values(values, number_of_bins)
@@ -30,14 +31,14 @@ def bin_label_heartbeat(df: pd.DataFrame, number_of_bins: int, trg_column: str):
 
 
 def calculate_bins_values_dataframe(
-    df: pd.DataFrame, number_of_bins: int, column: str
+    df: DataFrame, number_of_bins: int, column: str
 ) -> list[float]:
     min_value, max_value = max(df[column].min() - 0.2, 0), df[column].max() + 0.2
     return calculate_bins_from_min_max_value(min_value, max_value, number_of_bins)
 
 
 def get_pace_bins_labels_for_dataframe(
-    df: pd.DataFrame, number_of_bins: int, pace_float_column: str
+    df: DataFrame, number_of_bins: int, pace_float_column: str
 ) -> tuple[list[float], list[str]]:
     bins = calculate_bins_values_dataframe(df, number_of_bins, pace_float_column)
     pace_str_bins = [transform_pace_float_to_pace(bin) for bin in bins]
@@ -48,7 +49,7 @@ def get_pace_bins_labels_for_dataframe(
     return (bins, labels)
 
 
-def create_df_pivot_hpm_pace(df) -> pd.DataFrame:
+def create_df_pivot_hpm_pace(df) -> DataFrame:
     df = categorize_df_column(df, "PACE_FLOAT", 8, get_pace_bins_labels_for_dataframe)
     df = categorize_df_column(df, "AVG_HEART_RATE", 8, bin_label_heartbeat)
     df = df.pivot_table(
@@ -63,7 +64,7 @@ def create_df_pivot_hpm_pace(df) -> pd.DataFrame:
     return df
 
 
-def get_overview_table(df: pd.DataFrame, column: str) -> pd.DataFrame:
+def get_overview_table(df: DataFrame, column: str) -> DataFrame:
     df = df[column].agg(["mean", "median", "max"]).T
     df.index = df.index.map(
         {
@@ -72,26 +73,33 @@ def get_overview_table(df: pd.DataFrame, column: str) -> pd.DataFrame:
             "max": "Max",
         }
     )
-    return pd.DataFrame(df)
+    return DataFrame(df)
 
 
-def get_grouped_table(
-    df: pd.DataFrame, group_columns: list[str], agg_columns: list[str]
-):
+def get_grouped_table(df: DataFrame, group_columns: list[str], agg_columns: list[str]):
     sum_df = df.groupby(group_columns)[agg_columns].sum()
     count_df = df.groupby(group_columns).size().to_frame("Count")
     return count_df.join(sum_df).reset_index()
 
 
 def get_unique_values_per_column(
-    df: pd.DataFrame, columns: list[str]
+    df: DataFrame, columns: list[str]
 ) -> dict[str, list[Any]]:
     return {column: df[column].unique().tolist() for column in columns}
 
 
-def filter_dataframe(df: pd.DataFrame, filter_kwargs: dict[str, Any]) -> pd.DataFrame:
+def generate_dates_df(
+    min_date: date,
+    max_date: date,
+    freq: Literal["D", "MS"] = "D",
+    date_column: str = "Date",
+) -> DataFrame:
+    return DataFrame({date_column: date_range(min_date, max_date, freq=freq).date})
+
+
+def filter_dataframe(df: DataFrame, filter_kwargs: dict[str, Any]) -> DataFrame:
     df = df.copy()
-    mask = pd.Series(True, index=df.index)
+    mask = Series(True, index=df.index)
     for col, val in filter_kwargs.items():
         if isinstance(val, (list, tuple, set)):
             mask &= df[col].isin(val)
@@ -100,18 +108,18 @@ def filter_dataframe(df: pd.DataFrame, filter_kwargs: dict[str, Any]) -> pd.Data
     return df[mask].copy()
 
 
-def get_highlights_data(df: pd.DataFrame, columns: list[str], idx: int):
+def get_highlights_data(df: DataFrame, columns: list[str], idx: int):
     return df.loc[idx, columns].values
 
 
-def get_gantt_df(df: pd.DataFrame, date_column: str) -> pd.DataFrame:
-    df[date_column] = pd.to_datetime(df[date_column])
-    df["Date End"] = df[date_column] + pd.Timedelta(days=1)
+def get_gantt_df(df: DataFrame, date_column: str) -> DataFrame:
+    df[date_column] = to_datetime(df[date_column])
+    df["Date End"] = df[date_column] + Timedelta(days=1)
     return df
 
 
 def get_pivot_dataframe(
-    df: pd.DataFrame,
+    df: DataFrame,
     groupby_columns: list[str] | str,
     agg_columns: list[str] | str,
     value_column: str,

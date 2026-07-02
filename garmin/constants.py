@@ -5,3 +5,12 @@ from garmin.data.data_load import get_running_data, import_file
 FILE_PATH = Path("garmin/data/Activities.csv")
 DATA = get_running_data(FILE_PATH)
 FULL_DATA = import_file(FILE_PATH)
+
+ACTIVITY_ATTR_COLUMNS = [
+    "Distance",
+    "Average Pace",
+    "Speed",
+    "Calories",
+    "Time",
+    "Avg Heart Rate",
+]
