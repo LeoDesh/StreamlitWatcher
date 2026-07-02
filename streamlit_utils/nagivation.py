@@ -9,7 +9,7 @@ from streamlit_utils.config import PAGE_CONFIG, Icons
 def get_pages():
     st.set_page_config(layout="wide")
     base_config = {"icon": Icons.monitoring}
-    streamlit_pages = []
+    page_order_dict = {}
     for file in Path("views").iterdir():
         if not file.suffix == ".py":
             continue
@@ -23,7 +23,8 @@ def get_pages():
         )
         config = initial_config | {"title": page_name, "page": file}
         streamlit_page = st.Page(**config)
-        streamlit_pages.append(streamlit_page)
+        page_order_dict[index] = streamlit_page
+    streamlit_pages = [page_order_dict[idx] for idx in sorted(page_order_dict)]
     return st.navigation(streamlit_pages, position="top")
 
 
