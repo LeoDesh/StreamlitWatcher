@@ -1,0 +1,34 @@
+name: Run Pytest with uv
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Code aus dem GitHub-Repository auschecken
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. uv installieren und Python-Version aus pyproject.toml lesen
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        # Aktiviert das Caching für extrem schnelle Folgeläufe
+        enable-cache: true
+        # Optional: Falls du eine exakte Python-Version erzwingen willst:
+        # version: "0.x"
+
+    # 3. Projekt-Abhängigkeiten synchronisieren
+    # "uv sync" installiert alle Pakete aus deiner pyproject.toml / uv.lock
+    - name: Install dependencies
+      run: uv sync
+
+    # 4. Pytest isoliert in der uv-Umgebung ausführen
+    - name: Run tests with pytest
+      run: uv run pytest
