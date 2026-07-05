@@ -37,11 +37,12 @@ def construct_header() -> None:
     st.title("Distance Overview")
 
 
-def setup_histogram(df: DataFrame):
+def setup_histogram(df: DataFrame) -> None:
     distance_min = math.floor(df["DISTANCE"].min())
     distance_max = math.ceil(df["DISTANCE"].max())
     bins = calculate_int_bins(distance_min, distance_max, 2)
-    return get_df_km_histogram(df, "DISTANCE", bins)
+    fig = get_df_km_histogram(df, "DISTANCE", bins)
+    place_figure(fig)
 
 
 def compute_delta(src: float, trg: float):
@@ -54,17 +55,18 @@ def compute_delta(src: float, trg: float):
     return 0
 
 
-def setup_heatmap(df: DataFrame):
+def setup_heatmap(df: DataFrame) -> None:
     df = df.copy()
     df.columns = [prettify(col) for col in df.columns]
     pivot_df = df.pivot_table(
         values="Distance", index="Year", columns="Month", aggfunc="sum"
     ).fillna(0)
-    return create_heat_map_monthly_axis(
+    fig = create_heat_map_monthly_axis(
         pivot_df,
         "Distance in km per (Month, Year)",
         hovertemplate="%{y}, %{x}: %{z:.2f} km <extra></extra>",
     )
+    place_figure(fig)
 
 
 def compute_monthly_distance(df: DataFrame) -> DataFrame:
@@ -96,7 +98,7 @@ def get_current_month_metric(df: DataFrame) -> Metric:
     )
 
 
-def get_distance_before_given_date(df: DataFrame, selected_date: date):
+def get_distance_before_given_date(df: DataFrame, selected_date: date) -> float:
     df_current_year = filter_dataframe(df, {"year": selected_date.year})
     df_filtered = df_current_year[df_current_year["date"] <= selected_date]
     return 0 if df_filtered.empty else df_filtered["total"].sum()
@@ -122,22 +124,23 @@ def render_distance_metrics(df: DataFrame) -> None:
     stream_metrics([month_metric, year_metric])
 
 
-def setup_progress_plot(df: DataFrame):
+def setup_progress_plot(df: DataFrame) -> None:
     date_df = generate_dates_df(
         df["date"].min(), df["date"].max(), freq="MS", date_column="date"
     )
     df = date_df.merge(df, how="left", on="date").fillna(0)
     df["distance"] = df["total"].cumsum()
-    return create_bar_chart_ordinary_axis(
+    fig = create_bar_chart_ordinary_axis(
         df,
         "date",
         "distance",
         "Total Distance covered per",
         hovertemplate="%{y} km distance covered up to %{x} <extra></extra>",
     )
+    place_figure(fig)
 
 
-def main():
+def main() -> None:
     construct_header()
     df = DATA.copy()
     monthly_distance_df = compute_monthly_distance(df)

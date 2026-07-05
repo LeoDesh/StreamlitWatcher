@@ -19,12 +19,12 @@ def validate_structure_of_csv_file(file: Path) -> bool:
         return analyze_lines(lines)
 
 
-def analyze_lines(lines: list[str], sep=",") -> bool:
+def analyze_lines(lines: list[str], sep: str = ",") -> bool:
     line_sizes = [len(list(line.split(sep))) for line in lines]
     return all(x == line_sizes[0] for x in line_sizes)
 
 
-def check_for_valid_container(container: list | tuple | set):
+def check_for_valid_container(container: list | tuple | set) -> bool:
     if not container:
         return False
     if (

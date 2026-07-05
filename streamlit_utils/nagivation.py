@@ -1,12 +1,13 @@
 from pathlib import Path
 
 import streamlit as st
+from streamlit.navigation.page import StreamlitPage
 
 from garmin.constants import DATA
 from streamlit_utils.config import PAGE_CONFIG, Icons
 
 
-def get_pages():
+def get_pages() -> StreamlitPage:
     st.set_page_config(layout="wide")
     base_config = {"icon": Icons.monitoring}
     page_order_dict = {}

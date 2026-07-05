@@ -98,7 +98,7 @@ def render_metrics(df: DataFrame) -> None:
     stream_metrics(metrics, num_cols=3)
 
 
-def main():
+def main() -> None:
     df = DATA.copy()
     df.columns = [prettify(col) for col in df.columns]
     render_metrics(df)

@@ -1,7 +1,7 @@
 from functools import cache
 from pathlib import Path
 
-import pandas as pd
+from pandas import DataFrame, read_csv
 
 from garmin.data.column_mapping import GARMIN_COLUMNS
 from garmin.data.file_verification import validate_csv_file
@@ -23,30 +23,30 @@ MIN_DISTANCE = 2.5
 
 
 @cache
-def import_file(file: Path) -> pd.DataFrame:
+def import_file(file: Path) -> DataFrame:
     validate_csv_file(file)
     df = read_file(file)
     df = rename_df_columns(df)
     return transform_dataframe(df)
 
 
-def get_running_data(file: Path) -> pd.DataFrame:
+def get_running_data(file: Path) -> DataFrame:
     df = import_file(file)
     return filter_garmin_df(df)
 
 
-def read_file(file: Path) -> pd.DataFrame:
-    return pd.read_csv(str(file))
+def read_file(file: Path) -> DataFrame:
+    return read_csv(str(file))
 
 
-def rename_df_columns(df: pd.DataFrame) -> pd.DataFrame:
+def rename_df_columns(df: DataFrame) -> DataFrame:
     selected_columns = [col for col in GARMIN_COLUMNS.keys()]
     df = df[selected_columns].copy()
     df.columns = [str(GARMIN_COLUMNS[col]) for col in df.columns]
     return df
 
 
-def filter_garmin_df(df: pd.DataFrame):
+def filter_garmin_df(df: DataFrame) -> DataFrame:
     df = df[df["AVERAGE_PACE"] != "--"]
     df = df[df["ACTIVITY_TYPE"] == "Laufen"]
     df = df[df["DISTANCE"] >= MIN_DISTANCE]
@@ -54,7 +54,7 @@ def filter_garmin_df(df: pd.DataFrame):
     return df
 
 
-def transform_activity(initial_activity: str, title: str):
+def transform_activity(initial_activity: str, title: str) -> str:
     if initial_activity != "Cardio":
         return initial_activity
     activity_mapping = {
@@ -68,7 +68,7 @@ def transform_activity(initial_activity: str, title: str):
     return initial_activity
 
 
-def add_pace(activity: str, title: str, pace: str):
+def add_pace(activity: str, title: str, pace: str) -> str:
     if activity == "Indoor Cycling" and "KM" in title.upper():
         value = parse_indoor_cycling_title(title)
         return transform_speed_to_pace(value) if value else pace
@@ -77,13 +77,13 @@ def add_pace(activity: str, title: str, pace: str):
 
 def add_distance(
     activity: str, title: str, speed: float, time_in_minutes: float, distance: float
-):
+) -> float:
     if activity == "Indoor Cycling" and "KM" in title.upper():
         return round(speed * time_in_minutes / 60, 2) if speed > 1 else distance
     return distance
 
 
-def transform_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def transform_dataframe(df: DataFrame) -> DataFrame:
     df["ACTIVITY_TYPE"] = df.apply(
         lambda row: transform_activity(row["ACTIVITY_TYPE"], row["TITLE"]), axis=1
     )

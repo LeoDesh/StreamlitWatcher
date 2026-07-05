@@ -27,7 +27,7 @@ def get_regex_match(regex_pattern: str, target_str: str, idx: int) -> str:
     return regex.findall(target_str)[idx]
 
 
-def search_with_regex(regex_pattern: str, target_str, idx: int = 0) -> str:
+def search_with_regex(regex_pattern: str, target_str: str, idx: int = 0) -> str:
     match = re.search(regex_pattern, target_str)
     if match:
         group = match.group(idx)
@@ -64,7 +64,9 @@ def calculate_ticker_values(values: list[float], max_numb: int = 7) -> list[floa
     return calculate_bins_from_min_max_value(min_val, max_val, max_numb)
 
 
-def bin_label_heartbeat(df: pd.DataFrame, number_of_bins: int, trg_column: str):
+def bin_label_heartbeat(
+    df: pd.DataFrame, number_of_bins: int, trg_column: str
+) -> tuple[list[int], list[str]]:
     values = df[trg_column].tolist()
     bin_values = [
         int(value) for value in calculate_ticker_values(values, number_of_bins)
@@ -81,7 +83,7 @@ def categorize_df_column(
     trg_column: str,
     number_of_bins: int,
     bins_labels_func: Callable[[pd.DataFrame, int, str], tuple[list, list]],
-):
+) -> pd.DataFrame:
     bins, labels = bins_labels_func(df, number_of_bins, trg_column)
     df = df.copy()
     df.loc[:, f"new_{trg_column}"] = pd.cut(df[trg_column], bins=bins, labels=labels)
@@ -178,13 +180,13 @@ def replace_comma_in_number(line: str) -> str:
     return line
 
 
-def parse_indoor_cycling_title(line: str):
+def parse_indoor_cycling_title(line: str) -> float | str:
     pattern = r"(\d+([\.,]\s*\d+)?)\s*KM"
     value = search_with_regex(pattern, line.upper(), 1)
     return transform_str_to_float(value)
 
 
-def transform_str_to_float(value: str):
+def transform_str_to_float(value: str) -> float | str:
     value = value.replace(" ", "")
     value = value.replace(",", ".")
     try:

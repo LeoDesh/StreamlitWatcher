@@ -13,7 +13,7 @@ class Metric:
     delta: Any | None = None
     help: str | None = None
 
-    def render_metric(self):
+    def render_metric(self) -> None:
         return st.metric(**asdict(self))
 
 
@@ -28,7 +28,7 @@ def stream_metrics(
                 metric.render_metric()
 
 
-def create_metrics_container(header: str, activites: dict[str, str]):
+def create_metrics_container(header: str, activites: dict[str, str]) -> None:
     with st.container(border=True, horizontal_alignment="center"):
         st.header(header)
         metrics = [

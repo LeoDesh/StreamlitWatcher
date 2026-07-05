@@ -39,7 +39,7 @@ def verify_pace_format(pace_str: str) -> bool:
     return False
 
 
-def transform_seconds_to_hour_minutes_seconds_format(seconds: int):
+def transform_seconds_to_hour_minutes_seconds_format(seconds: int) -> str:
     hours = int(seconds // 3600)
     seconds -= hours * 3600
     minutes = int(seconds // 60)

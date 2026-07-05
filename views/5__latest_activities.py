@@ -22,13 +22,15 @@ def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:
     data["Speed"] = "--" if pace == "--" else data["Speed"]
 
 
-def construct_activity_header(date_str: str, activity_type: str, activity_title: str):
+def construct_activity_header(
+    date_str: str, activity_type: str, activity_title: str
+) -> str:
     if activity_title.find(activity_type) > -1:
         return f"{date_str} -- {activity_type}"
     return f"{date_str} -- {activity_type} -- {activity_title}"
 
 
-def show_latest_activities(df: DataFrame, rows: int = 20):
+def show_latest_activities(df: DataFrame, rows: int = 20) -> None:
     df = df.head(rows)
     df_dict = df.to_dict(orient="records")
     for idx, row_dict in enumerate(df_dict):
@@ -47,7 +49,7 @@ def show_latest_activities(df: DataFrame, rows: int = 20):
         create_metrics_container(header, activity)
 
 
-def get_activity_filters(df: DataFrame):
+def get_activity_filters(df: DataFrame) -> dict[str, Any]:
     unique_values_dict = get_unique_values_per_column(df, ["Activity Type"])
     filters = {}
     with st.expander("Activity Filter", expanded=False):
@@ -56,7 +58,7 @@ def get_activity_filters(df: DataFrame):
     return filters
 
 
-def get_gantt_filters(df: DataFrame):
+def get_gantt_filters(df: DataFrame) -> dict[str, Any]:
     unique_values_dict = get_unique_values_per_column(df, ["Year"])
     filters = {}
     with st.expander("Chart Filter", expanded=False):
@@ -65,7 +67,7 @@ def get_gantt_filters(df: DataFrame):
     return filters
 
 
-def get_heatmap_filters():
+def get_heatmap_filters() -> dict[str, Any]:
     unique_values_dict = get_unique_values_per_column(FULL_DATA, ["Activity Type"])
     filters = {}
     with st.expander("Heatmap Choice", expanded=False):
@@ -76,13 +78,13 @@ def get_heatmap_filters():
     return filters
 
 
-def show_activities_timeline(df: DataFrame):
+def show_activities_timeline(df: DataFrame) -> None:
     gantt_df = get_gantt_df(df, "Date")
     fig = create_gantt_chart(gantt_df, "Date", "Date End", "Activity Type")
     place_figure(fig)
 
 
-def show_heat_map(df: DataFrame, category: str, unit_choice: bool):
+def show_heat_map(df: DataFrame, category: str, unit_choice: bool) -> None:
     filters = {} if category == "Alle" else {"Activity Type": "Laufen"}
     df["Time In Hours"] = round(df["Time In Hours"], 2)
     pivot_df = get_pivot_dataframe(
@@ -115,7 +117,7 @@ def heatmap_filter() -> tuple[str, bool]:
     return (selection, metric_choice)
 
 
-def main():
+def main() -> None:
     st.header("Latest Activities", text_alignment="center")
     df = FULL_DATA.copy()
     df.columns = [prettify(col) for col in df.columns]

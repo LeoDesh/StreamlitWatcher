@@ -1,9 +1,9 @@
 from itertools import pairwise
 from typing import Any
 
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from pandas import DataFrame, cut
 from plotly.graph_objects import Figure
 
 from garmin.plots.config import X_AXIS_BASE_CONFIG, X_AXIS_MONTH_CONFIG
@@ -15,7 +15,7 @@ from garmin.utils.pandas_helpers import get_pace_bins_labels_for_dataframe
 
 
 def get_df_pace_histogram(
-    df: pd.DataFrame, pace_float_column: str, number_of_bins: int
+    df: DataFrame, pace_float_column: str, number_of_bins: int
 ) -> Figure:
     df = categorize_df_column(
         df, pace_float_column, number_of_bins, get_pace_bins_labels_for_dataframe
@@ -29,10 +29,10 @@ def get_df_pace_histogram(
     )
 
 
-def get_df_km_histogram(df: pd.DataFrame, trg_col: str, bins: list[int]) -> Figure:
+def get_df_km_histogram(df: DataFrame, trg_col: str, bins: list[int]) -> Figure:
     labels = [f"{current_km}-{next_km} km" for current_km, next_km in pairwise(bins)]
     df = df.copy()
-    df.loc[:, "binned"] = pd.cut(df[trg_col], bins=bins, labels=labels)
+    df.loc[:, "binned"] = cut(df[trg_col], bins=bins, labels=labels)
     counts = df["binned"].value_counts().sort_index().reset_index()
     counts.columns = ["km", "Amount"]
     return create_histogram(
@@ -42,7 +42,7 @@ def get_df_km_histogram(df: pd.DataFrame, trg_col: str, bins: list[int]) -> Figu
     )
 
 
-def create_histogram(df: pd.DataFrame, title: str, hovertemplate: str):
+def create_histogram(df: DataFrame, title: str, hovertemplate: str) -> Figure:
     x_col, y_col = df.columns
     fig = Figure()
     fig.add_bar(x=df[x_col], y=df[y_col])
@@ -60,7 +60,7 @@ def get_empty_figure() -> Figure:
 
 
 def create_bar_chart(
-    df: pd.DataFrame,
+    df: DataFrame,
     x_col: str,
     y_col: str,
     *,
@@ -84,12 +84,12 @@ def create_bar_chart(
 
 
 def create_bar_chart_month_axis(
-    df: pd.DataFrame,
+    df: DataFrame,
     x_col: str,
     y_col: str,
     y_title: str = "km run per",
     hovertemplate: str = "",
-):
+) -> DataFrame:
     return create_bar_chart(
         df,
         x_col,
@@ -101,12 +101,12 @@ def create_bar_chart_month_axis(
 
 
 def create_bar_chart_ordinary_axis(
-    df: pd.DataFrame,
+    df: DataFrame,
     x_col: str,
     y_col: str,
     y_title: str = "km run per",
     hovertemplate: str = "",
-):
+) -> DataFrame:
     return create_bar_chart(
         df,
         x_col,
@@ -118,7 +118,7 @@ def create_bar_chart_ordinary_axis(
 
 
 def create_plotly_pace_chart(
-    df: pd.DataFrame, x_col: str, y_col: str, y_text_col: str, y_col_2: str
+    df: DataFrame, x_col: str, y_col: str, y_text_col: str, y_col_2: str
 ) -> Figure:
     values = df[y_col].tolist()
     tickvals = calculate_ticker_values(values)
@@ -185,7 +185,7 @@ def create_plotly_pace_chart(
 
 
 def create_gantt_chart(
-    df: pd.DataFrame, start_date_column: str, end_date_column: str, category_col: str
+    df: DataFrame, start_date_column: str, end_date_column: str, category_col: str
 ) -> Figure:
     fig = px.timeline(
         df,
@@ -199,7 +199,7 @@ def create_gantt_chart(
 
 
 def create_heat_map(
-    df: pd.DataFrame, title: str, *, x_axis_kwargs: dict[str, Any], hovertemplate: str
+    df: DataFrame, title: str, *, x_axis_kwargs: dict[str, Any], hovertemplate: str
 ) -> Figure:
     index_name = prettify(df.index.name)
     columns_name = prettify(df.columns.name)
@@ -220,7 +220,7 @@ def create_heat_map(
     return fig
 
 
-def create_heat_map_ordinary(df: pd.DataFrame, title: str) -> Figure:
+def create_heat_map_ordinary(df: DataFrame, title: str) -> Figure:
     hovertemplate = "With Avg. Heart Rate %{y}: %{z:.2f} % chance of a run with Pace %{x}<extra></extra>"
     return create_heat_map(
         df, title, x_axis_kwargs=X_AXIS_BASE_CONFIG, hovertemplate=hovertemplate
@@ -228,7 +228,7 @@ def create_heat_map_ordinary(df: pd.DataFrame, title: str) -> Figure:
 
 
 def create_heat_map_monthly_axis(
-    df: pd.DataFrame, title: str, hovertemplate: str
+    df: DataFrame, title: str, hovertemplate: str
 ) -> Figure:
     return create_heat_map(
         df, title, x_axis_kwargs=X_AXIS_MONTH_CONFIG, hovertemplate=hovertemplate

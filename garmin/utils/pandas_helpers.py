@@ -18,7 +18,9 @@ def get_df_sum_from_column(
     return df.groupby(groupby_column)[[value_column]].sum()
 
 
-def bin_label_heartbeat(df: DataFrame, number_of_bins: int, trg_column: str):
+def bin_label_heartbeat(
+    df: DataFrame, number_of_bins: int, trg_column: str
+) -> tuple[list[int], list[str]]:
     values = df[trg_column].tolist()
     bin_values = [
         int(value) for value in calculate_ticker_values(values, number_of_bins)
@@ -49,7 +51,7 @@ def get_pace_bins_labels_for_dataframe(
     return (bins, labels)
 
 
-def create_df_pivot_hpm_pace(df) -> DataFrame:
+def create_df_pivot_hpm_pace(df: DataFrame) -> DataFrame:
     df = categorize_df_column(df, "PACE_FLOAT", 8, get_pace_bins_labels_for_dataframe)
     df = categorize_df_column(df, "AVG_HEART_RATE", 8, bin_label_heartbeat)
     df = df.pivot_table(
@@ -76,7 +78,9 @@ def get_overview_table(df: DataFrame, column: str) -> DataFrame:
     return DataFrame(df)
 
 
-def get_grouped_table(df: DataFrame, group_columns: list[str], agg_columns: list[str]):
+def get_grouped_table(
+    df: DataFrame, group_columns: list[str], agg_columns: list[str]
+) -> DataFrame:
     sum_df = df.groupby(group_columns)[agg_columns].sum()
     count_df = df.groupby(group_columns).size().to_frame("Count")
     return count_df.join(sum_df).reset_index()
@@ -108,7 +112,7 @@ def filter_dataframe(df: DataFrame, filter_kwargs: dict[str, Any]) -> DataFrame:
     return df[mask].copy()
 
 
-def get_highlights_data(df: DataFrame, columns: list[str], idx: int):
+def get_highlights_data(df: DataFrame, columns: list[str], idx: int) -> DataFrame:
     return df.loc[idx, columns].values
 
 
@@ -124,8 +128,9 @@ def get_pivot_dataframe(
     agg_columns: list[str] | str,
     value_column: str,
     agg_func: list[str] | str,
-    filters: dict[list, Any] = {},
-):
+    filters: dict[list, Any] | None = None,
+) -> DataFrame:
+    filters = filters if filters else {}
     df = filter_dataframe(df, filters)
     return df.pivot_table(
         index=groupby_columns,
