@@ -67,17 +67,6 @@ def get_gantt_filters(df: DataFrame) -> dict[str, Any]:
     return filters
 
 
-def get_heatmap_filters() -> dict[str, Any]:
-    unique_values_dict = get_unique_values_per_column(FULL_DATA, ["Activity Type"])
-    filters = {}
-    with st.expander("Heatmap Choice", expanded=False):
-        for key, groups in unique_values_dict.items():
-            filters[key] = st.selectbox(
-                key, options=groups, index=groups.index("Laufen")
-            )
-    return filters
-
-
 def show_activities_timeline(df: DataFrame) -> None:
     gantt_df = get_gantt_df(df, "Date")
     fig = create_gantt_chart(gantt_df, "Date", "Date End", "Activity Type")

@@ -2,8 +2,8 @@ import math
 from datetime import date, timedelta
 from typing import Tuple
 
-import pandas as pd
 import streamlit as st
+from pandas import DataFrame, Timestamp
 
 from garmin.constants import DATA
 from garmin.plots.visualization import (
@@ -16,8 +16,12 @@ from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
 
+type FilterParameters = list[
+    tuple[date, date], tuple[float, float], tuple[float, float]
+]
 
-def setup_date_range_selection(df: pd.DataFrame) -> Tuple[date, date]:
+
+def setup_date_range_selection(df: DataFrame) -> Tuple[date, date]:
     date_min = df["DATE"].min().date()
     date_max: date = df["DATE"].max().date()
     date_max = date_max + timedelta(days=1)
@@ -43,7 +47,7 @@ def setup_pace_range_selection() -> Tuple[int, int]:
     return (chosen_pace_min, chosen_pace_max)
 
 
-def setup_distance_range_selection(df: pd.DataFrame) -> Tuple[int, int]:
+def setup_distance_range_selection(df: DataFrame) -> Tuple[int, int]:
     distance_min = 0
     distance_max = math.ceil(df["DISTANCE"].max())
     chosen_distance_min, chosen_distance_max = st.slider(
@@ -55,11 +59,7 @@ def setup_distance_range_selection(df: pd.DataFrame) -> Tuple[int, int]:
     return (chosen_distance_min, chosen_distance_max)
 
 
-def setup_number_of_bins() -> int:
-    return st.number_input("Number of Bins", 5, 30, 15)
-
-
-def setup_line_plot(df: pd.DataFrame) -> None:
+def setup_line_plot(df: DataFrame) -> None:
     return create_plotly_pace_chart(
         df,
         x_col="DATE",
@@ -69,7 +69,7 @@ def setup_line_plot(df: pd.DataFrame) -> None:
     )
 
 
-def setup_pace_histogram(df: pd.DataFrame, number_of_bins: int) -> None:
+def setup_pace_histogram(df: DataFrame, number_of_bins: int) -> None:
     if df.empty:
         fig = get_empty_figure()
     else:
@@ -77,26 +77,41 @@ def setup_pace_histogram(df: pd.DataFrame, number_of_bins: int) -> None:
     return fig
 
 
-def main():
-    df = DATA
-    st.title("Pace Overview")
+def render_filter_parameters(
+    df: DataFrame,
+) -> FilterParameters:
     with st.expander("Filters"):
         date_range_col, pace_col, distance_col = st.columns(3)
         with date_range_col:
-            start_date, end_date = setup_date_range_selection(df)
+            date_range = setup_date_range_selection(df)
         with pace_col:
-            min_pace, max_pace = setup_pace_range_selection()
+            pace_range = setup_pace_range_selection()
         with distance_col:
-            min_distance, max_distance = setup_distance_range_selection(df)
+            distance_range = setup_distance_range_selection(df)
+    return [date_range, pace_range, distance_range]
 
+
+def filter_dataframe(df: DataFrame, filters: FilterParameters) -> DataFrame:
+    date_range, pace_range, distance_range = filters
+    start_date, end_date = date_range
+    min_pace, max_pace = pace_range
+    min_distance, max_distance = distance_range
     df = df[
-        (df["DATE"] >= pd.Timestamp(start_date))
-        & (df["DATE"] <= pd.Timestamp(end_date))
+        (df["DATE"] >= Timestamp(start_date))
+        & (df["DATE"] <= Timestamp(end_date))
         & (df["PACE_FLOAT"] <= max_pace)
         & (df["PACE_FLOAT"] >= min_pace)
         & (df["DISTANCE"] <= max_distance)
         & (df["DISTANCE"] >= min_distance)
     ]
+    return df
+
+
+def main() -> None:
+    df = DATA.copy()
+    st.title("Pace Overview")
+    filters = render_filter_parameters(df)
+    df = filter_dataframe(df, filters)
     histogram_tab, line_plot_tab, pace_hpm_tab = st.tabs(
         [
             f"{Icons.bar_chart} Pace Histogram",

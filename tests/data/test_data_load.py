@@ -8,19 +8,21 @@ from garmin.data.data_load import (
 )
 
 
-@pytest.mark.fast
+@pytest.mark.data
 def test_import_filter_columns_success(load_appropriate_garmin_df):
     df = load_appropriate_garmin_df
     df = rename_df_columns(df)
     assert "AVERAGE_PACE" in df.columns
 
 
+@pytest.mark.data
 def test_import_filter_columns_fail(load_wrong_header_garmin_df):
     df = load_wrong_header_garmin_df
     with pytest.raises(KeyError):
         df = rename_df_columns(df)
 
 
+@pytest.mark.data
 def test_transform_dataframe(load_appropriate_garmin_df):
     df = rename_df_columns(load_appropriate_garmin_df)
     df = transform_dataframe(df)
@@ -29,11 +31,13 @@ def test_transform_dataframe(load_appropriate_garmin_df):
         assert col in df.columns
 
 
+@pytest.mark.data
 def test_import_file_fail(get_missing_value_garmin_csv_file):
     with pytest.raises(ValueError):
         import_file(get_missing_value_garmin_csv_file)
 
 
+@pytest.mark.data
 @pytest.mark.parametrize(
     "activity, title, expected",
     [

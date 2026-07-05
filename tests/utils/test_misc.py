@@ -6,6 +6,7 @@ import pytest
 from garmin.utils.misc import (
     calculate_bins_from_min_max_value,
     calculate_minutes,
+    compute_delta,
     get_all_regex_matches,
     get_regex_match,
     parse_activity_duration_to_minutes,
@@ -24,17 +25,20 @@ from garmin.utils.misc import (
 REGEX_TEXT = "545 343 754"
 
 
+@pytest.mark.misc
 def test_parse_str_to_int_identity():
     value = 5
     assert parse_str_to_int(value) == 5
 
 
+@pytest.mark.misc
 def test_parse_str_to_int_str_with_comma():
     value = "5,453"
     parsed_value = parse_str_to_int(value)
     assert parsed_value == 5453
 
 
+@pytest.mark.misc
 @pytest.mark.parametrize(
     "pattern,expected",
     [
@@ -46,6 +50,7 @@ def test_get_all_regex_match(pattern: str, expected: list[str]):
     assert get_all_regex_matches(pattern, REGEX_TEXT) == expected
 
 
+@pytest.mark.misc
 @pytest.mark.parametrize(
     "pattern,idx,expected,expected_context",
     [
@@ -75,6 +80,7 @@ def test_get_regex_match(pattern: str, idx: int, expected: str, expected_context
         assert value == expected
 
 
+@pytest.mark.misc
 @pytest.mark.parametrize(
     "pattern,idx,expected,expected_context",
     [
@@ -103,17 +109,20 @@ def test_search_with_regex(pattern: str, idx: int, expected: str, expected_conte
         assert search_with_regex(pattern, REGEX_TEXT, idx) == expected
 
 
+@pytest.mark.misc
 def test_transform_str_to_date_correct_format():
     date_str = "2025-05-03 18:05:04"
     assert transform_str_to_date(date_str) == datetime(2025, 5, 3, 18, 5, 4)
 
 
+@pytest.mark.misc
 def test_transform_str_to_date_failure():
     date_str = "2025.05.03 18:05:04"
     with pytest.raises(ValueError):
         transform_str_to_date(date_str)
 
 
+@pytest.mark.misc
 def test_calculate_bins_values_from_min_max():
     bins = 5
     min_value = 1
@@ -123,6 +132,7 @@ def test_calculate_bins_values_from_min_max():
     )
 
 
+@pytest.mark.misc
 @pytest.mark.parametrize(
     "line,expected",
     [
@@ -144,10 +154,12 @@ def test_transform_number_to_comma(line: str, expected: str):
     assert replace_comma_in_number(line) == expected
 
 
+@pytest.mark.misc
 def test_verify_duration_correct(get_duration_str):
     assert verify_activity_duration(get_duration_str)
 
 
+@pytest.mark.misc
 @pytest.mark.parametrize(
     "duration_str,expected",
     [
@@ -165,23 +177,28 @@ def test_verify_duration_minutes_part_incorrect(duration_str, expected):
     assert verify_activity_duration(duration_str) is expected
 
 
+@pytest.mark.misc
 def test_parse_hours_from_activity_duration(get_duration_str):
     assert parse_hours_from_activity_duration(get_duration_str) == 4
 
 
+@pytest.mark.misc
 def test_parse_minutes_from_activity_duration(get_duration_str):
     assert parse_minutes_from_activity_duration(get_duration_str) == 2
 
 
+@pytest.mark.misc
 def test_parse_seconds_from_activity_duration(get_duration_str):
     assert parse_seconds_from_activity_duration(get_duration_str) == 56
 
 
+@pytest.mark.misc
 def test_calculate_minutes():
     hours, minutes, seconds = (2, 54, 40)
     assert calculate_minutes(hours, minutes, seconds) == pytest.approx(174.66667)
 
 
+@pytest.mark.misc
 def test_parse_activity_duration_to_minutes(get_duration_str):
     assert parse_activity_duration_to_minutes(get_duration_str) == pytest.approx(
         242.93333
@@ -189,6 +206,7 @@ def test_parse_activity_duration_to_minutes(get_duration_str):
     # "04:02:56.8"
 
 
+@pytest.mark.misc
 def test_transform_activity_minutes_to_duration_format(get_duration_str):
     duration_in_minutes = parse_activity_duration_to_minutes(get_duration_str)
     assert (
@@ -196,6 +214,7 @@ def test_transform_activity_minutes_to_duration_format(get_duration_str):
     )
 
 
+@pytest.mark.misc
 @pytest.mark.parametrize(
     "title,expected",
     [
@@ -209,3 +228,19 @@ def test_transform_activity_minutes_to_duration_format(get_duration_str):
 )
 def test_parse_indoor_cycling_title(title: str, expected: str | float):
     assert parse_indoor_cycling_title(title) == expected
+
+
+@pytest.mark.misc
+@pytest.mark.parametrize(
+    "src,trg,expected",
+    [
+        (100, 100, 0.0),
+        (200, 100, -50),
+        (100, 200, 100),
+        (100, 0, -100),
+        (0, 100, 100),
+        (0, 0, 0),
+    ],
+)
+def test_compute_delta(src: float, trg: float, expected: float):
+    assert compute_delta(src, trg) == expected

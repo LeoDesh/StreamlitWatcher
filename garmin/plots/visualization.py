@@ -83,23 +83,6 @@ def create_bar_chart(
     return fig
 
 
-def create_bar_chart_month_axis(
-    df: DataFrame,
-    x_col: str,
-    y_col: str,
-    y_title: str = "km run per",
-    hovertemplate: str = "",
-) -> DataFrame:
-    return create_bar_chart(
-        df,
-        x_col,
-        y_col,
-        x_axis_config=X_AXIS_MONTH_CONFIG,
-        y_title=y_title,
-        hovertemplate=hovertemplate,
-    )
-
-
 def create_bar_chart_ordinary_axis(
     df: DataFrame,
     x_col: str,

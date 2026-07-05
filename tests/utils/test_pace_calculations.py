@@ -9,6 +9,7 @@ from garmin.utils.pace_calculations import (
 )
 
 
+@pytest.mark.pace
 @pytest.mark.parametrize(
     "pace_str,expected",
     [
@@ -20,16 +21,19 @@ def test_transform_pace_to_speed(pace_str: str, expected):
     assert transform_pace_to_speed(pace_str) == expected
 
 
+@pytest.mark.pace
 def test_transform_pace_str_to_pace_float():
     pace_str = "4:30"
     assert transform_pace_to_pace_float(pace_str) == pytest.approx(4.5)
 
 
+@pytest.mark.pace
 def test_transform_pace_float_to_pace_str():
     pace_float = 4.95
     assert transform_pace_float_to_pace(pace_float) == "4:57"
 
 
+@pytest.mark.pace
 def test_transform_pace_str_pace_float_conversion_cycle():
     pace_float = 4.95
     assert (
@@ -37,6 +41,7 @@ def test_transform_pace_str_pace_float_conversion_cycle():
     )
 
 
+@pytest.mark.pace
 def test_transform_pace_float_pace_str_conversion_cycle():
     pace_str = "4:30"
     assert (
@@ -44,11 +49,13 @@ def test_transform_pace_float_pace_str_conversion_cycle():
     )
 
 
+@pytest.mark.pace
 def test_transform_speed_to_pace():
     speed = 5.5
     assert transform_speed_to_pace(speed) == "10:54"
 
 
+@pytest.mark.pace
 @pytest.mark.parametrize(
     "pace_str,expected",
     [

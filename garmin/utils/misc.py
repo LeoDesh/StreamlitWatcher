@@ -22,6 +22,9 @@ def get_all_regex_matches(regex_pattern: str, target_str: str) -> str:
     return regex.findall(target_str)
 
 
+"""Keep it. May still be used"""
+
+
 def get_regex_match(regex_pattern: str, target_str: str, idx: int) -> str:
     regex = re.compile(regex_pattern)
     return regex.findall(target_str)[idx]
@@ -33,12 +36,6 @@ def search_with_regex(regex_pattern: str, target_str: str, idx: int = 0) -> str:
         group = match.group(idx)
         return group
     return ""
-
-
-def get_df_sum_from_column(
-    df: pd.DataFrame, groupby_column: str, value_column: str
-) -> pd.DataFrame:
-    return df.groupby(groupby_column)[[value_column]].sum()
 
 
 def calculate_bins_from_min_max_value(
@@ -126,22 +123,23 @@ def parse_activity_duration_to_hours(duration_str: str) -> float:
     return calculate_hours(hours, minutes, seconds)
 
 
-def parse_hours_from_activity_duration(duration_str: str) -> float:
+def _parse_time_components_from_activity_duration(
+    duration_str: str, component_part: int
+) -> int:
     regex_pattern = TIME_PATTERN
-    hours = search_with_regex(regex_pattern, duration_str, 1)
-    return int(hours)
+    return int(search_with_regex(regex_pattern, duration_str, component_part))
 
 
-def parse_minutes_from_activity_duration(duration_str: str) -> float:
-    regex_pattern = TIME_PATTERN
-    minutes = search_with_regex(regex_pattern, duration_str, 2)
-    return int(minutes)
+def parse_hours_from_activity_duration(duration_str: str) -> int:
+    return _parse_time_components_from_activity_duration(duration_str, 1)
 
 
-def parse_seconds_from_activity_duration(duration_str: str) -> float:
-    regex_pattern = TIME_PATTERN
-    seconds = search_with_regex(regex_pattern, duration_str, 3)
-    return int(seconds)
+def parse_minutes_from_activity_duration(duration_str: str) -> int:
+    return _parse_time_components_from_activity_duration(duration_str, 2)
+
+
+def parse_seconds_from_activity_duration(duration_str: str) -> int:
+    return _parse_time_components_from_activity_duration(duration_str, 3)
 
 
 def calculate_minutes(hours: float, minutes: float, seconds: float) -> float:
@@ -166,11 +164,6 @@ def transform_str_to_date(date_str: str) -> datetime:
     return datetime.strptime(date_str, src_format)
 
 
-def split_lines_with_comma(line: str, sep: str = ",") -> list[str]:
-    line = replace_comma_in_number(line)
-    return line.split(sep)
-
-
 def replace_comma_in_number(line: str) -> str:
     pattern = r"\d+,\d{3}"
     matches = get_all_regex_matches(pattern, line)
@@ -193,3 +186,13 @@ def transform_str_to_float(value: str) -> float | str:
         return float(value)
     except (TypeError, ValueError):
         return value
+
+
+def compute_delta(src: float, trg: float) -> float:
+    if src and trg:
+        return round((trg - src) / src * 100, 2)
+    if src:
+        return -100
+    if trg:
+        return 100
+    return 0

@@ -1,7 +1,5 @@
 from pathlib import Path
 
-# from garmin.utils.misc import split_lines_with_comma
-
 
 def validate_file_type(file: Path) -> bool:
     if not file.is_file():

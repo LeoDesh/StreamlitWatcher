@@ -1,5 +1,5 @@
 import math
-from datetime import date, timedelta
+from datetime import date
 
 import streamlit as st
 from pandas import DataFrame
@@ -10,7 +10,7 @@ from garmin.plots.visualization import (
     create_heat_map_monthly_axis,
     get_df_km_histogram,
 )
-from garmin.utils.misc import calculate_int_bins, prettify
+from garmin.utils.misc import calculate_int_bins, compute_delta, prettify
 from garmin.utils.pandas_helpers import filter_dataframe, generate_dates_df
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
@@ -27,12 +27,6 @@ def get_month_previous_year() -> date:
     return date(current_month.year - 1, current_month.month, 1)
 
 
-def get_previous_month() -> date:
-    current_month = get_current_month()
-    last_of_month = current_month + timedelta(days=-1)
-    return date(last_of_month.year, last_of_month.month, 1)
-
-
 def construct_header() -> None:
     st.title("Distance Overview")
 
@@ -43,16 +37,6 @@ def setup_histogram(df: DataFrame) -> None:
     bins = calculate_int_bins(distance_min, distance_max, 2)
     fig = get_df_km_histogram(df, "DISTANCE", bins)
     place_figure(fig)
-
-
-def compute_delta(src: float, trg: float):
-    if src and trg:
-        return round((trg - src) / src * 100, 2)
-    if src:
-        return -100
-    if trg:
-        return 100
-    return 0
 
 
 def setup_heatmap(df: DataFrame) -> None:
@@ -119,12 +103,15 @@ def get_current_year_metric(df: DataFrame) -> Metric:
 
 
 def render_distance_metrics(df: DataFrame) -> None:
-    month_metric = get_current_month_metric(df)
-    year_metric = get_current_year_metric(df)
-    stream_metrics([month_metric, year_metric])
+    monthly_distance_df = compute_monthly_distance(df)
+    month_metric = get_current_month_metric(monthly_distance_df)
+    year_metric = get_current_year_metric(monthly_distance_df)
+    latest_run_metric = render_latest_run_metric(df)
+    stream_metrics([month_metric, year_metric, latest_run_metric])
 
 
 def setup_progress_plot(df: DataFrame) -> None:
+    df = compute_monthly_distance(df)
     date_df = generate_dates_df(
         df["date"].min(), df["date"].max(), freq="MS", date_column="date"
     )
@@ -140,11 +127,28 @@ def setup_progress_plot(df: DataFrame) -> None:
     place_figure(fig)
 
 
+def get_latest_run(df: DataFrame) -> tuple[date, float]:
+    df = df.copy().sort_values(by="DATE", ascending=False)
+    run_date, distance = df.loc[0, ["DATE", "DISTANCE"]]
+    return (run_date.date(), distance)
+
+
+def render_run_metric(run_date: date, distance: float) -> Metric:
+    return Metric(
+        label=f"Distance Covered On Last Run ({run_date.strftime('%d.%m.%Y')})",
+        value=f"{distance} km",
+    )
+
+
+def render_latest_run_metric(df: DataFrame) -> Metric:
+    run_time, distance = get_latest_run(df)
+    return render_run_metric(run_time, distance)
+
+
 def main() -> None:
     construct_header()
     df = DATA.copy()
-    monthly_distance_df = compute_monthly_distance(df)
-    render_distance_metrics(monthly_distance_df)
+    render_distance_metrics(df)
     progress_tab, histogram_tab, heatmap_tab = st.tabs(
         [
             f"{Icons.monitoring} Progress per Month",
@@ -153,7 +157,7 @@ def main() -> None:
         ]
     )
     with progress_tab:
-        setup_progress_plot(monthly_distance_df)
+        setup_progress_plot(df)
     with histogram_tab:
         setup_histogram(df)
     with heatmap_tab:

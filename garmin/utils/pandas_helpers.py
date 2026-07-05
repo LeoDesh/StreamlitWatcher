@@ -12,12 +12,6 @@ from garmin.utils.misc import (
 from garmin.utils.pace_calculations import transform_pace_float_to_pace
 
 
-def get_df_sum_from_column(
-    df: DataFrame, groupby_column: str, value_column: str
-) -> DataFrame:
-    return df.groupby(groupby_column)[[value_column]].sum()
-
-
 def bin_label_heartbeat(
     df: DataFrame, number_of_bins: int, trg_column: str
 ) -> tuple[list[int], list[str]]:
@@ -66,18 +60,6 @@ def create_df_pivot_hpm_pace(df: DataFrame) -> DataFrame:
     return df
 
 
-def get_overview_table(df: DataFrame, column: str) -> DataFrame:
-    df = df[column].agg(["mean", "median", "max"]).T
-    df.index = df.index.map(
-        {
-            "mean": "Average",
-            "median": "Median",
-            "max": "Max",
-        }
-    )
-    return DataFrame(df)
-
-
 def get_grouped_table(
     df: DataFrame, group_columns: list[str], agg_columns: list[str]
 ) -> DataFrame:
@@ -110,10 +92,6 @@ def filter_dataframe(df: DataFrame, filter_kwargs: dict[str, Any]) -> DataFrame:
         else:
             mask &= df[col] == val
     return df[mask].copy()
-
-
-def get_highlights_data(df: DataFrame, columns: list[str], idx: int) -> DataFrame:
-    return df.loc[idx, columns].values
 
 
 def get_gantt_df(df: DataFrame, date_column: str) -> DataFrame:
