@@ -148,19 +148,16 @@ def main() -> None:
     progress_tab, histogram_tab, heatmap_tab = st.tabs(
         [
             f"{Icons.monitoring} Progress per Month",
-            f"{Icons.bar_chart} Histogram by 'km'",
+            f"{Icons.bar_chart} Histogram by Distance Ranges",
             f"{Icons.analytics} Month Year Distribution",
         ]
     )
     with progress_tab:
-        fig = setup_progress_plot(monthly_distance_df)
-        place_figure(fig)
+        setup_progress_plot(monthly_distance_df)
     with histogram_tab:
-        fig = setup_histogram(df)
-        place_figure(fig)
+        setup_histogram(df)
     with heatmap_tab:
-        fig = setup_heatmap(df)
-        place_figure(fig)
+        setup_heatmap(df)
 
 
 if __name__ == "__main__":

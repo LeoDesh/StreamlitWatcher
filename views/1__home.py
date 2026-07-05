@@ -56,22 +56,25 @@ def construct_column_highlights(df: DataFrame, column: str, amount: int = 3) -> 
 def construct_year_statistics(df: DataFrame) -> None:
     df = df.copy()
     category_col, _ = st.columns([1, 2])
+    mapping = {
+        "Count": ("Total Runs", "%{y} Runs"),
+        "Distance": ("Distance Covered", "%{y} km covered "),
+        "Time": ("Time Spent", "%{y} hours spent "),
+        "Avg. Km": (
+            "Average kilometre amount of a run",
+            "Average of %{y} km per run",
+        ),
+    }
     category = category_col.selectbox(
         label="Category",
         index=None,
-        options=["Count", "Distance", "Time", "Avg. Km"],
+        options=list(mapping.keys()),
         placeholder="Choose your Category",
         label_visibility="collapsed",
     )
     category = category if category else "Count"
     df = get_year_overview_table(df)
     df["Time"] = df["Time"].apply(transform_hours_minutes_seconds_format_to_hours)
-    mapping = {
-        "Count": ("Total Runs", "%{y} Runs"),
-        "Distance": ("Distance Covered", "%{y} km covered "),
-        "Time": ("Time Spent", "%{y} hours spent "),
-        "Avg. Km": ("Average km. of a run", "Average of %{y} km per run"),
-    }
     header, template = mapping.get(category)
     hovertemplate = f"{template} in %{{x}} <extra></extra>"
     fig = create_bar_chart_ordinary_axis(
