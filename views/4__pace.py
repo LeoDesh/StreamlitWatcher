@@ -12,9 +12,12 @@ from garmin.plots.visualization import (
     get_df_pace_histogram,
     get_empty_figure,
 )
-from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace
+from garmin.utils.misc import get_current_month
+from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
+from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace, filter_dataframe
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
+from streamlit_utils.utils import Metric, stream_metrics
 
 type FilterParameters = list[
     tuple[date, date], tuple[float, float], tuple[float, float]
@@ -91,7 +94,9 @@ def render_filter_parameters(
     return [date_range, pace_range, distance_range]
 
 
-def filter_dataframe(df: DataFrame, filters: FilterParameters) -> DataFrame:
+def filter_dataframe_by_parameters(
+    df: DataFrame, filters: FilterParameters
+) -> DataFrame:
     date_range, pace_range, distance_range = filters
     start_date, end_date = date_range
     min_pace, max_pace = pace_range
@@ -107,11 +112,51 @@ def filter_dataframe(df: DataFrame, filters: FilterParameters) -> DataFrame:
     return df
 
 
+def get_current_year_median_pace(df: DataFrame) -> Metric:
+    speed = df["SPEED"].median() if not df.empty else 0.0
+    return Metric(
+        label="Current Year Median Pace",
+        value=transform_speed_to_pace_prettified(speed),
+    )
+
+
+def get_current_year_best_pace(df: DataFrame) -> Metric:
+    speed = df["SPEED"].max() if not df.empty else 0.0
+    return Metric(
+        label="Current Year Highest Pace",
+        value=transform_speed_to_pace_prettified(speed),
+    )
+
+
+def get_most_recent_pace(df: DataFrame) -> Metric:
+    df = df.sort_values(by="DATE", ascending=False)
+    speed, last_date = df.loc[0, ["SPEED", "DATE"]]
+    return Metric(
+        label=f"Pace Most Recent Run ({last_date.strftime('%d.%m.%Y')})",
+        value=transform_speed_to_pace_prettified(speed),
+    )
+
+
+def render_pace_metrics(df: DataFrame) -> None:
+    current_year_df = filter_dataframe(df.copy(), {"YEAR": get_current_month().year})
+    most_recent_pace_metric = get_most_recent_pace(df)
+    current_year_median_pace_metric = get_current_year_median_pace(current_year_df)
+    current_year_highest_pace = get_current_year_best_pace(current_year_df)
+    stream_metrics(
+        [
+            current_year_median_pace_metric,
+            current_year_highest_pace,
+            most_recent_pace_metric,
+        ]
+    )
+
+
 def main() -> None:
     df = DATA.copy()
     st.title("Pace Overview")
+    render_pace_metrics(df)
     filters = render_filter_parameters(df)
-    df = filter_dataframe(df, filters)
+    df = filter_dataframe_by_parameters(df, filters)
     histogram_tab, line_plot_tab, pace_hpm_tab = st.tabs(
         [
             f"{Icons.bar_chart} Pace Histogram",

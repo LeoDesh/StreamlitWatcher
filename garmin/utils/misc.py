@@ -1,6 +1,6 @@
 import math
 import re
-from datetime import datetime
+from datetime import date, datetime
 from itertools import pairwise
 from typing import Callable
 
@@ -196,3 +196,13 @@ def compute_delta(src: float, trg: float) -> float:
     if trg:
         return 100
     return 0
+
+
+def get_current_month() -> date:
+    today = date.today()
+    return date(today.year, today.month, 1)
+
+
+def get_month_previous_year() -> date:
+    current_month = get_current_month()
+    return date(current_month.year - 1, current_month.month, 1)

@@ -3,6 +3,11 @@ import math
 from garmin.utils.misc import get_all_regex_matches
 
 
+def transform_speed_to_pace_prettified(speed: float) -> str:
+    pace_str = transform_speed_to_pace(speed)
+    return f"{pace_str} min/km"
+
+
 def transform_speed_to_pace(speed: float) -> str:
     pace_float = float(60) / speed if speed > 0 else 0
     return transform_pace_float_to_pace(pace_float)
