@@ -18,6 +18,7 @@ class Icons(StrEnum):
 PAGE_CONFIG = {
     "home": {"icon": Icons.home, "default": True},
     "distance": {"icon": Icons.route},
+    "comparison": {"icon": Icons.analytics},
     "pace": {"icon": Icons.monitoring},
     "latest_activities": {"icon": Icons.search},
 }

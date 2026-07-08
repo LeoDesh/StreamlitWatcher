@@ -216,3 +216,25 @@ def create_heat_map_monthly_axis(
     return create_heat_map(
         df, title, x_axis_kwargs=X_AXIS_MONTH_CONFIG, hovertemplate=hovertemplate
     )
+
+
+def create_box_plot_chart(df: DataFrame, column: str) -> Figure:
+    fig = Figure()
+    fig.add_trace(
+        go.Box(
+            x=df["YEAR"].astype(
+                str
+            ),  # Convert to string so years are distinct categories
+            y=df[column],
+            name=prettify(column),  # Label for the legend
+            marker_color="indianred",  # Customize box color
+            boxpoints="all",  # Optional: shows all data points next to the boxes
+        )
+    )
+
+    fig.update_layout(
+        title=f"Annual Distribution of {prettify(column)}",
+        xaxis_title="Year of Run",
+        yaxis_title=prettify(column),
+    )
+    return fig

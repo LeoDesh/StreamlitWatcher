@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any
 
 import streamlit as st
@@ -5,8 +6,9 @@ from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, FULL_DATA
 from garmin.plots.visualization import create_gantt_chart, create_heat_map_monthly_axis
-from garmin.utils.misc import prettify
+from garmin.utils.misc import get_current_month, prettify
 from garmin.utils.pandas_helpers import (
+    aggregate_df_named_column,
     filter_dataframe,
     get_gantt_df,
     get_pivot_dataframe,
@@ -14,7 +16,7 @@ from garmin.utils.pandas_helpers import (
 )
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
-from streamlit_utils.utils import create_metrics_container
+from streamlit_utils.utils import Metric, create_metrics_container, stream_metrics
 
 
 def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:
@@ -106,9 +108,50 @@ def heatmap_filter() -> tuple[str, bool]:
     return (selection, metric_choice)
 
 
+def get_top_activity(df: DataFrame) -> tuple[str, int]:
+    agg_df = aggregate_df_named_column(
+        df,
+        "ACTIVITY_TYPE",
+        "ACTIVITY_TYPE",
+        col_name="Total",
+        agg_func="count",
+        sort_asc=False,
+    ).reset_index(drop=True)
+    return agg_df.loc[0, ["ACTIVITY_TYPE", "Total"]]
+
+
+def get_activity_count(df: DataFrame) -> int:
+    return len(df)
+
+
+def get_metrics(df: DataFrame, description: str) -> list[Metric]:
+    current_month_activity_count = get_activity_count(df)
+    top_activity, count = get_top_activity(df)
+    return [
+        Metric(
+            label=f"Current {description} Activites", value=current_month_activity_count
+        ),
+        Metric(
+            label=f"Current {description} Top Activity",
+            value=f"{top_activity}: {count}",
+        ),
+    ]
+
+
+def render_activities_metrics(df: DataFrame) -> None:
+    current_month = get_current_month()
+    current_month_df = df[df["month_start"] == current_month]
+    current_year_df = df[df["YEAR"] == current_month.year]
+    stream_metrics(
+        [*get_metrics(current_month_df, "Month"), *get_metrics(current_year_df, "Year")]
+    )
+
+
 def main() -> None:
     st.header("Latest Activities", text_alignment="center")
     df = FULL_DATA.copy()
+    df["month_start"] = df["DATE"].apply(lambda x: date(x.year, x.month, 1))
+    render_activities_metrics(df)
     df.columns = [prettify(col) for col in df.columns]
     activity_tab, gantt_chart_tab, heat_tab = st.tabs(
         [

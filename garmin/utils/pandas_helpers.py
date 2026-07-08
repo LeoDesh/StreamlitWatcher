@@ -117,3 +117,25 @@ def get_pivot_dataframe(
         aggfunc=agg_func,
         fill_value=0,
     )
+
+
+def aggregate_df_named_column(
+    df: DataFrame,
+    groupby_col: str,
+    value_col: str,
+    col_name: str | None = None,
+    agg_func: str = "sum",
+    sort_asc: bool | None = None,
+) -> DataFrame:
+    col_name = col_name if col_name else value_col
+    agg_dict = {col_name: (value_col, agg_func)}
+    df = aggregrate_df_by_dict(df, groupby_col, agg_dict)
+    return df if sort_asc is None else df.sort_values(by=col_name, ascending=sort_asc)
+
+
+def aggregrate_df_by_dict(
+    df: DataFrame,
+    groupby_col: str,
+    agg_dict: dict[str, tuple[str, str]],
+) -> DataFrame:
+    return df.groupby(by=groupby_col, as_index=False).agg(**agg_dict)
