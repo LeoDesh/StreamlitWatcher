@@ -47,9 +47,9 @@ def rename_df_columns(df: DataFrame) -> DataFrame:
 
 
 def filter_garmin_df(df: DataFrame) -> DataFrame:
-    df = df[df["AVERAGE_PACE"] != "--"]
-    df = df[df["ACTIVITY_TYPE"] == "Laufen"]
-    df = df[df["DISTANCE"] >= MIN_DISTANCE]
+    df = df[df["average_pace"] != "--"]
+    df = df[df["activity_type"] == "Laufen"]
+    df = df[df["distance"] >= MIN_DISTANCE]
     df = df.reset_index()
     return df
 
@@ -84,32 +84,32 @@ def add_distance(
 
 
 def transform_dataframe(df: DataFrame) -> DataFrame:
-    df["ACTIVITY_TYPE"] = df.apply(
-        lambda row: transform_activity(row["ACTIVITY_TYPE"], row["TITLE"]), axis=1
+    df["activity_type"] = df.apply(
+        lambda row: transform_activity(row["activity_type"], row["title"]), axis=1
     )
-    df["AVERAGE_PACE"] = df.apply(
-        lambda row: add_pace(row["ACTIVITY_TYPE"], row["TITLE"], row["AVERAGE_PACE"]),
+    df["average_pace"] = df.apply(
+        lambda row: add_pace(row["activity_type"], row["title"], row["average_pace"]),
         axis=1,
     )
-    df["DATE"] = df["DATE"].apply(transform_str_to_date)
-    df["HOUR"] = df["DATE"].apply(lambda x: x.hour)
-    df["MONTH"] = df["DATE"].apply(lambda x: x.month)
-    df["YEAR"] = df["DATE"].apply(lambda x: x.year)
-    df["STEPS"] = df["STEPS"].apply(parse_str_to_int)
-    df["SPEED"] = df["AVERAGE_PACE"].apply(transform_pace_to_speed)
-    df["PACE_FLOAT"] = df["AVERAGE_PACE"].apply(
+    df["date"] = df["date"].apply(transform_str_to_date)
+    df["hour"] = df["date"].apply(lambda x: x.hour)
+    df["month"] = df["date"].apply(lambda x: x.month)
+    df["year"] = df["date"].apply(lambda x: x.year)
+    df["steps"] = df["steps"].apply(parse_str_to_int)
+    df["speed"] = df["average_pace"].apply(transform_pace_to_speed)
+    df["pace_float"] = df["average_pace"].apply(
         lambda x: round(transform_pace_to_pace_float(x), 2)
     )
-    df["TIME_IN_MINUTES"] = df["TIME"].apply(parse_activity_duration_to_minutes)
-    df["TIME_IN_HOURS"] = df["TIME"].apply(parse_activity_duration_to_hours)
-    df["DISTANCE"] = df.apply(
+    df["time_in_minutes"] = df["time"].apply(parse_activity_duration_to_minutes)
+    df["time_in_hours"] = df["time"].apply(parse_activity_duration_to_hours)
+    df["distance"] = df.apply(
         lambda row: add_distance(
-            row["ACTIVITY_TYPE"],
-            row["TITLE"],
-            row["SPEED"],
-            row["TIME_IN_MINUTES"],
-            row["DISTANCE"],
+            row["activity_type"],
+            row["title"],
+            row["speed"],
+            row["time_in_minutes"],
+            row["distance"],
         ),
         axis=1,
     )
-    return df[df["YEAR"] >= MIN_YEAR]
+    return df[df["year"] >= MIN_YEAR]

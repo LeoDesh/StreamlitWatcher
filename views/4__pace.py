@@ -25,8 +25,8 @@ type FilterParameters = list[
 
 
 def setup_date_range_selection(df: DataFrame) -> Tuple[date, date]:
-    date_min = df["DATE"].min().date()
-    date_max: date = df["DATE"].max().date()
+    date_min = df["date"].min().date()
+    date_max: date = df["date"].max().date()
     date_max = date_max + timedelta(days=1)
     start_date, end_date = st.slider(
         "Select date range:",
@@ -52,7 +52,7 @@ def setup_pace_range_selection() -> Tuple[int, int]:
 
 def setup_distance_range_selection(df: DataFrame) -> Tuple[int, int]:
     distance_min = 0
-    distance_max = math.ceil(df["DISTANCE"].max())
+    distance_max = math.ceil(df["distance"].max())
     chosen_distance_min, chosen_distance_max = st.slider(
         "Select distance range (km):",
         min_value=distance_min,
@@ -65,10 +65,10 @@ def setup_distance_range_selection(df: DataFrame) -> Tuple[int, int]:
 def setup_line_plot(df: DataFrame) -> None:
     return create_plotly_pace_chart(
         df,
-        x_col="DATE",
-        y_col="SPEED",
-        y_text_col="AVERAGE_PACE",
-        y_col_2="AVG_HEART_RATE",
+        x_col="date",
+        y_col="speed",
+        y_text_col="average_pace",
+        y_col_2="average_heart_rate",
     )
 
 
@@ -76,7 +76,7 @@ def setup_pace_histogram(df: DataFrame, number_of_bins: int) -> None:
     if df.empty:
         fig = get_empty_figure()
     else:
-        fig = get_df_pace_histogram(df, "PACE_FLOAT", number_of_bins)
+        fig = get_df_pace_histogram(df, "pace_float", number_of_bins)
     return fig
 
 
@@ -102,18 +102,18 @@ def filter_dataframe_by_parameters(
     min_pace, max_pace = pace_range
     min_distance, max_distance = distance_range
     df = df[
-        (df["DATE"] >= Timestamp(start_date))
-        & (df["DATE"] <= Timestamp(end_date))
-        & (df["PACE_FLOAT"] <= max_pace)
-        & (df["PACE_FLOAT"] >= min_pace)
-        & (df["DISTANCE"] <= max_distance)
-        & (df["DISTANCE"] >= min_distance)
+        (df["date"] >= Timestamp(start_date))
+        & (df["date"] <= Timestamp(end_date))
+        & (df["pace_float"] <= max_pace)
+        & (df["pace_float"] >= min_pace)
+        & (df["distance"] <= max_distance)
+        & (df["distance"] >= min_distance)
     ]
     return df
 
 
 def get_current_year_median_pace(df: DataFrame) -> Metric:
-    speed = df["SPEED"].median() if not df.empty else 0.0
+    speed = df["speed"].median() if not df.empty else 0.0
     return Metric(
         label="Current Year Median Pace",
         value=transform_speed_to_pace_prettified(speed),
@@ -121,7 +121,7 @@ def get_current_year_median_pace(df: DataFrame) -> Metric:
 
 
 def get_current_year_best_pace(df: DataFrame) -> Metric:
-    speed = df["SPEED"].max() if not df.empty else 0.0
+    speed = df["speed"].max() if not df.empty else 0.0
     return Metric(
         label="Current Year Highest Pace",
         value=transform_speed_to_pace_prettified(speed),
@@ -129,8 +129,8 @@ def get_current_year_best_pace(df: DataFrame) -> Metric:
 
 
 def get_most_recent_pace(df: DataFrame) -> Metric:
-    df = df.sort_values(by="DATE", ascending=False)
-    speed, last_date = df.loc[0, ["SPEED", "DATE"]]
+    df = df.sort_values(by="date", ascending=False)
+    speed, last_date = df.loc[0, ["speed", "date"]]
     return Metric(
         label=f"Pace Most Recent Run ({last_date.strftime('%d.%m.%Y')})",
         value=transform_speed_to_pace_prettified(speed),
@@ -138,7 +138,7 @@ def get_most_recent_pace(df: DataFrame) -> Metric:
 
 
 def render_pace_metrics(df: DataFrame) -> None:
-    current_year_df = filter_dataframe(df.copy(), {"YEAR": get_current_month().year})
+    current_year_df = filter_dataframe(df.copy(), {"year": get_current_month().year})
     most_recent_pace_metric = get_most_recent_pace(df)
     current_year_median_pace_metric = get_current_year_median_pace(current_year_df)
     current_year_highest_pace = get_current_year_best_pace(current_year_df)

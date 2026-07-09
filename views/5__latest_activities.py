@@ -111,13 +111,13 @@ def heatmap_filter() -> tuple[str, bool]:
 def get_top_activity(df: DataFrame) -> tuple[str, int]:
     agg_df = aggregate_df_named_column(
         df,
-        "ACTIVITY_TYPE",
-        "ACTIVITY_TYPE",
+        "activity_type",
+        "activity_type",
         col_name="Total",
         agg_func="count",
         sort_asc=False,
     ).reset_index(drop=True)
-    return agg_df.loc[0, ["ACTIVITY_TYPE", "Total"]]
+    return agg_df.loc[0, ["activity_type", "Total"]]
 
 
 def get_activity_count(df: DataFrame) -> int:
@@ -141,7 +141,7 @@ def get_metrics(df: DataFrame, description: str) -> list[Metric]:
 def render_activities_metrics(df: DataFrame) -> None:
     current_month = get_current_month()
     current_month_df = df[df["month_start"] == current_month]
-    current_year_df = df[df["YEAR"] == current_month.year]
+    current_year_df = df[df["year"] == current_month.year]
     stream_metrics(
         [*get_metrics(current_month_df, "Month"), *get_metrics(current_year_df, "Year")]
     )
@@ -150,7 +150,7 @@ def render_activities_metrics(df: DataFrame) -> None:
 def main() -> None:
     st.header("Latest Activities", text_alignment="center")
     df = FULL_DATA.copy()
-    df["month_start"] = df["DATE"].apply(lambda x: date(x.year, x.month, 1))
+    df["month_start"] = df["date"].apply(lambda x: date(x.year, x.month, 1))
     render_activities_metrics(df)
     df.columns = [prettify(col) for col in df.columns]
     activity_tab, gantt_chart_tab, heat_tab = st.tabs(

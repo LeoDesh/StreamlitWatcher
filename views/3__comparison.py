@@ -15,11 +15,11 @@ from streamlit_utils.utils import Metric, stream_metrics
 
 def render_comparison_metrics(df: DataFrame) -> None:
     current_year = get_current_month().year
-    df = filter_dataframe(df, {"YEAR": current_year})
+    df = filter_dataframe(df, {"year": current_year})
     distance, speed, time = (
-        df["DISTANCE"].mean(),
-        df["SPEED"].mean(),
-        df["TIME_IN_MINUTES"].mean(),
+        df["distance"].mean(),
+        df["speed"].mean(),
+        df["time_in_minutes"].mean(),
     )
     metrics_dict = {
         "Current Year Average Distance": f"{distance:.02f} km",
@@ -38,7 +38,7 @@ def render_comparison_dashboard(df: DataFrame) -> None:
     select_box_col, _ = st.columns([1, 5])
     category = select_box_col.selectbox(
         "Category",
-        options=["DISTANCE", "TIME_IN_MINUTES", "SPEED"],
+        options=["distance", "time_in_minutes", "speed"],
         index=0,
         format_func=prettify,
     )

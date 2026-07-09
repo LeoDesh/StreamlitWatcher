@@ -12,5 +12,5 @@ ACTIVITY_ATTR_COLUMNS = [
     "Speed",
     "Calories",
     "Time",
-    "Avg Heart Rate",
+    "Average Heart Rate",
 ]

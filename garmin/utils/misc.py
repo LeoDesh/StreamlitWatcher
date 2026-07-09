@@ -101,8 +101,17 @@ def verify_activity_duration(duration_str: str) -> bool:
     # 00:02:56.8
 
 
+def check_prettified(text: str) -> bool:
+    text_parts = text.split(" ")
+    return all(part == part.capitalize() for part in text_parts)
+
+
 def prettify(text: str) -> str:
-    return " ".join(part.capitalize() for part in text.split("_"))
+    return (
+        text
+        if check_prettified(text)
+        else " ".join(part.capitalize() for part in text.split("_"))
+    )
 
 
 def parse_activity_duration_to_minutes(duration_str: str) -> float:

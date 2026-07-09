@@ -12,7 +12,7 @@ from garmin.data.data_load import (
 def test_import_filter_columns_success(load_appropriate_garmin_df):
     df = load_appropriate_garmin_df
     df = rename_df_columns(df)
-    assert "AVERAGE_PACE" in df.columns
+    assert "average_pace" in df.columns
 
 
 @pytest.mark.data
@@ -26,7 +26,7 @@ def test_import_filter_columns_fail(load_wrong_header_garmin_df):
 def test_transform_dataframe(load_appropriate_garmin_df):
     df = rename_df_columns(load_appropriate_garmin_df)
     df = transform_dataframe(df)
-    additional_columns = ["HOUR", "MONTH", "SPEED", "PACE_FLOAT"]
+    additional_columns = ["hour", "month", "speed", "pace_float"]
     for col in additional_columns:
         assert col in df.columns
 

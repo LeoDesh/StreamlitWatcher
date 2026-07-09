@@ -28,10 +28,10 @@ def construct_header() -> None:
 
 
 def setup_histogram(df: DataFrame) -> None:
-    distance_min = math.floor(df["DISTANCE"].min())
-    distance_max = math.ceil(df["DISTANCE"].max())
+    distance_min = math.floor(df["distance"].min())
+    distance_max = math.ceil(df["distance"].max())
     bins = calculate_int_bins(distance_min, distance_max, 2)
-    fig = get_df_km_histogram(df, "DISTANCE", bins)
+    fig = get_df_km_histogram(df, "distance", bins)
     place_figure(fig)
 
 
@@ -51,12 +51,12 @@ def setup_heatmap(df: DataFrame) -> None:
 
 def compute_monthly_distance(df: DataFrame) -> DataFrame:
     df = df.copy()
-    df["DATE"] = df["DATE"].dt.date
-    df["date"] = df["DATE"].apply(lambda x: date(x.year, x.month, 1))
+    df["date"] = df["date"].dt.date
+    df["monthly_date"] = df["date"].apply(lambda x: date(x.year, x.month, 1))
     return (
-        df.groupby(by="date")
-        .agg(total=("DISTANCE", "sum"))
-        .sort_values(by="date")
+        df.groupby(by="monthly_date")
+        .agg(total=("distance", "sum"))
+        .sort_values(by="monthly_date")
         .reset_index()
     )
 
@@ -64,7 +64,7 @@ def compute_monthly_distance(df: DataFrame) -> DataFrame:
 def get_current_month_metric(df: DataFrame) -> Metric:
     current_month = get_current_month()
     previous_year_month = get_month_previous_year()
-    date_km_dict = dict(zip(df["date"], df["total"]))
+    date_km_dict = dict(zip(df["monthly_date"], df["total"]))
     current_km, previous_km = (
         date_km_dict.get(current_month, 0),
         date_km_dict.get(previous_year_month, 0),
@@ -80,12 +80,12 @@ def get_current_month_metric(df: DataFrame) -> Metric:
 
 def get_distance_before_given_date(df: DataFrame, selected_date: date) -> float:
     df_current_year = filter_dataframe(df, {"year": selected_date.year})
-    df_filtered = df_current_year[df_current_year["date"] <= selected_date]
+    df_filtered = df_current_year[df_current_year["monthly_date"] <= selected_date]
     return 0 if df_filtered.empty else df_filtered["total"].sum()
 
 
 def get_current_year_metric(df: DataFrame) -> Metric:
-    df["year"] = df["date"].apply(lambda x: x.year)
+    df["year"] = df["monthly_date"].apply(lambda x: x.year)
     current_year_km = get_distance_before_given_date(df, get_current_month())
     last_year_km = get_distance_before_given_date(df, get_month_previous_year())
     delta = compute_delta(last_year_km, current_year_km)
@@ -109,23 +109,27 @@ def render_distance_metrics(df: DataFrame) -> None:
 def setup_progress_plot(df: DataFrame) -> None:
     df = compute_monthly_distance(df)
     date_df = generate_dates_df(
-        df["date"].min(), df["date"].max(), freq="MS", date_column="date"
+        df["monthly_date"].min(),
+        df["monthly_date"].max(),
+        freq="MS",
+        date_column="monthly_date",
     )
-    df = date_df.merge(df, how="left", on="date").fillna(0)
+    df = date_df.merge(df, how="left", on="monthly_date").fillna(0)
     df["distance"] = df["total"].cumsum()
     fig = create_bar_chart_ordinary_axis(
         df,
-        "date",
+        "monthly_date",
         "distance",
         "Total Distance covered per",
         hovertemplate="%{y} km distance covered up to %{x} <extra></extra>",
+        show_x_title=False,
     )
     place_figure(fig)
 
 
 def get_latest_run(df: DataFrame) -> tuple[date, float]:
-    df = df.copy().sort_values(by="DATE", ascending=False)
-    run_date, distance = df.loc[0, ["DATE", "DISTANCE"]]
+    df = df.copy().sort_values(by="date", ascending=False)
+    run_date, distance = df.loc[0, ["date", "distance"]]
     return (run_date.date(), distance)
 
 

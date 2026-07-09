@@ -65,6 +65,7 @@ def create_bar_chart(
     y_col: str,
     *,
     x_axis_config: dict[str, Any],
+    show_x_title: bool = True,
     y_title: str = "km run per",
     hovertemplate: str = "",
 ) -> Figure:
@@ -74,7 +75,7 @@ def create_bar_chart(
         y=df[y_col],
     )
     fig.update_layout(
-        xaxis=x_axis_config | {"title": prettify(x_col)},
+        xaxis=x_axis_config | {"title": prettify(x_col)} if show_x_title else {},
         yaxis_title="Amount",
         title={"text": f"{y_title} {x_col}", "font": {"size": 20}},
     )
@@ -89,12 +90,14 @@ def create_bar_chart_ordinary_axis(
     y_col: str,
     y_title: str = "km run per",
     hovertemplate: str = "",
+    show_x_title: bool = True,
 ) -> DataFrame:
     return create_bar_chart(
         df,
         x_col,
         y_col,
         x_axis_config=X_AXIS_BASE_CONFIG,
+        show_x_title=show_x_title,
         y_title=y_title,
         hovertemplate=hovertemplate,
     )
@@ -222,7 +225,7 @@ def create_box_plot_chart(df: DataFrame, column: str) -> Figure:
     fig = Figure()
     fig.add_trace(
         go.Box(
-            x=df["YEAR"].astype(
+            x=df["year"].astype(
                 str
             ),  # Convert to string so years are distinct categories
             y=df[column],

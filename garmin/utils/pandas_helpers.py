@@ -46,12 +46,12 @@ def get_pace_bins_labels_for_dataframe(
 
 
 def create_df_pivot_hpm_pace(df: DataFrame) -> DataFrame:
-    df = categorize_df_column(df, "PACE_FLOAT", 8, get_pace_bins_labels_for_dataframe)
-    df = categorize_df_column(df, "AVG_HEART_RATE", 8, bin_label_heartbeat)
+    df = categorize_df_column(df, "pace_float", 8, get_pace_bins_labels_for_dataframe)
+    df = categorize_df_column(df, "average_heart_rate", 8, bin_label_heartbeat)
     df = df.pivot_table(
-        index="AVG_HEART_RATE",
-        columns="PACE_FLOAT",
-        values="DISTANCE",
+        index="average_heart_rate",
+        columns="pace_float",
+        values="distance",
         aggfunc="count",
         observed=False,
     )

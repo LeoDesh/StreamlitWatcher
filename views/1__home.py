@@ -23,13 +23,10 @@ from streamlit_utils.utils import Metric, create_metrics_container, stream_metri
 
 def get_year_overview_table(df: DataFrame) -> DataFrame:
     df = get_grouped_table(
-        df, ["Year"], ["Distance", "Time In Minutes", "Calories", "Avg Heart Rate"]
+        df, ["Year"], ["Distance", "Time In Minutes", "Calories", "Average Heart Rate"]
     )
-    df["AVG._KM"] = df.apply(
+    df["Average Km"] = df.apply(
         lambda row: round(row["Distance"] / row["Count"], 1), axis=1
-    )
-    df["Avg Heart Rate"] = df.apply(
-        lambda row: round(row["Avg Heart Rate"] / row["Count"], 0), axis=1
     )
     df = df.rename(columns={"Time In Minutes": "Time"})
     df["Time"] = df["Time"].apply(
@@ -60,7 +57,7 @@ def construct_year_statistics(df: DataFrame) -> None:
         "Count": ("Total Runs", "%{y} Runs"),
         "Distance": ("Distance Covered", "%{y} km covered "),
         "Time": ("Time Spent", "%{y} hours spent "),
-        "Avg. Km": (
+        "Average Km": (
             "Average kilometre amount of a run",
             "Average of %{y} km per run",
         ),
