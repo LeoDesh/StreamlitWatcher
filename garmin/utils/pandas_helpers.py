@@ -96,7 +96,7 @@ def filter_dataframe(df: DataFrame, filter_kwargs: dict[str, Any]) -> DataFrame:
 
 def get_gantt_df(df: DataFrame, date_column: str) -> DataFrame:
     df[date_column] = to_datetime(df[date_column])
-    df["Date End"] = df[date_column] + Timedelta(days=1)
+    df["date_end"] = df[date_column] + Timedelta(days=1)
     return df
 
 

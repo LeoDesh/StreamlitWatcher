@@ -7,10 +7,10 @@ DATA = get_running_data(FILE_PATH)
 FULL_DATA = import_file(FILE_PATH)
 
 ACTIVITY_ATTR_COLUMNS = [
-    "Distance",
-    "Average Pace",
-    "Speed",
-    "Calories",
-    "Time",
-    "Average Heart Rate",
+    "distance",
+    "average_pace",
+    "speed",
+    "calories",
+    "time",
+    "average_heart_rate",
 ]

@@ -180,7 +180,12 @@ def create_gantt_chart(
         y=category_col,
         color=category_col,
     )
-    fig.update_layout(height=400, bargap=0.2, yaxis_title=None)
+    fig.update_layout(
+        height=400,
+        bargap=0.2,
+        yaxis_title=None,
+        legend_title_text=prettify(category_col),
+    )
     return fig
 
 

@@ -47,11 +47,13 @@ def rename_df_columns(df: DataFrame) -> DataFrame:
 
 
 def filter_garmin_df(df: DataFrame) -> DataFrame:
-    df = df[df["average_pace"] != "--"]
-    df = df[df["activity_type"] == "Laufen"]
-    df = df[df["distance"] >= MIN_DISTANCE]
-    df = df.reset_index()
-    return df
+    df = df.copy()
+    filter_mask = (
+        (df["average_pace"] != "--")
+        & (df["activity_type"] == "Laufen")
+        & (df["distance"] >= MIN_DISTANCE)
+    )
+    return df[filter_mask].reset_index(drop=True)
 
 
 def transform_activity(initial_activity: str, title: str) -> str:
