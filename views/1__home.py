@@ -23,7 +23,7 @@ def get_year_overview_table(df: DataFrame) -> DataFrame:
         "Average Distance": ("distance", "mean"),
     }
     df = aggregrate_df_by_dict(df, "year", agg_dict)
-    # df["Time"] = df["Time"].apply(lambda x: round(x / 60, 2))
+    df["Time"] = df["Time"].apply(lambda x: round(x / 60, 2))
     return df
 
 

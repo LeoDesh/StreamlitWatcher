@@ -56,7 +56,9 @@ def get_activity_filters(df: DataFrame) -> dict[str, Any]:
     filters = {}
     with st.expander("Activity Filter", expanded=False):
         for key, groups in unique_values_dict.items():
-            filters[key] = st.multiselect(key, options=groups, default=groups)
+            filters[key] = st.multiselect(
+                key, options=groups, default=groups, label_visibility="hidden"
+            )
     return filters
 
 
@@ -65,7 +67,9 @@ def get_gantt_filters(df: DataFrame) -> dict[str, Any]:
     filters = {}
     with st.expander("Chart Filter", expanded=False):
         for key, groups in unique_values_dict.items():
-            filters[key] = st.multiselect(key, options=groups, default=groups[0])
+            filters[key] = st.multiselect(
+                key, options=groups, default=groups[0], label_visibility="hidden"
+            )
     return filters
 
 
@@ -76,7 +80,7 @@ def show_activities_timeline(df: DataFrame) -> None:
 
 
 def show_heat_map(df: DataFrame, category: str, unit_choice: bool) -> None:
-    filters = {} if category == "Alle" else {"activity_type": "Laufen"}
+    filters = {} if category == "All" else {"activity_type": "Running"}
     df["time_in_hours"] = round(df["time_in_hours"], 2)
     pivot_df = get_pivot_dataframe(
         df,
@@ -105,7 +109,7 @@ def heatmap_filter() -> tuple[str, bool]:
     selection_col, metric_col, _ = st.columns([2, 2, 8], gap="large")
     selection = selection_col.selectbox(
         "Category",
-        ["Laufen", "Alle"],
+        ["Running", "All"],
         index=0,
         placeholder="Choose a category",
         label_visibility="collapsed",

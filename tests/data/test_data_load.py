@@ -1,6 +1,8 @@
 import pytest
 
 from garmin.data.data_load import (
+    add_distance,
+    add_pace,
     import_file,
     rename_df_columns,
     transform_activity,
@@ -26,7 +28,15 @@ def test_import_filter_columns_fail(load_wrong_header_garmin_df):
 def test_transform_dataframe(load_appropriate_garmin_df):
     df = rename_df_columns(load_appropriate_garmin_df)
     df = transform_dataframe(df)
-    additional_columns = ["hour", "month", "speed", "pace_float"]
+    additional_columns = [
+        "hour",
+        "month",
+        "speed",
+        "pace_float",
+        "speed",
+        "time_in_minutes",
+        "time_in_hours",
+    ]
     for col in additional_columns:
         assert col in df.columns
 
@@ -41,14 +51,47 @@ def test_import_file_fail(get_missing_value_garmin_csv_file):
 @pytest.mark.parametrize(
     "activity, title, expected",
     [
-        ("Cardio", "FB Training 28.05.2024", "Fußball"),
-        ("Cardio", "Bad Gams Schwimmen", "Schwimmen"),
+        ("Cardio", "FB Training 28.05.2024", "Football"),
+        ("Cardio", "Bad Gams Schwimmen", "Swimming"),
         ("Cardio", "Fußball", "Cardio"),
         ("Laufen", "FB Training 28.05.2024", "Laufen"),
         ("Cardio", "Heute Tenis", "Cardio"),
         ("Cardio", "Tennis", "Tennis"),
-        ("Cardio", "Padel Tennis", "Tennis"),
+        ("Cardio", "Padel Tennis", "Padel Tennis"),
     ],
 )
 def test_transform_activity(activity: str, title: str, expected: str):
     assert transform_activity(activity, title) == expected
+
+
+@pytest.mark.data
+@pytest.mark.parametrize(
+    "activity,pace,distance,time_in_hours,expected",
+    [
+        ("Indoor Cycling", "--", 15, 0.5, "2:00"),
+        ("Indoor Cycling", "--", 0.0, 0.5, "--"),
+    ],
+)
+def test_add_pace(
+    activity: str,
+    pace: str,
+    distance: float,
+    time_in_hours: float,
+    expected: str,
+):
+    assert add_pace(activity, pace, distance, time_in_hours) == expected
+
+
+@pytest.mark.data
+@pytest.mark.parametrize(
+    "activity,title,distance,expected",
+    [
+        ("Indoor Cycling", "21,5 km", 0.0, 21.5),
+        ("Indoor Cycling", "24.745 km", 0.0, 24.745),
+        ("Indoor Cycling", "Niente", 0.0, 0.0),
+        ("Swimming", "Niente", 0.0, 0.0),
+        ("Running", "9.45 km", 8.5, 8.5),
+    ],
+)
+def test_add_distance(activity: str, title: str, distance: float, expected: float):
+    assert add_distance(activity, title, distance) == expected
