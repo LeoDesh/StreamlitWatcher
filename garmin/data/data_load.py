@@ -85,15 +85,25 @@ def add_distance(activity: str, title: str, distance: float) -> float:
     return distance
 
 
-def column_mapper() -> dict[str, str]:
-    return {"activity_type": lambda x: ACTIVITY_TYPE_MAPPING[x]}
+def transform_date_columns(df: DataFrame) -> DataFrame:
+    df["date"] = df["date"].apply(transform_str_to_date)
+    df["hour"] = df["date"].apply(lambda x: x.hour)
+    df["month"] = df["date"].apply(lambda x: x.month)
+    df["year"] = df["date"].apply(lambda x: x.year)
+    df["time_in_minutes"] = df["time"].apply(parse_activity_duration_to_minutes)
+    df["time_in_hours"] = df["time"].apply(parse_activity_duration_to_hours)
+    return df
 
 
-def transform_dataframe(df: DataFrame) -> DataFrame:
+def transform_activity_columns(df: DataFrame) -> DataFrame:
     df["activity_type"] = df["activity_type"].map(ACTIVITY_TYPE_MAPPING)
     df["activity_type"] = df.apply(
         lambda row: transform_activity(row["activity_type"], row["title"]), axis=1
     )
+    return df
+
+
+def transform_distance_pace_columns(df: DataFrame) -> DataFrame:
     df["distance"] = df.apply(
         lambda row: add_distance(
             row["activity_type"],
@@ -102,12 +112,6 @@ def transform_dataframe(df: DataFrame) -> DataFrame:
         ),
         axis=1,
     )
-    df["date"] = df["date"].apply(transform_str_to_date)
-    df["hour"] = df["date"].apply(lambda x: x.hour)
-    df["month"] = df["date"].apply(lambda x: x.month)
-    df["year"] = df["date"].apply(lambda x: x.year)
-    df["time_in_minutes"] = df["time"].apply(parse_activity_duration_to_minutes)
-    df["time_in_hours"] = df["time"].apply(parse_activity_duration_to_hours)
     df["average_pace"] = df.apply(
         lambda row: add_pace(
             row["activity_type"],
@@ -122,4 +126,11 @@ def transform_dataframe(df: DataFrame) -> DataFrame:
     df["pace_float"] = df["average_pace"].apply(
         lambda x: round(transform_pace_to_pace_float(x), 2)
     )
+    return df
+
+
+def transform_dataframe(df: DataFrame) -> DataFrame:
+    df = transform_date_columns(df)
+    df = transform_activity_columns(df)
+    df = transform_distance_pace_columns(df)
     return df[df["year"] >= MIN_YEAR]

@@ -24,12 +24,8 @@ def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:
     data["speed"] = "--" if pace == "--" else data["speed"]
 
 
-def construct_activity_header(
-    date_str: str, activity_type: str, activity_title: str
-) -> str:
-    if activity_title.find(activity_type) > -1:
-        return f"{date_str} -- {activity_type}"
-    return f"{date_str} -- {activity_type} -- {activity_title}"
+def construct_activity_header(date_str: str, activity_type: str) -> str:
+    return f"{date_str} -- {activity_type}"
 
 
 def show_latest_activities(df: DataFrame, rows: int = 20) -> None:
@@ -39,9 +35,7 @@ def show_latest_activities(df: DataFrame, rows: int = 20) -> None:
         clean_up_dict(row_dict)
         date = row_dict["date"].date()
         date_str = date.strftime("%d.%m.%Y")
-        activity_title = construct_activity_header(
-            date_str, row_dict["activity_type"], row_dict["title"]
-        )
+        activity_title = construct_activity_header(date_str, row_dict["activity_type"])
         header = f"{idx + 1}: {activity_title}"
         activity = {
             attr: value
