@@ -118,7 +118,7 @@ def create_plotly_pace_chart(
             # mode="lines",
             name=prettify(y_col),
             connectgaps=False,
-            line=dict(width=2.5, color="blue"),
+            line={"width": 2.5, "color": "blue"},
             customdata=df[y_text_col],
             hovertemplate="Speed: %{y} km/h<br>" + "Pace: %{customdata}<extra></extra>",
             yaxis="y1",
@@ -132,7 +132,7 @@ def create_plotly_pace_chart(
             opacity=0.25,
             name=prettify(y_col_2),
             connectgaps=False,
-            line=dict(width=2.5, color="red"),
+            line={"width": 2.5, "color": "red"},
             hovertemplate="HPM: %{y}",
             yaxis="y2",
         )
@@ -141,20 +141,18 @@ def create_plotly_pace_chart(
     fig.update_layout(
         title={"text": "Pace and Heartbeat Per Minute", "font": {"size": 20}},
         xaxis_title="Date",
-        yaxis1=dict(
-            title="Pace min/km",
-            tickmode="array",
-            tickvals=tickvals,
-            ticktext=ticktext,
-            # autorange="reversed"
-        ),
-        yaxis2=dict(
-            title="Heartbeats per Minute",
-            # tickvals = tickvals_hpm,
-            overlaying="y",
-            showgrid=False,
-            side="right",
-        ),
+        yaxis1={
+            "title": "Pace min/km",
+            "tickmode": "array",
+            "tickvals": tickvals,
+            "ticktext": ticktext,
+        },
+        yaxis2={
+            "title": "Heartbeats per Minute",
+            "overlaying": "y",
+            "showgrid": False,
+            "side": "right",
+        },
         template="plotly_white",
         hovermode="x unified",
         legend=dict(
@@ -165,7 +163,7 @@ def create_plotly_pace_chart(
             x=0.5,
             y=1.2,
         ),
-        margin=dict(l=10, r=20, t=60, b=10),
+        margin={"l": 10, "r": 20, "t": 60, "b": 10},
     )
     return fig
 

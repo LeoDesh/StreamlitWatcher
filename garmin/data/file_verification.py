@@ -4,14 +4,12 @@ from pathlib import Path
 def validate_file_type(file: Path) -> bool:
     if not file.is_file():
         return False
-    if file.suffix != ".csv":
-        return False
-    return True
+    return file.suffix == ".csv"
 
 
 def validate_structure_of_csv_file(file: Path) -> bool:
     with open(str(file), "r", encoding="utf-8") as f:
-        lines = [line for line in f.readlines()]
+        lines = [line for line in f]
         if not check_for_valid_container(lines):
             return False
         return analyze_lines(lines)
@@ -25,13 +23,7 @@ def analyze_lines(lines: list[str], sep: str = ",") -> bool:
 def check_for_valid_container(container: list | tuple | set) -> bool:
     if not container:
         return False
-    if (
-        isinstance(container, list)
-        or isinstance(container, tuple)
-        or isinstance(container, set)
-    ):
-        return True
-    return False
+    return isinstance(container, (list, tuple, set))
 
 
 def validate_csv_file(file: Path) -> bool:

@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.fixture
 def get_regex_text() -> str:
     return "545 343 754"

@@ -1,8 +1,8 @@
 import math
 import re
+from collections.abc import Callable
 from datetime import date, datetime
 from itertools import pairwise
-from typing import Callable
 
 import pandas as pd
 
@@ -39,7 +39,7 @@ def search_with_regex(regex_pattern: str, target_str: str, idx: int = 0) -> str:
 
 
 def calculate_bins_from_min_max_value(
-    min_value: float | int, max_value: float | int, number_of_bins: int
+    min_value: float, max_value: float, number_of_bins: int
 ) -> list[float]:
     step = (max_value - min_value) / number_of_bins
     return sorted(

@@ -129,12 +129,12 @@ def get_activity_count(df: DataFrame) -> int:
 
 
 def get_metrics(df: DataFrame, description: str) -> list[Metric]:
-    current_month_activity_count = get_activity_count(df)
+    if df.empty:
+        return []
+    current_activity_count = get_activity_count(df)
     top_activity, count = get_top_activity(df)
     return [
-        Metric(
-            label=f"Current {description} Activites", value=current_month_activity_count
-        ),
+        Metric(label=f"Current {description} Activites", value=current_activity_count),
         Metric(
             label=f"Current {description} Top Activity",
             value=f"{top_activity}: {count}",
@@ -144,10 +144,10 @@ def get_metrics(df: DataFrame, description: str) -> list[Metric]:
 
 def render_activities_metrics(df: DataFrame) -> None:
     current_month = get_current_month()
-    current_month_df = df[df["month_start"] == current_month]
-    current_year_df = df[df["year"] == current_month.year]
+    current_month_df = filter_dataframe(df.copy(), {"month_start": current_month})
+    current_year_df = filter_dataframe(df.copy(), {"year": current_month.year})
     stream_metrics(
-        [*get_metrics(current_month_df, "month"), *get_metrics(current_year_df, "year")]
+        [*get_metrics(current_month_df, "Month"), *get_metrics(current_year_df, "Year")]
     )
 
 

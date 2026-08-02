@@ -16,4 +16,5 @@ ACTIVITY_TRANSLATION_MAPPING = {
     "Schwimmen": "Swimming",
     "Tennis": "Tennis",
     "Indoor Cycling": "Indoor Cycling",
+    "Wandern": "Hiking",
 }

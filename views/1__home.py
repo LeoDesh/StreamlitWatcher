@@ -77,17 +77,17 @@ def construct_year_statistics(df: DataFrame) -> None:
 def render_metrics(df: DataFrame) -> None:
     df = get_year_overview_table(df.copy())
     current_year = date.today().year
-    st.subheader(f"Current Year: {date.today().year}")
+    st.subheader(f"Current Year: {current_year}")
     df = filter_dataframe(df, {"year": current_year})
     df_dict = df.to_dict(orient="records")[0]
     description_mapping = {
-        "Count": "Total Runs",
-        "Distance": "Distance Covered",
-        "Time": "Time Spent",
+        "Count": ("Total Runs", "Units"),
+        "Distance": ("Distance Covered", "km"),
+        "Time": ("Time Spent", "hours"),
     }
     metrics = [
-        Metric(label=description, value=df_dict[attr])
-        for attr, description in description_mapping.items()
+        Metric(label=description, value=f"{df_dict[attr]} {suffix}")
+        for attr, (description, suffix) in description_mapping.items()
     ]
     stream_metrics(metrics, num_cols=3)
 

@@ -43,7 +43,7 @@ def read_file(file: Path) -> DataFrame:
 
 
 def rename_df_columns(df: DataFrame) -> DataFrame:
-    selected_columns = [col for col in GARMIN_COLUMNS.keys()]
+    selected_columns = [col for col in GARMIN_COLUMNS]
     df = df[selected_columns].copy()
     df.columns = [str(GARMIN_COLUMNS[col]) for col in df.columns]
     return df
@@ -60,7 +60,7 @@ def filter_garmin_df(df: DataFrame) -> DataFrame:
 
 
 def transform_activity(initial_activity: str, title: str) -> str:
-    if initial_activity != "Cardio":
+    if initial_activity not in ("Cardio", "Walking"):
         return initial_activity
     for title_part, activity in ACTIVITY_TRANSLATION_MAPPING.items():
         if title_part in title:
