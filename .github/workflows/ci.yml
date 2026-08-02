@@ -21,8 +21,6 @@ jobs:
       with:
         # Aktiviert das Caching für extrem schnelle Folgeläufe
         enable-cache: true
-        # Optional: Falls du eine exakte Python-Version erzwingen willst:
-        # version: "0.x"
 
     # 3. Projekt-Abhängigkeiten synchronisieren
     # "uv sync" installiert alle Pakete aus deiner pyproject.toml / uv.lock
@@ -32,3 +30,22 @@ jobs:
     # 4. Pytest isoliert in der uv-Umgebung ausführen
     - name: Run tests with pytest
       run: uv run pytest
+      
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
+
+    - name: Install dependencies
+      run: uv sync
+
+    - name: Run Ruff Check & Format
+      run: |
+        uv run ruff check
+        uv run ruff format --check
