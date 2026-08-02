@@ -155,14 +155,14 @@ def create_plotly_pace_chart(
         },
         template="plotly_white",
         hovermode="x unified",
-        legend=dict(
-            title="Columns",
-            bgcolor="rgba(240,240,240,0.6)",
-            bordercolor="lightgray",
-            borderwidth=1,
-            x=0.5,
-            y=1.2,
-        ),
+        legend={
+            "title": "Columns",
+            "bgcolor": "rgba(240,240,240,0.6)",
+            "bordercolor": "lightgray",
+            "borderwidth": 1,
+            "x": 0.5,
+            "y": 1.2,
+        },
         margin={"l": 10, "r": 20, "t": 60, "b": 10},
     )
     return fig

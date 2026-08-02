@@ -1,5 +1,3 @@
-from datetime import date
-
 import streamlit as st
 from pandas import DataFrame
 
@@ -9,6 +7,7 @@ from garmin.utils.pandas_helpers import (
     aggregrate_df_by_dict,
     filter_dataframe,
 )
+from garmin.utils.time_utils import get_current_year
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
 from streamlit_utils.utils import Metric, create_metrics_container, stream_metrics
@@ -76,7 +75,7 @@ def construct_year_statistics(df: DataFrame) -> None:
 
 def render_metrics(df: DataFrame) -> None:
     df = get_year_overview_table(df.copy())
-    current_year = date.today().year
+    current_year = get_current_year()
     st.subheader(f"Current Year: {current_year}")
     df = filter_dataframe(df, {"year": current_year})
     df_dict = df.to_dict(orient="records")[0]

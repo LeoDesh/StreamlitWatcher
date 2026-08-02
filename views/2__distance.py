@@ -10,14 +10,9 @@ from garmin.plots.visualization import (
     create_heat_map_monthly_axis,
     get_df_km_histogram,
 )
-from garmin.utils.misc import (
-    calculate_int_bins,
-    compute_delta,
-    get_current_month,
-    get_month_previous_year,
-    prettify,
-)
+from garmin.utils.misc import calculate_int_bins, compute_delta, prettify
 from garmin.utils.pandas_helpers import filter_dataframe, generate_dates_df
+from garmin.utils.time_utils import get_current_month, get_month_previous_year
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
 from streamlit_utils.utils import Metric, stream_metrics

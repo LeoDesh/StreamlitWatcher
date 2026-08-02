@@ -1,10 +1,12 @@
 import math
 import re
 from collections.abc import Callable
-from datetime import date, datetime
+from datetime import datetime
 from itertools import pairwise
 
 import pandas as pd
+
+from garmin.utils.time_utils import parse_date
 
 TIME_PATTERN = r"(\d{2}):([0-5]\d|60):([0-5]\d|60)(\.\d+)?"
 
@@ -42,9 +44,7 @@ def calculate_bins_from_min_max_value(
     min_value: float, max_value: float, number_of_bins: int
 ) -> list[float]:
     step = (max_value - min_value) / number_of_bins
-    return sorted(
-        list(set([min_value + step * idx for idx in range(number_of_bins + 1)]))
-    )
+    return sorted({min_value + step * idx for idx in range(number_of_bins + 1)})
 
 
 def calculate_int_bins(min_value: int, max_value: int, factor: int) -> list[float]:
@@ -97,7 +97,7 @@ def verify_activity_duration(duration_str: str) -> bool:
     hundreth = int(hundreth) if hundreth else 0
     if minutes == 60 and seconds > 0:
         return False
-    return False if seconds == 60 and hundreth > 0 else True
+    return not (seconds == 60 and hundreth > 0)
     # 00:02:56.8
 
 
@@ -161,7 +161,7 @@ def calculate_hours(hours: float, minutes: float, seconds: float) -> float:
 
 def transform_activity_minutes_to_duration_format(duration_in_minutes: float) -> str:
     hours = int(duration_in_minutes // 60)
-    minutes = int(math.floor(duration_in_minutes - hours * 60))
+    minutes = math.floor(duration_in_minutes - hours * 60)
     seconds = int(round((duration_in_minutes - hours * 60 - minutes) * 60, 0))
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
@@ -170,7 +170,7 @@ def transform_str_to_date(date_str: str) -> datetime:
     if isinstance(date_str, datetime):
         return date_str
     src_format = "%Y-%m-%d %H:%M:%S"
-    return datetime.strptime(date_str, src_format)
+    return parse_date(date_str, src_format)
 
 
 def replace_comma_in_number(line: str) -> str:
@@ -205,13 +205,3 @@ def compute_delta(src: float, trg: float) -> float:
     if trg:
         return 100
     return 0
-
-
-def get_current_month() -> date:
-    today = date.today()
-    return date(today.year, today.month, 1)
-
-
-def get_month_previous_year() -> date:
-    current_month = get_current_month()
-    return date(current_month.year - 1, current_month.month, 1)

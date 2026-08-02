@@ -6,7 +6,6 @@ from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, FULL_DATA
 from garmin.plots.visualization import create_gantt_chart, create_heat_map_monthly_axis
-from garmin.utils.misc import get_current_month
 from garmin.utils.pandas_helpers import (
     aggregate_df_named_column,
     filter_dataframe,
@@ -14,6 +13,7 @@ from garmin.utils.pandas_helpers import (
     get_pivot_dataframe,
     get_unique_values_per_column,
 )
+from garmin.utils.time_utils import get_current_month
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
 from streamlit_utils.utils import Metric, create_metrics_container, stream_metrics

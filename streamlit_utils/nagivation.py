@@ -12,7 +12,7 @@ def get_pages() -> StreamlitPage:
     base_config = {"icon": Icons.monitoring}
     page_order_dict = {}
     for file in Path("views").iterdir():
-        if not file.suffix == ".py":
+        if file.suffix != ".py":
             continue
         index, file_name = file.stem.split("__")
         index = int(index)

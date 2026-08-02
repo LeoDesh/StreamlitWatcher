@@ -1,5 +1,6 @@
 from contextlib import nullcontext
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -112,7 +113,9 @@ def test_search_with_regex(pattern: str, idx: int, expected: str, expected_conte
 @pytest.mark.misc
 def test_transform_str_to_date_correct_format():
     date_str = "2025-05-03 18:05:04"
-    assert transform_str_to_date(date_str) == datetime(2025, 5, 3, 18, 5, 4)
+    assert transform_str_to_date(date_str) == datetime(
+        2025, 5, 3, 18, 5, 4, tzinfo=ZoneInfo("UTC")
+    )
 
 
 @pytest.mark.misc

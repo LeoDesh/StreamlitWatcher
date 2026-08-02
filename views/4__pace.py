@@ -11,9 +11,9 @@ from garmin.plots.visualization import (
     get_df_pace_histogram,
     get_empty_figure,
 )
-from garmin.utils.misc import get_current_month
 from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
 from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace, filter_dataframe
+from garmin.utils.time_utils import get_current_year
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
 from streamlit_utils.utils import Metric, stream_metrics
@@ -101,8 +101,8 @@ def filter_dataframe_by_parameters(
     min_pace, max_pace = pace_range
     min_distance, max_distance = distance_range
     df = df[
-        (df["date"] >= Timestamp(start_date))
-        & (df["date"] <= Timestamp(end_date))
+        (df["date"] >= Timestamp(start_date).tz_localize("UTC"))
+        & (df["date"] <= Timestamp(end_date).tz_localize("UTC"))
         & (df["pace_float"] <= max_pace)
         & (df["pace_float"] >= min_pace)
         & (df["distance"] <= max_distance)
@@ -137,7 +137,7 @@ def get_most_recent_pace(df: DataFrame) -> Metric:
 
 
 def render_pace_metrics(df: DataFrame) -> None:
-    current_year_df = filter_dataframe(df.copy(), {"year": get_current_month().year})
+    current_year_df = filter_dataframe(df.copy(), {"year": get_current_year()})
     most_recent_pace_metric = get_most_recent_pace(df)
     current_year_median_pace_metric = get_current_year_median_pace(current_year_df)
     current_year_highest_pace = get_current_year_best_pace(current_year_df)

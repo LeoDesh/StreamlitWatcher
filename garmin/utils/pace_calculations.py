@@ -39,9 +39,7 @@ def transform_pace_to_minutes_seconds(pace_str: str) -> tuple[int, int]:
 
 def verify_pace_format(pace_str: str) -> bool:
     pattern = r"^([0-5]?\d:[0-5]\d)$"
-    if get_all_regex_matches(pattern, pace_str):
-        return True
-    return False
+    return bool(get_all_regex_matches(pattern, pace_str))
 
 
 def transform_seconds_to_hour_minutes_seconds_format(seconds: int) -> str:
