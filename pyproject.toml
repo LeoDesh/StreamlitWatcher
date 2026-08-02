@@ -21,3 +21,6 @@ package-dir = {"" = ""}
 
 [tool.setuptools.packages.find]
 where = [""]
+
+[tool.ruff.format]
+line-ending = "lf"
