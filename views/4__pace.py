@@ -4,7 +4,7 @@ from datetime import date, timedelta
 import streamlit as st
 from pandas import DataFrame, Timestamp
 
-from garmin.constants import DATA
+from garmin.constants import RUNNING_DF
 from garmin.plots.visualization import (
     create_heat_map_ordinary,
     create_plotly_pace_chart,
@@ -151,7 +151,7 @@ def render_pace_metrics(df: DataFrame) -> None:
 
 
 def main() -> None:
-    df = DATA.copy()
+    df = RUNNING_DF.copy()
     st.title("Pace Overview")
     render_pace_metrics(df)
     filters = render_filter_parameters(df)

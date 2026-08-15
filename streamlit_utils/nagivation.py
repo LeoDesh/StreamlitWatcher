@@ -3,7 +3,7 @@ from pathlib import Path
 import streamlit as st
 from streamlit.navigation.page import StreamlitPage
 
-from garmin.constants import DATA
+from garmin.constants import RUNNING_DF
 from streamlit_utils.config import PAGE_CONFIG, Icons
 
 
@@ -32,10 +32,10 @@ def get_pages() -> StreamlitPage:
 def define_sidebar(update_date_str: str) -> None:
     with st.sidebar:
         st.title(f"Last Update {update_date_str}")
-        min_date = DATA["date"].min().strftime("%d.%m.%Y")
-        max_date = DATA["date"].max().strftime("%d.%m.%Y")
-        time_hours = DATA["time_in_minutes"].sum() // 60
-        distance = round(DATA["distance"].sum(), 2)
+        min_date = RUNNING_DF["date"].min().strftime("%d.%m.%Y")
+        max_date = RUNNING_DF["date"].max().strftime("%d.%m.%Y")
+        time_hours = RUNNING_DF["time_in_minutes"].sum() // 60
+        distance = round(RUNNING_DF["distance"].sum(), 2)
         st.metric(label="Last Recorded Run", value=max_date)
         st.metric(label="Total Distance", value=f"{distance} km")
         st.metric(label="Total Time", value=f"{time_hours} h")

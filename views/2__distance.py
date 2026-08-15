@@ -4,7 +4,7 @@ from datetime import date
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import DATA
+from garmin.constants import RUNNING_DF
 from garmin.plots.visualization import (
     create_bar_chart_ordinary_axis,
     create_heat_map_monthly_axis,
@@ -142,7 +142,7 @@ def render_latest_run_metric(df: DataFrame) -> Metric:
 
 def main() -> None:
     construct_header()
-    df = DATA.copy()
+    df = RUNNING_DF.copy()
     render_distance_metrics(df)
     progress_tab, histogram_tab, heatmap_tab = st.tabs(
         [
