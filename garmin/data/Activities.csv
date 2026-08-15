@@ -1,4 +1,14 @@
 ID,Aktivitätstyp,Datum,Titel,Distanz,Kalorien,Ø Geschwindigkeit,Maximale Geschwindigkeit,Ø Herzfrequenz,Maximale Herzfrequenz,Schritte,Gesamtzeit
+23984659522,Radfahren,2026-08-15 11:35:27,Deutschlandsberg Radfahren,26.51,682.0,2:31,1:16,142.0,163.0,0,01:06:46
+23977708804,Laufen,2026-08-14 19:30:25,Deutschlandsberg Laufen,8.93,552.0,6:07,5:36,141.0,152.0,8742,00:54:45
+23964022732,Cardio,2026-08-13 16:16:30,Tennis,0.0,1057.0,--,--,148.0,179.0,0,01:45:12
+23953910261,Laufen,2026-08-12 19:38:41,Deutschlandsberg Laufen,9.15,572.0,6:34,5:39,138.0,147.0,9354,01:00:05
+23925678092,Cardio,2026-08-10 17:38:15,Tennis,0.0,917.0,--,--,145.0,172.0,0,01:32:35
+23909757185,Laufen,2026-08-09 11:35:56,Deutschlandsberg Laufen,13.12,919.0,5:31,4:39,160.0,172.0,11744,01:12:30
+23902966789,Radfahren,2026-08-08 19:03:58,Deutschlandsberg Radfahren,17.46,646.0,3:55,1:23,147.0,180.0,0,01:08:30
+23900986122,Radfahren,2026-08-08 16:15:26,Deutschlandsberg Radfahren,18.9,612.0,3:21,1:10,141.0,175.0,0,01:03:35
+23881834958,Cardio,2026-08-06 18:04:31,Padel Tennis,0.0,1044.0,--,--,143.0,167.0,0,01:57:34
+23828152032,Laufen,2026-08-02 19:16:04,Deutschlandsberg Laufen,4.1,286.0,5:57,5:16,149.0,163.0,3896,00:24:27
 23803852668,Cardio,2026-07-31 18:29:48,Tennis,0.0,1377.0,--,--,163.0,184.0,0,01:54:44
 23780689091,Cardio,2026-07-29 18:58:08,Padel Tennis,0.0,670.0,--,--,122.0,160.0,0,01:46:59
 23767712749,Laufen,2026-07-28 20:09:56,Frauental an der Laßnitz Laufen,12.6,824.0,4:55,4:09,170.0,182.0,10244,01:01:56

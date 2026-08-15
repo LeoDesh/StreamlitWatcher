@@ -1,7 +1,7 @@
 from functools import cache
 from pathlib import Path
 
-from pandas import DataFrame, read_csv
+from pandas import DataFrame
 
 from garmin.data.column_mapping import GARMIN_COLUMNS
 from garmin.data.constants import (
@@ -23,6 +23,7 @@ from garmin.utils.pace_calculations import (
     transform_pace_to_speed,
     transform_speed_to_pace,
 )
+from garmin.utils.pandas_helpers import read_file
 
 
 @cache
@@ -36,10 +37,6 @@ def import_file(file: Path) -> DataFrame:
 def get_running_data(file: Path) -> DataFrame:
     df = import_file(file)
     return filter_garmin_df(df)
-
-
-def read_file(file: Path) -> DataFrame:
-    return read_csv(str(file))
 
 
 def rename_df_columns(df: DataFrame) -> DataFrame:

@@ -1,8 +1,17 @@
 from datetime import date
 from itertools import pairwise
+from pathlib import Path
 from typing import Any, Literal
 
-from pandas import DataFrame, Series, Timedelta, date_range, to_datetime
+from pandas import (
+    DataFrame,
+    Series,
+    Timedelta,
+    concat,
+    date_range,
+    read_csv,
+    to_datetime,
+)
 
 from garmin.utils.misc import (
     calculate_bins_from_min_max_value,
@@ -131,3 +140,36 @@ def aggregrate_df_by_dict(
     agg_dict: dict[str, tuple[str, str]],
 ) -> DataFrame:
     return df.groupby(by=groupby_col, as_index=False).agg(**agg_dict)
+
+
+def update_data(df_existing: DataFrame, df_new: DataFrame) -> DataFrame:
+    df_difference = df_new.merge(df_existing, how="left", indicator=True)
+    df_difference = df_difference[df_difference["_merge"] == "left_only"].drop(
+        columns="_merge"
+    )
+    return concat([df_difference, df_existing], ignore_index=True)
+
+
+def save_df_to_csv(
+    df: DataFrame,
+    filename: str | Path,
+    *,
+    sep: str = ",",
+    encoding: str = "utf-8",
+    index: bool = False,
+    header: bool = True,
+) -> None:
+    df.to_csv(filename, sep=sep, encoding=encoding, index=index, header=header)
+
+
+def read_file(
+    filename: str | Path,
+    *,
+    sep: str = ",",
+    encoding: str = "utf-8",
+    header: int = 0,
+    index_col: int | None = None,
+) -> DataFrame:
+    return read_csv(
+        filename, sep=sep, encoding=encoding, header=header, index_col=index_col
+    )
