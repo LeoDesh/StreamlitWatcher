@@ -10,7 +10,12 @@ from garmin.plots.visualization import (
     create_heat_map_monthly_axis,
     get_df_km_histogram,
 )
-from garmin.utils.misc import calculate_int_bins, compute_delta, prettify
+from garmin.utils.misc import (
+    calculate_int_bins,
+    compute_delta,
+    get_last_day_of_date,
+    prettify,
+)
 from garmin.utils.pandas_helpers import filter_dataframe, generate_dates_df
 from garmin.utils.time_utils import get_current_month, get_month_previous_year
 from streamlit_utils.chart_helpers import place_figure
@@ -69,7 +74,7 @@ def get_current_month_metric(df: DataFrame) -> Metric:
         label="Distance Covered Current Month",
         value=f"{round(current_km, 2)} km",
         delta=f"{delta} %",
-        help=f"Comparison with {previous_year_month.strftime('%d.%m.%Y')}",
+        help=f"Comparison with {previous_year_month.strftime('%b, %Y')}",
     )
 
 
@@ -84,7 +89,7 @@ def get_current_year_metric(df: DataFrame) -> Metric:
     current_year_km = get_distance_before_given_date(df, get_current_month())
     last_year_km = get_distance_before_given_date(df, get_month_previous_year())
     delta = compute_delta(last_year_km, current_year_km)
-    previous_year_month = get_month_previous_year()
+    previous_year_month = get_last_day_of_date(get_month_previous_year())
     return Metric(
         label="Distance Covered Year To Date",
         value=f"{round(current_year_km, 2)} km",
@@ -111,9 +116,10 @@ def setup_progress_plot(df: DataFrame) -> None:
     )
     df = date_df.merge(df, how="left", on="monthly_date").fillna(0)
     df["distance"] = df["total"].cumsum()
+    df["month"] = df["monthly_date"].apply(get_last_day_of_date)
     fig = create_bar_chart_ordinary_axis(
         df,
-        "monthly_date",
+        "month",
         "distance",
         "Total Distance covered per",
         hovertemplate="%{y} km distance covered up to %{x} <extra></extra>",

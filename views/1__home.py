@@ -1,7 +1,7 @@
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import ACTIVITY_ATTR_COLUMNS, DATA
+from garmin.constants import ACTIVITY_ATTR_COLUMNS, RUNNING_DF
 from garmin.plots.visualization import create_bar_chart_ordinary_axis
 from garmin.utils.pandas_helpers import (
     aggregrate_df_by_dict,
@@ -92,7 +92,7 @@ def render_metrics(df: DataFrame) -> None:
 
 
 def main() -> None:
-    df = DATA.copy()
+    df = RUNNING_DF.copy()
 
     render_metrics(df)
     home_tab, distance_tab, speed_tab = st.tabs(
