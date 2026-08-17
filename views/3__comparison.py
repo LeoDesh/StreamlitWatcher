@@ -17,17 +17,19 @@ from streamlit_utils.utils import Metric, stream_metrics
 def render_comparison_metrics(df: DataFrame) -> None:
     current_year = get_current_year()
     df = filter_dataframe(df, {"year": current_year})
-    distance, speed, time = (
+    distance, speed, time, hpm = (
         df["distance"].mean(),
         df["speed"].mean(),
         df["time_in_minutes"].mean(),
+        df["average_heart_rate"].mean(),
     )
     metrics_dict = {
         "Current Year Average Distance": f"{distance:.02f} km",
-        "Current Year Average Speed": transform_speed_to_pace_prettified(speed),
+        "Current Year Average Pace": transform_speed_to_pace_prettified(speed),
         "Current Year Average Time": transform_seconds_to_hour_minutes_seconds_format(
             time * 60
         ),
+        "Current Year Average HPM": f"{hpm:.0f}",
     }
     metrics = [
         Metric(label=label, value=value) for label, value in metrics_dict.items()
@@ -36,10 +38,10 @@ def render_comparison_metrics(df: DataFrame) -> None:
 
 
 def render_comparison_dashboard(df: DataFrame) -> None:
-    select_box_col, _ = st.columns([1, 5])
+    select_box_col, _ = st.columns([1, 3])
     category = select_box_col.selectbox(
         "Category",
-        options=["distance", "time_in_minutes", "speed"],
+        options=["distance", "time_in_minutes", "speed", "average_heart_rate"],
         index=0,
         format_func=prettify,
     )
