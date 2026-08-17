@@ -7,6 +7,7 @@ from pandas import DataFrame, cut
 from plotly.graph_objects import Figure
 
 from garmin.plots.config import X_AXIS_BASE_CONFIG, X_AXIS_MONTH_CONFIG
+from garmin.themes import THEME
 from garmin.utils.misc import calculate_ticker_values, categorize_df_column, prettify
 from garmin.utils.pace_calculations import (
     transform_speed_to_pace,
@@ -45,7 +46,7 @@ def get_df_km_histogram(df: DataFrame, trg_col: str, bins: list[int]) -> Figure:
 def create_histogram(df: DataFrame, title: str, hovertemplate: str) -> Figure:
     x_col, y_col = df.columns
     fig = Figure()
-    fig.add_bar(x=df[x_col], y=df[y_col])
+    fig.add_bar(x=df[x_col], y=df[y_col], marker_color=THEME.primary_blue)
     fig.update_layout(
         xaxis=X_AXIS_BASE_CONFIG | {"title": x_col},
         yaxis_title=y_col,
@@ -70,10 +71,7 @@ def create_bar_chart(
     hovertemplate: str = "",
 ) -> Figure:
     fig = Figure()
-    fig.add_bar(
-        x=df[x_col],
-        y=df[y_col],
-    )
+    fig.add_bar(x=df[x_col], y=df[y_col], marker_color=THEME.primary_blue)
     fig.update_layout(
         xaxis=x_axis_config | {"title": prettify(x_col)} if show_x_title else {},
         yaxis_title="Amount",
@@ -118,7 +116,7 @@ def create_plotly_pace_chart(
             # mode="lines",
             name=prettify(y_col),
             connectgaps=False,
-            line={"width": 2.5, "color": "blue"},
+            line={"width": 2.5, "color": THEME.primary_blue},
             customdata=df[y_text_col],
             hovertemplate="Speed: %{y} km/h<br>" + "Pace: %{customdata}<extra></extra>",
             yaxis="y1",
@@ -132,7 +130,7 @@ def create_plotly_pace_chart(
             opacity=0.25,
             name=prettify(y_col_2),
             connectgaps=False,
-            line={"width": 2.5, "color": "red"},
+            line={"width": 2.5, "color": THEME.primary_red},
             hovertemplate="HPM: %{y}",
             yaxis="y2",
         )
@@ -157,8 +155,8 @@ def create_plotly_pace_chart(
         hovermode="x unified",
         legend={
             "title": "Columns",
-            "bgcolor": "rgba(240,240,240,0.6)",
-            "bordercolor": "lightgray",
+            "bgcolor": THEME.bright_grey,
+            "bordercolor": THEME.primary_grey,
             "borderwidth": 1,
             "x": 0.5,
             "y": 1.2,
@@ -233,7 +231,7 @@ def create_box_plot_chart(df: DataFrame, column: str) -> Figure:
             ),  # Convert to string so years are distinct categories
             y=df[column],
             name=prettify(column),  # Label for the legend
-            marker_color="indianred",  # Customize box color
+            marker_color=THEME.primary_blue,  # Customize box color
             boxpoints="all",  # Optional: shows all data points next to the boxes
         )
     )
