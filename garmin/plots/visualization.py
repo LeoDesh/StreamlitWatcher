@@ -20,10 +20,10 @@ def get_df_pace_histogram(
     df = categorize_df_column(
         df, pace_float_column, number_of_bins, get_pace_bins_labels_for_dataframe
     )
-    counts = df[pace_float_column].value_counts().sort_index().reset_index()
-    counts.columns = ["Minute per km", "Amount"]
+    counts_df = df[pace_float_column].value_counts().sort_index().reset_index()
+    counts_df.columns = ["Minute per km", "Amount"]
     return create_histogram(
-        counts,
+        counts_df,
         "Pace Distribution",
         hovertemplate="%{y} units exercised within pace of %{x} min/km<extra></extra>",
     )

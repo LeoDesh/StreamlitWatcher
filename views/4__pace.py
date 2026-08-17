@@ -16,7 +16,7 @@ from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace, filter_datafra
 from garmin.utils.time_utils import get_current_year
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
-from streamlit_utils.utils import Metric, stream_metrics
+from streamlit_utils.utils import Metric, stream_metrics, time_options_provider
 
 type FilterParameters = list[
     tuple[date, date], tuple[float, float], tuple[float, float]
@@ -83,9 +83,8 @@ def render_filter_parameters(
     df: DataFrame,
 ) -> FilterParameters:
     with st.expander("Filters"):
-        date_range_col, pace_col, distance_col = st.columns(3)
-        with date_range_col:
-            date_range = setup_date_range_selection(df)
+        date_range = time_options_provider()
+        pace_col, distance_col = st.columns(2)
         with pace_col:
             pace_range = setup_pace_range_selection()
         with distance_col:
@@ -150,12 +149,21 @@ def render_pace_metrics(df: DataFrame) -> None:
     )
 
 
+def has_df_too_few_rows(df: DataFrame) -> bool:
+    return len(df) <= 3
+
+
 def main() -> None:
     df = RUNNING_DF.copy()
     st.title("Pace Overview")
     render_pace_metrics(df)
     filters = render_filter_parameters(df)
     df = filter_dataframe_by_parameters(df, filters)
+    if has_df_too_few_rows(df):
+        st.info(
+            f"In the chosen time range must be at least 4 runs! There are {len(df)} runs."
+        )
+        st.stop()
     histogram_tab, line_plot_tab, pace_hpm_tab = st.tabs(
         [
             f"{Icons.bar_chart} Pace Histogram",

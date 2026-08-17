@@ -1,6 +1,8 @@
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
+from garmin.data.constants import MIN_YEAR
+
 
 def parse_date(date_str: str, src_format: str):
     return datetime.strptime(date_str, src_format).replace(tzinfo=ZoneInfo("UTC"))
@@ -23,3 +25,11 @@ def get_current_year() -> int:
 def get_month_previous_year() -> date:
     current_month = get_current_month()
     return current_month.replace(year=current_month.year - 1)
+
+
+def get_first_of_given_year(yr: int) -> date:
+    return date(yr, 1, 1)
+
+
+def get_min_date() -> date:
+    return get_first_of_given_year(MIN_YEAR)

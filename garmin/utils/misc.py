@@ -54,12 +54,11 @@ def calculate_int_bins(min_value: int, max_value: int, factor: int) -> list[floa
 
 
 def calculate_ticker_values(values: list[float], max_numb: int = 7) -> list[float]:
-    sample_number = len(values)
-    if sample_number <= max_numb:
-        return values
+    sample_number = len(set(values))
+    number_of_bins = min(sample_number, max_numb)
     min_val = min(values) * 0.98
     max_val = max(values) * 1.02
-    return calculate_bins_from_min_max_value(min_val, max_val, max_numb)
+    return calculate_bins_from_min_max_value(min_val, max_val, number_of_bins)
 
 
 def bin_label_heartbeat(
