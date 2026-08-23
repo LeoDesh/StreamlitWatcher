@@ -5,14 +5,14 @@ from typing import Any
 
 from pandas import DataFrame
 
-from garmin.data.column_mapping import GARMIN_COLUMNS
-from garmin.data.constants import (
+from garmin.etl.column_mapping import GARMIN_COLUMNS
+from garmin.etl.constants import (
     ACTIVITY_TRANSLATION_MAPPING,
     ACTIVITY_TYPE_MAPPING,
     MIN_DISTANCE,
     MIN_YEAR,
 )
-from garmin.data.file_verification import validate_csv_file
+from garmin.etl.file_verification import validate_csv_file
 from garmin.utils.misc import (
     parse_activity_duration_to_hours,
     parse_activity_duration_to_minutes,

@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-from garmin.data.constants import MIN_YEAR
+from garmin.etl.constants import MIN_YEAR
 
 
 def parse_date(date_str: str, src_format: str):

@@ -4,7 +4,7 @@ from typing import Any
 
 import streamlit as st
 
-from garmin.data.constants import MIN_YEAR
+from garmin.etl.constants import MIN_YEAR
 from garmin.utils.misc import prettify
 from garmin.utils.time_utils import (
     get_current_date,

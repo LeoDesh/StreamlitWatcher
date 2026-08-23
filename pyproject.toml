@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "garminconnect>=0.2.38",
+    "garminconnect>=0.3.11",
     "pandas>=2.3.3",
     "playwright>=1.58.0",
     "plotly>=6.5.2",
@@ -13,6 +13,7 @@ dependencies = [
     "python-dotenv>=1.2.2",
     "ruff>=0.16.1",
     "streamlit>=1.53.0",
+    "garth==0.5.21"
 ]
 
 

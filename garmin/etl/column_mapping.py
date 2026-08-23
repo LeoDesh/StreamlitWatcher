@@ -1,7 +1,5 @@
 from enum import StrEnum, auto
 
-# from strenum import StrEnum
-
 
 class Activity(StrEnum):
     ACTIVITY_TYPE = auto()

@@ -1,6 +1,6 @@
 import pytest
 
-from garmin.data.file_verification import (
+from garmin.etl.file_verification import (
     analyze_lines,
     check_for_valid_container,
     validate_csv_file,

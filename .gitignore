@@ -18,3 +18,4 @@ workaround.py
 validation.py
 report.html
 garmin/data/archive/*.csv
+.garminconnect

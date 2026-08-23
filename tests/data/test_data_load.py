@@ -1,6 +1,6 @@
 import pytest
 
-from garmin.data.data_load import (
+from garmin.etl.data_load import (
     add_distance,
     add_pace,
     import_file,

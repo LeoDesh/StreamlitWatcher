@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from garmin.data.data_load import read_file
+from garmin.etl.data_load import read_file
 
 PATH_TO_CSV_FILES = Path("tests/data/files")
 

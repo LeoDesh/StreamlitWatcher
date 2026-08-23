@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from garmin.data.data_load import get_running_data, import_file
+from garmin.etl.data_load import get_running_data, import_file
 
-DATA_PATH = Path("garmin/data/")
-ARCHIVE_PATH = Path("garmin/data/archive")
+DATA_PATH = Path("garmin/etl/data/")
+ARCHIVE_PATH = Path("garmin/etl/data/archive")
 ACTIVITY_FILE_PATH = DATA_PATH / "Activities.csv"
 RUNNING_DF = get_running_data(ACTIVITY_FILE_PATH)
 COMPLETE_ACTIVITY_DF = import_file(ACTIVITY_FILE_PATH)
