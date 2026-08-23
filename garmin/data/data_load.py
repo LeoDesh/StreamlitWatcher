@@ -1,5 +1,7 @@
+import json
 from functools import cache
 from pathlib import Path
+from typing import Any
 
 from pandas import DataFrame
 
@@ -131,3 +133,13 @@ def transform_dataframe(df: DataFrame) -> DataFrame:
     df = transform_activity_columns(df)
     df = transform_distance_pace_columns(df)
     return df[df["year"] >= MIN_YEAR]
+
+
+def save_dict_to_json(filename: Path, data: dict[str, Any]) -> None:
+    with open(filename, "w") as f:
+        json.dump(data, f)
+
+
+def load_json(filename: Path) -> dict[str, Any]:
+    with open(filename) as f:
+        return json.load(f)
