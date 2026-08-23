@@ -107,11 +107,11 @@ def check_prettified(text: str) -> bool:
 
 
 def prettify(text: str) -> str:
-    return (
-        text
-        if check_prettified(text)
-        else " ".join(part.capitalize() for part in text.split("_"))
-    )
+    return text if check_prettified(text) else prettify_by_sep(text)
+
+
+def prettify_by_sep(text: str, sep: str = "_") -> str:
+    return " ".join(part.capitalize() for part in text.split(sep))
 
 
 def parse_activity_duration_to_minutes(duration_str: str) -> float:

@@ -12,6 +12,15 @@ def get_current_date() -> date:
     return datetime.now(ZoneInfo("UTC")).date()
 
 
+def convert_iso_format_to_date(date_iso_format: str | None) -> date | None:
+    return datetime.fromisoformat(date_iso_format).date() if date_iso_format else None
+
+
+def get_current_date_str(format: str = "%Y%m%d") -> str:
+    current_date = get_current_date()
+    return current_date.strftime(format)
+
+
 def get_current_month() -> date:
     today = get_current_date()
     return today.replace(day=1)
