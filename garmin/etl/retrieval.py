@@ -100,10 +100,8 @@ def archive_data(df: DataFrame) -> None:
     save_df_to_csv(df, filename)
 
 
-def download_garmin_activities(client: Garmin) -> None:
+def update_garmin_activities(client: Garmin) -> None:
     activities = client.get_activities(0, ACTIVITY_COUNT_THRESHOLD)
-    personal_records = client.get_personal_record()
-    convert_personal_records_to_csv(personal_records)
     update_activities(activities)
 
 
