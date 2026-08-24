@@ -3,7 +3,7 @@ import pytest
 from garmin.etl.data_load import (
     add_distance,
     add_pace,
-    import_file,
+    load_activity_file,
     rename_df_columns,
     transform_activity,
     transform_dataframe,
@@ -44,7 +44,7 @@ def test_transform_dataframe(load_appropriate_garmin_df):
 @pytest.mark.data
 def test_import_file_fail(get_missing_value_garmin_csv_file):
     with pytest.raises(ValueError):
-        import_file(get_missing_value_garmin_csv_file)
+        load_activity_file(get_missing_value_garmin_csv_file)
 
 
 @pytest.mark.data

@@ -3,10 +3,7 @@ from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, RUNNING_DF
 from garmin.plots.visualization import create_bar_chart_ordinary_axis
-from garmin.utils.pandas_helpers import (
-    aggregrate_df_by_dict,
-    filter_dataframe,
-)
+from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
 from garmin.utils.time_utils import get_current_year
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons

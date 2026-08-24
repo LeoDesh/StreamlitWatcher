@@ -19,7 +19,7 @@ from garmin.utils.misc import (
     replace_comma_in_number,
     search_with_regex,
     transform_activity_minutes_to_duration_format,
-    transform_str_to_date,
+    transform_str_to_datetime,
     verify_activity_duration,
 )
 
@@ -111,18 +111,18 @@ def test_search_with_regex(pattern: str, idx: int, expected: str, expected_conte
 
 
 @pytest.mark.misc
-def test_transform_str_to_date_correct_format():
+def test_transform_str_to_datetime_correct_format():
     date_str = "2025-05-03 18:05:04"
-    assert transform_str_to_date(date_str) == datetime(
+    assert transform_str_to_datetime(date_str) == datetime(
         2025, 5, 3, 18, 5, 4, tzinfo=ZoneInfo("UTC")
     )
 
 
 @pytest.mark.misc
-def test_transform_str_to_date_failure():
+def test_transform_str_to_datetime_failure():
     date_str = "2025.05.03 18:05:04"
     with pytest.raises(ValueError):
-        transform_str_to_date(date_str)
+        transform_str_to_datetime(date_str)
 
 
 @pytest.mark.misc

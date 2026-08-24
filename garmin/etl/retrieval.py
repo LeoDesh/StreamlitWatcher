@@ -3,7 +3,12 @@ from typing import Any
 from garminconnect import Garmin
 from pandas import DataFrame, to_datetime
 
-from garmin.constants import ACTIVITY_FILE_PATH, ARCHIVE_PATH, DATA_PATH
+from garmin.constants import (
+    ACTIVITY_FILE_PATH,
+    ARCHIVE_PATH,
+    DATA_PATH,
+    STEPS_DATA_FILE,
+)
 from garmin.etl.data_load import load_json, save_dict_to_json
 from garmin.etl.transformation import (
     scale_distance,
@@ -19,10 +24,7 @@ from garmin.utils.pace_calculations import (
     transform_speed_to_pace,
 )
 from garmin.utils.pandas_helpers import read_file, save_df_to_csv, update_data
-from garmin.utils.time_utils import (
-    convert_iso_format_to_date,
-    get_current_date_str,
-)
+from garmin.utils.time_utils import convert_iso_format_to_date, get_current_date_str
 
 ACTIVITY_MAPPING = {
     "other": "Sontige",
@@ -52,7 +54,6 @@ CONFIG = {
 ACTIVITY_COUNT_THRESHOLD = 50
 RECORD_CONFIG_FILE = DATA_PATH / "PersonalRecordsConfig.json"
 RECORD_DATA_FILE = DATA_PATH / "PersonalRecords.csv"
-STEPS_DATA_FILE = DATA_PATH / "Steps.csv"
 
 
 def extract_data_from_entry(activity_entry: dict[str, Any]) -> dict[str, Any]:

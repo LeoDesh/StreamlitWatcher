@@ -166,11 +166,16 @@ def transform_activity_minutes_to_duration_format(duration_in_minutes: float) ->
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 
-def transform_str_to_date(date_str: str) -> datetime:
+def transform_str_to_datetime(
+    date_str: str, src_format: str = "%Y-%m-%d %H:%M:%S"
+) -> datetime:
     if isinstance(date_str, datetime):
         return date_str
-    src_format = "%Y-%m-%d %H:%M:%S"
     return parse_date(date_str, src_format)
+
+
+def transform_str_to_datetime_date_str(date_str: str) -> datetime:
+    return transform_str_to_datetime(date_str, "%Y-%m-%d")
 
 
 def replace_comma_in_number(line: str) -> str:

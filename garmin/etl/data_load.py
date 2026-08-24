@@ -1,4 +1,6 @@
 import json
+from collections.abc import Callable
+from datetime import datetime
 from functools import cache
 from pathlib import Path
 from typing import Any
@@ -18,7 +20,8 @@ from garmin.utils.misc import (
     parse_activity_duration_to_minutes,
     parse_indoor_cycling_title,
     parse_str_to_int,
-    transform_str_to_date,
+    transform_str_to_datetime,
+    transform_str_to_datetime_date_str,
 )
 from garmin.utils.pace_calculations import (
     transform_pace_to_pace_float,
@@ -29,7 +32,7 @@ from garmin.utils.pandas_helpers import read_file
 
 
 @cache
-def import_file(file: Path) -> DataFrame:
+def load_activity_file(file: Path) -> DataFrame:
     validate_csv_file(file)
     df = read_file(file)
     df = rename_df_columns(df)
@@ -37,8 +40,17 @@ def import_file(file: Path) -> DataFrame:
 
 
 def get_running_data(file: Path) -> DataFrame:
-    df = import_file(file)
+    df = load_activity_file(file)
     return filter_garmin_df(df)
+
+
+@cache
+def load_steps_file(file: Path) -> DataFrame:
+    df = read_file(file)
+    df = apply_date_transformation_date_format(df, "Date")
+    df = df[df["year"] >= MIN_YEAR]
+    df["goal_reached"] = df["Steps"] >= df["Goal"]
+    return df
 
 
 def rename_df_columns(df: DataFrame) -> DataFrame:
@@ -84,11 +96,30 @@ def add_distance(activity: str, title: str, distance: float) -> float:
     return distance
 
 
+def apply_date_transformation(
+    df: DataFrame, date_column: str, conversion_function: Callable[[str], datetime]
+) -> DataFrame:
+    df[date_column] = df[date_column].apply(conversion_function)
+    df["hour"] = df[date_column].apply(lambda x: x.hour)
+    df["month"] = df[date_column].apply(lambda x: x.month)
+    df["year"] = df[date_column].apply(lambda x: x.year)
+    return df
+
+
+def apply_date_transformation_datetime_format(
+    df: DataFrame, date_column: str
+) -> DataFrame:
+    return apply_date_transformation(df, date_column, transform_str_to_datetime)
+
+
+def apply_date_transformation_date_format(df: DataFrame, date_column: str) -> DataFrame:
+    return apply_date_transformation(
+        df, date_column, transform_str_to_datetime_date_str
+    )
+
+
 def transform_date_columns(df: DataFrame) -> DataFrame:
-    df["date"] = df["date"].apply(transform_str_to_date)
-    df["hour"] = df["date"].apply(lambda x: x.hour)
-    df["month"] = df["date"].apply(lambda x: x.month)
-    df["year"] = df["date"].apply(lambda x: x.year)
+    df = apply_date_transformation_datetime_format(df, "date")
     df["time_in_minutes"] = df["time"].apply(parse_activity_duration_to_minutes)
     df["time_in_hours"] = df["time"].apply(parse_activity_duration_to_hours)
     return df
