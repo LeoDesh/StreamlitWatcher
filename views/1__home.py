@@ -2,12 +2,15 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, RUNNING_DF
-from garmin.plots.visualization import create_bar_chart_ordinary_axis
 from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
 from garmin.utils.time_utils import get_current_year
-from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
-from streamlit_utils.utils import Metric, create_metrics_container, stream_metrics
+from streamlit_utils.utils import (
+    Metric,
+    construct_year_statistics,
+    create_metrics_container,
+    stream_metrics,
+)
 
 
 def get_year_overview_table(df: DataFrame) -> DataFrame:
@@ -37,41 +40,7 @@ def construct_column_highlights(df: DataFrame, column: str, amount: int = 3) -> 
         create_metrics_container(date_str, activity)
 
 
-def construct_year_statistics(df: DataFrame) -> None:
-    df = df.copy()
-    category_col, _ = st.columns([1, 2])
-    mapping = {
-        "Count": ("Total Runs", "%{y} Runs"),
-        "Distance": ("Distance Covered", "%{y} km covered "),
-        "Time": ("Time Spent", "%{y} hours spent "),
-        "Average Time": (
-            "Average Time in minutes spent on a run",
-            "Average of %{y:.2f} minutes per run",
-        ),
-        "Average Distance": (
-            "Average kilometre amount of a run",
-            "Average of %{y:.2f} km per run",
-        ),
-    }
-    category = category_col.selectbox(
-        label="Category",
-        index=None,
-        options=list(mapping.keys()),
-        placeholder="Choose your Category",
-        label_visibility="collapsed",
-    )
-    category = category if category else "Count"
-    df = get_year_overview_table(df)
-    header, template = mapping.get(category)
-    hovertemplate = f"{template} in %{{x}} <extra></extra>"
-    fig = create_bar_chart_ordinary_axis(
-        df, "year", category, y_title=f"{header} per", hovertemplate=hovertemplate
-    )
-    place_figure(fig)
-
-
 def render_metrics(df: DataFrame) -> None:
-    df = get_year_overview_table(df.copy())
     current_year = get_current_year()
     st.header("Overview")
     df = filter_dataframe(df, {"year": current_year})
@@ -90,10 +59,27 @@ def render_metrics(df: DataFrame) -> None:
     stream_metrics(metrics, num_cols=3)
 
 
+def render_year_statistics(df: DataFrame) -> None:
+    mapping = {
+        "Count": ("Total Runs", "%{y} Runs"),
+        "Distance": ("Distance Covered", "%{y} km covered "),
+        "Time": ("Time Spent", "%{y} hours spent "),
+        "Average Time": (
+            "Average Time in minutes spent on a run",
+            "Average of %{y:.2f} minutes per run",
+        ),
+        "Average Distance": (
+            "Average kilometre amount of a run",
+            "Average of %{y:.2f} km per run",
+        ),
+    }
+    construct_year_statistics(df, mapping, "Count")
+
+
 def main() -> None:
     df = RUNNING_DF.copy()
-
-    render_metrics(df)
+    overview_df = get_year_overview_table(df)
+    render_metrics(overview_df)
     home_tab, distance_tab, speed_tab = st.tabs(
         [
             f"{Icons.analytics} Statistics",
@@ -102,7 +88,7 @@ def main() -> None:
         ]
     )
     with home_tab:
-        construct_year_statistics(df)
+        render_year_statistics(overview_df)
     with distance_tab:
         construct_column_highlights(df, "distance", 5)
     with speed_tab:

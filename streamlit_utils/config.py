@@ -13,6 +13,7 @@ class Icons(StrEnum):
     timeline = ":material/view_timeline:"
     apps = ":material/apps:"
     monitoring = ":material/monitoring:"
+    steps = ":material/steps:"
 
 
 PAGE_CONFIG = {
@@ -21,4 +22,5 @@ PAGE_CONFIG = {
     "comparison": {"icon": Icons.analytics},
     "pace": {"icon": Icons.monitoring},
     "latest_activities": {"icon": Icons.search},
+    "steps": {"icon": Icons.steps},
 }

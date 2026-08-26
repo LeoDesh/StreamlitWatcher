@@ -51,8 +51,6 @@ def setup_heatmap(df: DataFrame) -> None:
 
 def compute_monthly_distance(df: DataFrame) -> DataFrame:
     df = df.copy()
-    df["date"] = df["date"].dt.date
-    df["monthly_date"] = df["date"].apply(lambda x: date(x.year, x.month, 1))
     return (
         df.groupby(by="monthly_date")
         .agg(total=("distance", "sum"))

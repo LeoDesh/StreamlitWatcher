@@ -3,13 +3,13 @@ from datetime import date
 from typing import Any
 
 import streamlit as st
+from pandas import DataFrame
 
 from garmin.etl.constants import MIN_YEAR
+from garmin.plots.visualization import create_bar_chart_ordinary_axis
 from garmin.utils.misc import prettify
-from garmin.utils.time_utils import (
-    get_current_date,
-    get_first_of_given_year,
-)
+from garmin.utils.time_utils import get_current_date, get_first_of_given_year
+from streamlit_utils.chart_helpers import place_figure
 
 
 @dataclass
@@ -79,3 +79,23 @@ def time_options_provider() -> tuple[date, date]:
             return date_range
         else:
             st.stop()
+
+
+def construct_year_statistics(
+    df: DataFrame, config: dict[str, tuple[str, str]], default: str
+) -> None:
+    category_col, _ = st.columns([1, 2])
+    category = category_col.selectbox(
+        label="Category",
+        index=None,
+        options=list(config.keys()),
+        placeholder="Choose your Category",
+        label_visibility="collapsed",
+    )
+    category = category if category else default
+    header, template = config.get(category)
+    hovertemplate = f"{template} in %{{x}} <extra></extra>"
+    fig = create_bar_chart_ordinary_axis(
+        df, "year", category, y_title=f"{header} per", hovertemplate=hovertemplate
+    )
+    place_figure(fig)

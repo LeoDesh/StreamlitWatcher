@@ -1,6 +1,6 @@
 import json
 from collections.abc import Callable
-from datetime import datetime
+from datetime import date, datetime
 from functools import cache
 from pathlib import Path
 from typing import Any
@@ -103,6 +103,7 @@ def apply_date_transformation(
     df["hour"] = df[date_column].apply(lambda x: x.hour)
     df["month"] = df[date_column].apply(lambda x: x.month)
     df["year"] = df[date_column].apply(lambda x: x.year)
+    df["monthly_date"] = df[date_column].apply(lambda x: date(x.year, x.month, 1))
     return df
 
 
