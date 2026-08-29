@@ -14,6 +14,7 @@ class Icons(StrEnum):
     apps = ":material/apps:"
     monitoring = ":material/monitoring:"
     steps = ":material/steps:"
+    trophy = ":material/trophy:"
 
 
 PAGE_CONFIG = {
@@ -23,4 +24,5 @@ PAGE_CONFIG = {
     "pace": {"icon": Icons.monitoring},
     "latest_activities": {"icon": Icons.search},
     "steps": {"icon": Icons.steps},
+    "personal_records": {"icon": Icons.trophy},
 }

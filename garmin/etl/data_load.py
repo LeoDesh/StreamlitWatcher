@@ -28,7 +28,8 @@ from garmin.utils.pace_calculations import (
     transform_pace_to_speed,
     transform_speed_to_pace,
 )
-from garmin.utils.pandas_helpers import read_file
+from garmin.utils.pandas_helpers import filter_dataframe, read_file
+from garmin.utils.record_model import create_formatted_record_value
 
 
 @cache
@@ -42,6 +43,19 @@ def load_activity_file(file: Path) -> DataFrame:
 def get_running_data(file: Path) -> DataFrame:
     df = load_activity_file(file)
     return filter_garmin_df(df)
+
+
+def load_records_file(file: Path, activity_df: DataFrame) -> DataFrame:
+    record_df = read_file(file)
+    df = record_df.merge(activity_df, left_on="ActivityID", right_on="id", how="inner")
+    df = filter_dataframe(df, {"activity_type": "Running"})
+    df["formatted_value"] = df.apply(
+        lambda row: create_formatted_record_value(
+            row["Record"], row["Value"], row["Unit"]
+        ),
+        axis=1,
+    )
+    return df
 
 
 @cache

@@ -2,6 +2,7 @@ from enum import StrEnum, auto
 
 
 class Activity(StrEnum):
+    ID = auto()
     ACTIVITY_TYPE = auto()
     DATE = auto()
     TITLE = auto()
@@ -16,6 +17,7 @@ class Activity(StrEnum):
 
 
 GARMIN_COLUMNS = {
+    "ID": Activity.ID,
     "Aktivitätstyp": Activity.ACTIVITY_TYPE,
     "Datum": Activity.DATE,
     "Titel": Activity.TITLE,

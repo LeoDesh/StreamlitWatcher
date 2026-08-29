@@ -165,6 +165,14 @@ def transform_activity_minutes_to_duration_format(duration_in_minutes: float) ->
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 
+def transform_activity_minutes_to_duration_minute_format(
+    duration_in_minutes: float,
+) -> str:
+    minutes = math.floor(duration_in_minutes)
+    seconds = math.floor((duration_in_minutes - minutes) * 60)
+    return f"{minutes:02d}:{seconds:02d}"
+
+
 def transform_str_to_datetime(
     date_str: str, src_format: str = "%Y-%m-%d %H:%M:%S"
 ) -> datetime:

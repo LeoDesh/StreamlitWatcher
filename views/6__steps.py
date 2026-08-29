@@ -83,7 +83,6 @@ def compute_monthly_steps(df: DataFrame) -> DataFrame:
     )
 
 
-# uv run ruff check --fix
 def main() -> None:
     st.title("Steps Statistics")
     df = STEPS_DF.copy()

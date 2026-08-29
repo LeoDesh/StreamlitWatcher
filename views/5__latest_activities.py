@@ -25,7 +25,10 @@ def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:
     data["speed"] = "--" if pace == "--" else data["speed"]
 
 
-def construct_activity_header(date_str: str, activity_type: str) -> str:
+def construct_activity_header(activity: dict[str, Any]) -> str:
+    date = activity["date"].date()
+    date_str = date.strftime("%d.%m.%Y")
+    activity_type = activity["activity_type"]
     return f"{date_str} -- {activity_type}"
 
 
@@ -36,15 +39,13 @@ def get_activities(df: DataFrame) -> list[str]:
 def show_latest_activities(df: DataFrame, rows: int = 20) -> None:
     df = df.head(rows)
     df_dict = df.to_dict(orient="records")
-    for idx, row_dict in enumerate(df_dict):
-        clean_up_dict(row_dict)
-        date = row_dict["date"].date()
-        date_str = date.strftime("%d.%m.%Y")
-        activity_title = construct_activity_header(date_str, row_dict["activity_type"])
+    for idx, activity in enumerate(df_dict):
+        clean_up_dict(activity)
+        activity_title = construct_activity_header(activity)
         header = f"{idx + 1}: {activity_title}"
         activity = {
             attr: value
-            for attr, value in row_dict.items()
+            for attr, value in activity.items()
             if attr in ACTIVITY_ATTR_COLUMNS
         }
         create_metrics_container(header, activity)

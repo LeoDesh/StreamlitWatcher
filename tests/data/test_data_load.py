@@ -1,4 +1,5 @@
 import pytest
+from pandas import DataFrame
 
 from garmin.etl.data_load import (
     add_distance,
@@ -11,14 +12,14 @@ from garmin.etl.data_load import (
 
 
 @pytest.mark.data
-def test_import_filter_columns_success(load_appropriate_garmin_df):
+def test_import_filter_columns_success(load_appropriate_garmin_df: DataFrame):
     df = load_appropriate_garmin_df
     df = rename_df_columns(df)
     assert "average_pace" in df.columns
 
 
 @pytest.mark.data
-def test_import_filter_columns_fail(load_wrong_header_garmin_df):
+def test_import_filter_columns_fail(load_wrong_header_garmin_df: DataFrame):
     df = load_wrong_header_garmin_df
     with pytest.raises(KeyError):
         df = rename_df_columns(df)
