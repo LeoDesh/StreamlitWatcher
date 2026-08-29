@@ -1,3 +1,4 @@
+import calendar
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
@@ -42,3 +43,8 @@ def get_first_of_given_year(yr: int) -> date:
 
 def get_min_date() -> date:
     return get_first_of_given_year(MIN_YEAR)
+
+
+def get_last_day_of_date(given_date: date) -> date:
+    _, last_day = calendar.monthrange(given_date.year, given_date.month)
+    return given_date.replace(day=last_day)

@@ -1,8 +1,7 @@
-import calendar
 import math
 import re
 from collections.abc import Callable
-from datetime import date, datetime
+from datetime import datetime
 from itertools import pairwise
 
 import pandas as pd
@@ -210,8 +209,3 @@ def compute_delta(src: float, trg: float) -> float:
     if trg:
         return 100
     return 0
-
-
-def get_last_day_of_date(given_date: date) -> date:
-    _, last_day = calendar.monthrange(given_date.year, given_date.month)
-    return given_date.replace(day=last_day)

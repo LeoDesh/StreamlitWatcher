@@ -6,9 +6,17 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.etl.constants import MIN_YEAR
-from garmin.plots.visualization import create_bar_chart_ordinary_axis
+from garmin.plots.visualization import (
+    create_bar_chart_ordinary_axis,
+    create_heat_map_monthly_axis,
+)
 from garmin.utils.misc import prettify
-from garmin.utils.time_utils import get_current_date, get_first_of_given_year
+from garmin.utils.pandas_helpers import generate_dates_df
+from garmin.utils.time_utils import (
+    get_current_date,
+    get_first_of_given_year,
+    get_last_day_of_date,
+)
 from streamlit_utils.chart_helpers import place_figure
 
 
@@ -97,5 +105,42 @@ def construct_year_statistics(
     hovertemplate = f"{template} in %{{x}} <extra></extra>"
     fig = create_bar_chart_ordinary_axis(
         df, "year", category, y_title=f"{header} per", hovertemplate=hovertemplate
+    )
+    place_figure(fig)
+
+
+def render_monthly_progression(df: DataFrame, target_column: str) -> None:
+    date_df = generate_dates_df(
+        df["monthly_date"].min(),
+        df["monthly_date"].max(),
+        freq="MS",
+        date_column="monthly_date",
+    )
+    df = date_df.merge(df, how="left", on="monthly_date").fillna(0)
+    df[target_column] = df[target_column].cumsum()
+    df["month"] = df["monthly_date"].apply(get_last_day_of_date)
+    fig = create_bar_chart_ordinary_axis(
+        df,
+        "month",
+        target_column,
+        f"Total {target_column} covered per",
+        hovertemplate=f"%{{y:,.0f}} {target_column} covered up to %{{x}} <extra></extra>",
+        show_x_title=False,
+    )
+    place_figure(fig)
+
+
+def setup_heatmap(df: DataFrame, target_column: str, unit: str = "") -> None:
+    df = df.copy()
+    df.columns = [prettify(col) for col in df.columns]
+    pivot_df = df.pivot_table(
+        values=target_column, index="Year", columns="Month", aggfunc="sum"
+    ).fillna(0)
+    column_details = f"in {unit}" if unit else ""
+    template_details = unit if unit else ""
+    fig = create_heat_map_monthly_axis(
+        pivot_df,
+        f"{target_column} {column_details} per month over years",
+        hovertemplate=f"%{{y}}, %{{x}}: %{{z:.2f}} {template_details} <extra></extra>",
     )
     place_figure(fig)

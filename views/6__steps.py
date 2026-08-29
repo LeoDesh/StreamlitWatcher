@@ -2,20 +2,19 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import STEPS_DF
-from garmin.plots.visualization import (
-    create_bar_chart_ordinary_axis,
-    create_heat_map_monthly_axis,
-)
-from garmin.utils.misc import get_last_day_of_date, prettify
 from garmin.utils.pandas_helpers import (
     aggregrate_df_by_dict,
     filter_dataframe,
-    generate_dates_df,
 )
 from garmin.utils.time_utils import get_current_year
-from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
-from streamlit_utils.utils import Metric, construct_year_statistics, stream_metrics
+from streamlit_utils.utils import (
+    Metric,
+    construct_year_statistics,
+    render_monthly_progression,
+    setup_heatmap,
+    stream_metrics,
+)
 
 
 def get_year_overview_table(df: DataFrame) -> DataFrame:
@@ -78,46 +77,10 @@ def compute_monthly_steps(df: DataFrame) -> DataFrame:
     df = df.copy()
     return (
         df.groupby(by="monthly_date")
-        .agg(total=("Steps", "sum"))
+        .agg(steps=("Steps", "sum"))
         .sort_values(by="monthly_date")
         .reset_index()
     )
-
-
-def setup_progress_plot(df: DataFrame) -> None:
-    df = compute_monthly_steps(df)
-    date_df = generate_dates_df(
-        df["monthly_date"].min(),
-        df["monthly_date"].max(),
-        freq="MS",
-        date_column="monthly_date",
-    )
-    df = date_df.merge(df, how="left", on="monthly_date").fillna(0)
-    df["steps"] = df["total"].cumsum()
-    df["month"] = df["monthly_date"].apply(get_last_day_of_date)
-    fig = create_bar_chart_ordinary_axis(
-        df,
-        "month",
-        "steps",
-        "Total steps covered per",
-        hovertemplate="%{y:,.0f} steps covered up to %{x} <extra></extra>",
-        show_x_title=False,
-    )
-    place_figure(fig)
-
-
-def setup_heatmap(df: DataFrame) -> None:
-    df = df.copy()
-    df.columns = [prettify(col) for col in df.columns]
-    pivot_df = df.pivot_table(
-        values="Steps", index="Year", columns="Month", aggfunc="sum"
-    ).fillna(0)
-    fig = create_heat_map_monthly_axis(
-        pivot_df,
-        "Steps per (Month, Year)",
-        hovertemplate="%{y}, %{x}: %{z:,.0f} Steps <extra></extra>",
-    )
-    place_figure(fig)
 
 
 # uv run ruff check --fix
@@ -136,9 +99,10 @@ def main() -> None:
     with progress_tab:
         render_year_statistics(overview_df)
     with histogram_tab:
-        setup_progress_plot(df)
+        monthly_df = compute_monthly_steps(df)
+        render_monthly_progression(monthly_df, "steps")
     with heatmap_tab:
-        setup_heatmap(df)
+        setup_heatmap(df, "Steps")
 
 
 main()
