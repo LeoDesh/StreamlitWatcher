@@ -1,6 +1,5 @@
 from typing import Any
 
-from garminconnect import Garmin
 from pandas import DataFrame, to_datetime
 
 from garmin.constants import (
@@ -9,6 +8,7 @@ from garmin.constants import (
     DATA_PATH,
     STEPS_DATA_FILE,
 )
+from garmin.etl.client import DataClient
 from garmin.etl.data_load import load_json, save_dict_to_json
 from garmin.etl.transformation import (
     scale_distance,
@@ -100,7 +100,7 @@ def archive_data(df: DataFrame) -> None:
     save_df_to_csv(df, filename)
 
 
-def update_garmin_activities(client: Garmin) -> None:
+def update_garmin_activities(client: DataClient) -> None:
     activities = client.get_activities(0, ACTIVITY_COUNT_THRESHOLD)
     update_activities(activities)
 
@@ -127,7 +127,7 @@ def convert_personal_records_to_csv(personal_records: dict[str, Any]) -> None:
     save_df_to_csv(df, RECORD_DATA_FILE)
 
 
-def update_personal_records(client: Garmin) -> None:
+def update_personal_records(client: DataClient) -> None:
     personal_records = client.get_personal_record()
     convert_personal_records_to_csv(personal_records)
 
@@ -146,7 +146,7 @@ def refine_personal_record_mapping(
     return {item["id"]: item["key"].replace("pr.label.", "") for item in mapping}
 
 
-def refresh_personal_record_ids_mapping(client: Garmin) -> list[dict[str, Any]]:
+def refresh_personal_record_ids_mapping(client: DataClient) -> list[dict[str, Any]]:
     initial_mapping = client.connectapi(
         f"/personalrecord-service/personalrecordtype/prtypes/{client.display_name}"
     )
@@ -155,7 +155,7 @@ def refresh_personal_record_ids_mapping(client: Garmin) -> list[dict[str, Any]]:
 
 
 def get_daily_steps(
-    client: Garmin,
+    client: DataClient,
     start: str = "2020-01-01",
     end: str = get_current_date_str("%Y-%m-%d"),
 ) -> list[dict[str, str | float]]:
@@ -169,7 +169,7 @@ def transform_daily_steps(data: list[dict[str, str | float]]) -> DataFrame:
     return df
 
 
-def update_garmin_steps(garmin: Garmin) -> None:
+def update_garmin_steps(garmin: DataClient) -> None:
     steps_df = read_file(STEPS_DATA_FILE)
     steps_df["Date"] = to_datetime(steps_df["Date"]).dt.date
     start = (
