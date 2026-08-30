@@ -15,6 +15,7 @@ def get_app_version() -> str:
         return data.get("project", {}).get("version", "unknown")
 
 
+IMAGE_PATH = Path("garmin/assets/ActivityDiary.png")
 DATA_PATH = Path("garmin/etl/data/")
 ARCHIVE_PATH = Path("garmin/etl/data/archive")
 ACTIVITY_FILE_PATH = DATA_PATH / "Activities.csv"

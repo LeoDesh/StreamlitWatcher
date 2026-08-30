@@ -14,9 +14,10 @@ from garmin.utils.time_utils import (
     get_month_previous_year,
 )
 from streamlit_utils.chart_helpers import place_figure
-from streamlit_utils.config import Icons
+from streamlit_utils.model import GridConfig
 from streamlit_utils.utils import (
     Metric,
+    create_grid,
     render_monthly_progression,
     setup_heatmap,
     stream_metrics,
@@ -112,19 +113,14 @@ def main() -> None:
     construct_header()
     df = RUNNING_DF.copy()
     render_distance_metrics(df)
-    progress_tab, histogram_tab, heatmap_tab = st.tabs(
-        [
-            f"{Icons.monitoring} Progress per Month",
-            f"{Icons.bar_chart} Histogram by Distance Ranges",
-            f"{Icons.analytics} Month Year Distribution",
-        ]
-    )
-    with progress_tab:
+    grid_config = [GridConfig(1, height=550), GridConfig(2)]
+    grid = create_grid(grid_config)
+    with grid[0][0]:
         monthly_df = compute_monthly_distance(df)
-        render_monthly_progression(monthly_df, "distance")
-    with histogram_tab:
+        render_monthly_progression(monthly_df, "distance", "km")
+    with grid[1][0]:
         setup_histogram(df)
-    with heatmap_tab:
+    with grid[1][1]:
         setup_heatmap(df, "Distance", "km")
 
 

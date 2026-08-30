@@ -152,7 +152,6 @@ def create_plotly_pace_chart(
         template="plotly_white",
         hovermode="x unified",
         legend={
-            "title": "Columns",
             "bgcolor": THEME.bright_grey,
             "bordercolor": THEME.primary_grey,
             "borderwidth": 1,

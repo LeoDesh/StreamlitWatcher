@@ -3,7 +3,7 @@ from pathlib import Path
 import streamlit as st
 from streamlit.navigation.page import StreamlitPage
 
-from garmin.constants import APP_VERSION, RUNNING_DF
+from garmin.constants import APP_VERSION, IMAGE_PATH, RUNNING_DF
 from streamlit_utils.config import PAGE_CONFIG, Icons
 
 
@@ -29,9 +29,17 @@ def get_pages() -> StreamlitPage:
     return st.navigation(streamlit_pages, position="top")
 
 
+def render_logo() -> None:
+    st.set_page_config(
+        page_title="Activity Diary",
+        page_icon=IMAGE_PATH,
+        layout="wide",
+    )
+    st.logo(IMAGE_PATH, size="small", icon_image=IMAGE_PATH)
+
+
 def define_sidebar() -> None:
     with st.sidebar:
-        st.title("Activity Diary")
         st.subheader(f"Version {APP_VERSION}")
         min_date = RUNNING_DF["date"].min().strftime("%d.%m.%Y")
         max_date = RUNNING_DF["date"].max().strftime("%d.%m.%Y")

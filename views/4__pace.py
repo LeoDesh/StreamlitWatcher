@@ -14,9 +14,13 @@ from garmin.plots.visualization import (
 from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
 from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace, filter_dataframe
 from garmin.utils.time_utils import get_current_year
-from streamlit_utils.chart_helpers import place_figure
-from streamlit_utils.config import Icons
-from streamlit_utils.utils import Metric, stream_metrics, time_options_provider
+from streamlit_utils.model import GridConfig
+from streamlit_utils.utils import (
+    Metric,
+    create_grid,
+    stream_metrics,
+    time_options_provider,
+)
 
 type FilterParameters = list[
     tuple[date, date], tuple[float, float], tuple[float, float]
@@ -164,24 +168,18 @@ def main() -> None:
             f"In the chosen time range must be at least 4 runs! There are {len(df)} runs."
         )
         st.stop()
-    histogram_tab, line_plot_tab, pace_hpm_tab = st.tabs(
-        [
-            f"{Icons.bar_chart} Pace Histogram",
-            f"{Icons.line_chart} Pace and HPM Comparison",
-            f"{Icons.analytics} Pace and HPM Correlation",
-        ]
-    )
-    with histogram_tab:
+    grid = create_grid([GridConfig(columns=2), GridConfig(columns=1)])
+    with grid[0][0]:
         fig = setup_pace_histogram(df, 15)
-        place_figure(fig)
-    with line_plot_tab:
+        st.plotly_chart(fig)
+    with grid[1][0]:
         fig = setup_line_plot(df)
-        place_figure(fig)
-    with pace_hpm_tab:
+        st.plotly_chart(fig)
+    with grid[0][1]:
         pivot_df = create_df_pivot_hpm_pace(df)
         pivot_df.columns.name = "Pace km/min"
         fig = create_heat_map_ordinary(pivot_df, "Pace & HPM Correlation in %")
-        place_figure(fig)
+        st.plotly_chart(fig)
 
 
 if __name__ == "__main__":

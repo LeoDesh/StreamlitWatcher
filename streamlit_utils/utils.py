@@ -4,6 +4,7 @@ from typing import Any
 
 import streamlit as st
 from pandas import DataFrame
+from streamlit.delta_generator import DeltaGenerator
 
 from garmin.etl.constants import MIN_YEAR
 from garmin.plots.visualization import (
@@ -18,6 +19,7 @@ from garmin.utils.time_utils import (
     get_last_day_of_date,
 )
 from streamlit_utils.chart_helpers import place_figure
+from streamlit_utils.model import GridConfig
 
 
 @dataclass
@@ -109,7 +111,10 @@ def construct_year_statistics(
     place_figure(fig)
 
 
-def render_monthly_progression(df: DataFrame, target_column: str) -> None:
+def render_monthly_progression(
+    df: DataFrame, target_column: str, unit: str = ""
+) -> None:
+    unit = unit if unit else target_column
     date_df = generate_dates_df(
         df["monthly_date"].min(),
         df["monthly_date"].max(),
@@ -124,10 +129,10 @@ def render_monthly_progression(df: DataFrame, target_column: str) -> None:
         "month",
         target_column,
         f"Total {target_column} covered per",
-        hovertemplate=f"%{{y:,.0f}} {target_column} covered up to %{{x}} <extra></extra>",
+        hovertemplate=f"%{{y:,.0f}} {unit} covered up to %{{x}} <extra></extra>",
         show_x_title=False,
     )
-    place_figure(fig)
+    place_figure(fig, layout_tuple=(1, 22, 1))
 
 
 def setup_heatmap(df: DataFrame, target_column: str, unit: str = "") -> None:
@@ -143,4 +148,16 @@ def setup_heatmap(df: DataFrame, target_column: str, unit: str = "") -> None:
         f"{target_column} {column_details} per month over years",
         hovertemplate=f"%{{y}}, %{{x}}: %{{z:.2f}} {template_details} <extra></extra>",
     )
-    place_figure(fig)
+    place_figure(fig, layout_tuple=(1, 22, 1))
+
+
+def create_grid(grid_config: list[GridConfig]) -> list[list[DeltaGenerator]]:
+    grid_layout = []
+    for config in grid_config:
+        cols_config = st.columns(config.columns, gap=config.gap)
+        containers = [
+            col.container(border=config.has_border, height=config.height)
+            for col in cols_config
+        ]
+        grid_layout.append(containers)
+    return grid_layout
