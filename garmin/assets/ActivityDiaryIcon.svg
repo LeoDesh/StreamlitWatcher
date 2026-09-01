@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#20B978"/><stop offset="1" stop-color="#48D37F"/></linearGradient></defs>
+<g transform="translate(1 1) scale(.32)">
+<rect width="150" height="150" rx="22" fill="#fff" stroke="#1E2C42" stroke-width="7"/>
+<path d="M75 4v142M75 146c-13 11-36 10-52 10H15c-8 0-12-5-12-13M75 146c13 11 36 10 52 10h8c8 0 12-5 12-13" fill="none" stroke="#1E2C42" stroke-width="6" stroke-linecap="round"/>
+<path d="M67 146h16v29l-8-6-8 6z" fill="url(#g)"/>
+<g transform="translate(11 12)">
+<circle cx="14" cy="14" r="12" fill="#39C985"/><circle cx="17" cy="7" r="2.8" fill="#fff"/><path d="M14 11l-4 7 5 2 4 6M12 17l-6 2M15 12l6 4 4-3" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="14" cy="46" r="12" fill="#3F9BEA"/><path d="M9 52c8-2 14-8 14-16M7 47c6-1 11-5 14-10M18 39l7-9M23 41l7-9" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/>
+<circle cx="14" cy="78" r="12" fill="#F4AA22"/><path d="M14 71l5 3-2 6h-6l-2-6zM14 71v-5M9 74l-5-3M19 74l5-3M11 80l-3 6M17 80l3 6" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round"/>
+<circle cx="14" cy="110" r="12" fill="#8B5BEA"/><circle cx="8" cy="113" r="6" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="21" cy="113" r="6" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M8 113l6-9 7 9M14 104l-3-5h5M14 104l8-1" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<path d="M91 62l10 10 25-31" fill="none" stroke="url(#g)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M91 96h38M91 111h29" stroke="#1E2C42" stroke-width="5" stroke-linecap="round"/>
+</g>
+</svg>
