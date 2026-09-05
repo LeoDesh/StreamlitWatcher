@@ -18,11 +18,13 @@ class Icons(StrEnum):
 
 
 PAGE_CONFIG = {
-    "home": {"icon": Icons.home, "default": True},
-    "distance": {"icon": Icons.route},
-    "comparison": {"icon": Icons.analytics},
-    "pace": {"icon": Icons.monitoring},
-    "latest_activities": {"icon": Icons.search},
-    "steps": {"icon": Icons.steps},
-    "personal_records": {"icon": Icons.trophy},
+    "": {"home": {"icon": Icons.home, "default": True}},
+    "Running": {
+        "distance": {"icon": Icons.route},
+        "comparison": {"icon": Icons.analytics},
+        "pace": {"icon": Icons.monitoring},
+        "personal_records": {"icon": Icons.trophy},
+    },
+    "Activities": {"latest_activities": {"icon": Icons.search}},
+    "Steps": {"steps": {"icon": Icons.steps}},
 }

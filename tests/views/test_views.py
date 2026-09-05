@@ -1,9 +1,10 @@
-from pathlib import Path
-
 import pytest
 from streamlit.testing.v1 import AppTest
 
-page_files = [str(p) for p in Path("views").glob("*.py")]
+from streamlit_utils.nagivation import VIEW_FOLDER, get_folders
+
+FOLDERS = [VIEW_FOLDER, *get_folders(VIEW_FOLDER)]
+page_files = [str(p) for folder in FOLDERS for p in folder.glob("*.py")]
 
 
 @pytest.mark.streamlit

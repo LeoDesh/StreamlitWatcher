@@ -12,26 +12,67 @@ from garmin.constants import (
 )
 from streamlit_utils.config import PAGE_CONFIG, Icons
 
+VIEW_FOLDER = Path("views")
 
-def get_pages() -> StreamlitPage:
-    st.set_page_config(layout="wide")
-    base_config = {"icon": Icons.monitoring}
-    page_order_dict = {}
-    for file in Path("views").iterdir():
-        if file.suffix != ".py":
-            continue
-        index, file_name = file.stem.split("__")
-        index = int(index)
-        page_name = " ".join(file.capitalize() for file in file_name.split("_"))
-        initial_config = (
-            base_config
-            if not PAGE_CONFIG.get(file_name)
-            else PAGE_CONFIG.get(file_name)
+
+def split_page_name(file_name: str) -> tuple[int, str]:
+    idx, page_name = file_name.split("__")
+    return (int(idx), page_name)
+
+
+def get_folders(path: Path) -> list[Path]:
+    return [folder for folder in path.iterdir() if folder.is_dir()]
+
+
+def get_section_folder_mapping() -> dict[str, Path]:
+    folder_dict = {}
+    for folder_path in get_folders(VIEW_FOLDER):
+        idx, section_name = split_page_name(folder_path.name)
+        folder_dict[idx] = (section_name, folder_path)
+    sorted_folder_dict = dict(sorted(folder_dict.items()))
+    return {
+        section_name: folder for (section_name, folder) in sorted_folder_dict.values()
+    }
+
+
+def generate_page_from_file_path(file: Path, parent_folder: str = "") -> StreamlitPage:
+    _, file_name = file.stem.split("__")
+    page_name = " ".join(file.capitalize() for file in file_name.split("_"))
+    if parent_folder:
+        _, parent_folder = split_page_name(parent_folder)
+    page_config = PAGE_CONFIG.get(parent_folder).get(file_name)
+    initial_config = {"icon": Icons.monitoring} if not page_config else page_config
+    config = initial_config | {"title": page_name, "page": file}
+    return st.Page(**config)
+
+
+def extract_order_number_from_page(file: Path) -> int:
+    index, _ = file.stem.split("__")
+    return int(index)
+
+
+def get_pages(path: Path) -> list[StreamlitPage]:
+    streamlit_pages = {
+        extract_order_number_from_page(file): generate_page_from_file_path(
+            file, path.name
         )
-        config = initial_config | {"title": page_name, "page": file}
-        streamlit_page = st.Page(**config)
-        page_order_dict[index] = streamlit_page
-    streamlit_pages = [page_order_dict[idx] for idx in sorted(page_order_dict)]
+        for file in path.iterdir()
+        if file.suffix == ".py"
+    }
+    sorted_pages = dict(sorted(streamlit_pages.items()))
+    return list(sorted_pages.values())
+
+
+def render_page_layout() -> dict[str, list[StreamlitPage]]:
+    page_layout = get_section_folder_mapping()
+    return {"": [generate_page_from_file_path(VIEW_FOLDER / "0__home.py")]} | {
+        section: get_pages(folder_path) for section, folder_path in page_layout.items()
+    }
+
+
+def get_navigation() -> StreamlitPage:
+    st.set_page_config(layout="wide")
+    streamlit_pages = render_page_layout()
     return st.navigation(streamlit_pages, position="top")
 
 
