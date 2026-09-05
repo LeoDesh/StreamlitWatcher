@@ -10,7 +10,7 @@ from garmin.constants import (
     IMAGE_TRANSPARENT_PATH,
     RUNNING_DF,
 )
-from streamlit_utils.config import PAGE_CONFIG, Icons
+from streamlit_utils.config import PAGE_CONFIG, SECTION_CONFIG, Icons
 
 VIEW_FOLDER = Path("views")
 
@@ -63,16 +63,28 @@ def get_pages(path: Path) -> list[StreamlitPage]:
     return list(sorted_pages.values())
 
 
-def render_page_layout() -> dict[str, list[StreamlitPage]]:
+def prettify_section(section: str) -> str:
+    icon = SECTION_CONFIG.get(section, "")
+    return f"{icon} {section}" if icon else section
+
+
+def get_page_mapping() -> dict[str, list[StreamlitPage]]:
     page_layout = get_section_folder_mapping()
     return {"": [generate_page_from_file_path(VIEW_FOLDER / "0__home.py")]} | {
         section: get_pages(folder_path) for section, folder_path in page_layout.items()
     }
 
 
+def prettify_page_mapping(
+    mapping: dict[str, list[StreamlitPage]],
+) -> dict[str, list[StreamlitPage]]:
+    return {prettify_section(section): pages for section, pages in mapping.items()}
+
+
 def get_navigation() -> StreamlitPage:
     st.set_page_config(layout="wide")
-    streamlit_pages = render_page_layout()
+    page_mapping = get_page_mapping()
+    streamlit_pages = prettify_page_mapping(page_mapping)
     return st.navigation(streamlit_pages, position="top")
 
 

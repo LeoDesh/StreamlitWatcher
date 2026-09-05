@@ -25,9 +25,9 @@ STEPS_DATA_FILE = DATA_PATH / "Steps.csv"
 RECORDS_DATA_FILE = DATA_PATH / "PersonalRecords.csv"
 
 RUNNING_DF = get_running_data(ACTIVITY_FILE_PATH)
-COMPLETE_ACTIVITY_DF = load_activity_file(ACTIVITY_FILE_PATH)
+ACTIVITY_DF = load_activity_file(ACTIVITY_FILE_PATH)
 STEPS_DF = load_steps_file(STEPS_DATA_FILE)
-RECORDS_DF = load_records_file(RECORDS_DATA_FILE, COMPLETE_ACTIVITY_DF)
+RECORDS_DF = load_records_file(RECORDS_DATA_FILE, ACTIVITY_DF)
 ACTIVITY_ATTR_COLUMNS = [
     "distance",
     "average_pace",

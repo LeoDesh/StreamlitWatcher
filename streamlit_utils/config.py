@@ -15,6 +15,8 @@ class Icons(StrEnum):
     monitoring = ":material/monitoring:"
     steps = ":material/steps:"
     trophy = ":material/trophy:"
+    view = ":material/grid_view"
+    explore = ":material/explore"
 
 
 PAGE_CONFIG = {
@@ -28,3 +30,5 @@ PAGE_CONFIG = {
     "Activities": {"latest_activities": {"icon": Icons.search}},
     "Steps": {"steps": {"icon": Icons.steps}},
 }
+
+SECTION_CONFIG = {"Running": "🏃", "Activities": "📊", "Steps": "👟"}

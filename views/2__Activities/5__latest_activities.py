@@ -4,7 +4,7 @@ from typing import Any
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import ACTIVITY_ATTR_COLUMNS, COMPLETE_ACTIVITY_DF
+from garmin.constants import ACTIVITY_ATTR_COLUMNS, ACTIVITY_DF
 from garmin.plots.visualization import create_gantt_chart, create_heat_map_monthly_axis
 from garmin.utils.pandas_helpers import (
     aggregate_df_named_column,
@@ -178,7 +178,7 @@ def render_activities_metrics(df: DataFrame) -> None:
 
 def main() -> None:
     st.header("Latest Activities", text_alignment="center")
-    df = COMPLETE_ACTIVITY_DF.copy()
+    df = ACTIVITY_DF.copy()
     df["month_start"] = df["date"].apply(lambda x: date(x.year, x.month, 1))
     render_activities_metrics(df)
     activity_tab, gantt_chart_tab, heat_tab = st.tabs(
