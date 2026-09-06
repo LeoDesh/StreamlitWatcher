@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Any
 
 from pandas import DataFrame, to_datetime
@@ -23,7 +24,12 @@ from garmin.utils.pace_calculations import (
     transform_seconds_to_hour_minutes_seconds_format,
     transform_speed_to_pace,
 )
-from garmin.utils.pandas_helpers import read_file, save_df_to_csv, update_data
+from garmin.utils.pandas_helpers import (
+    read_file,
+    save_df_to_csv,
+    update_data,
+    update_data_on_column,
+)
 from garmin.utils.time_utils import convert_iso_format_to_date, get_current_date_str
 
 ACTIVITY_MAPPING = {
@@ -172,10 +178,13 @@ def transform_daily_steps(data: list[dict[str, str | float]]) -> DataFrame:
 def update_garmin_steps(garmin: DataClient) -> None:
     steps_df = read_file(STEPS_DATA_FILE)
     steps_df["Date"] = to_datetime(steps_df["Date"]).dt.date
-    start = (
-        "2022-01-01" if steps_df.empty else steps_df["Date"].max().strftime("%Y-%m-%d")
-    )
+    if steps_df.empty:
+        start = "2022-01-01"
+    else:
+        latest_date = steps_df["Date"].max()
+        start_date = latest_date - timedelta(days=30)
+        start = start_date.strftime("%Y-%m-%d")
     steps_data = get_daily_steps(garmin, start=start)
     new_steps_df = transform_daily_steps(steps_data)
-    df = update_data(new_steps_df, steps_df)
+    df = update_data_on_column(new_steps_df, steps_df, "Date")
     save_df_to_csv(df, STEPS_DATA_FILE)

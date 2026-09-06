@@ -150,6 +150,14 @@ def update_data(df_existing: DataFrame, df_new: DataFrame) -> DataFrame:
     return concat([df_difference, df_existing], ignore_index=True)
 
 
+def update_data_on_column(
+    df_existing: DataFrame, df_new: DataFrame, column: str
+) -> DataFrame:
+    ids = df_new[column].tolist()
+    df_base = df_existing[~df_existing[column].isin(ids)]
+    return concat([df_new, df_base], ignore_index=True)
+
+
 def save_df_to_csv(
     df: DataFrame,
     filename: str | Path,

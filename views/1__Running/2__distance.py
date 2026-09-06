@@ -7,7 +7,7 @@ from pandas import DataFrame
 from garmin.constants import RUNNING_DF
 from garmin.plots.visualization import get_df_km_histogram
 from garmin.utils.misc import calculate_int_bins, compute_delta
-from garmin.utils.pandas_helpers import filter_dataframe
+from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
 from garmin.utils.time_utils import (
     get_current_month,
     get_last_day_of_date,
@@ -37,13 +37,7 @@ def setup_histogram(df: DataFrame) -> None:
 
 
 def compute_monthly_distance(df: DataFrame) -> DataFrame:
-    df = df.copy()
-    return (
-        df.groupby(by="monthly_date")
-        .agg(distance=("distance", "sum"))
-        .sort_values(by="monthly_date")
-        .reset_index()
-    )
+    return aggregate_df_named_column(df, "monthly_date", "distance")
 
 
 def get_current_month_metric(df: DataFrame) -> Metric:

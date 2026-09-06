@@ -2,19 +2,9 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import STEPS_DF
-from garmin.utils.pandas_helpers import (
-    aggregrate_df_by_dict,
-    filter_dataframe,
-)
+from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
 from garmin.utils.time_utils import get_current_year
-from streamlit_utils.config import Icons
-from streamlit_utils.utils import (
-    Metric,
-    construct_year_statistics,
-    render_monthly_progression,
-    setup_heatmap,
-    stream_metrics,
-)
+from streamlit_utils.utils import Metric, construct_year_statistics, stream_metrics
 
 
 def get_year_overview_table(df: DataFrame) -> DataFrame:
@@ -35,7 +25,6 @@ def get_year_overview_table(df: DataFrame) -> DataFrame:
 
 def render_metrics(df: DataFrame) -> None:
     current_year = get_current_year()
-    st.header("Overview")
     df = filter_dataframe(df, {"year": current_year})
     df_dict = df.to_dict(orient="records")[0]
     description_mapping = {
@@ -73,35 +62,12 @@ def render_year_statistics(df: DataFrame) -> None:
     construct_year_statistics(df, mapping, "Steps")
 
 
-def compute_monthly_steps(df: DataFrame) -> DataFrame:
-    df = df.copy()
-    return (
-        df.groupby(by="monthly_date")
-        .agg(steps=("Steps", "sum"))
-        .sort_values(by="monthly_date")
-        .reset_index()
-    )
-
-
 def main() -> None:
-    st.title("Steps Statistics")
+    st.header("Overview")
     df = STEPS_DF.copy()
-    overview_df = get_year_overview_table(df.copy())
+    overview_df = get_year_overview_table(df)
     render_metrics(overview_df)
-    progress_tab, histogram_tab, heatmap_tab = st.tabs(
-        [
-            f"{Icons.bar_chart} Statistics",
-            f"{Icons.monitoring} Progress per Month",
-            f"{Icons.analytics} Month Year Distribution",
-        ]
-    )
-    with progress_tab:
-        render_year_statistics(overview_df)
-    with histogram_tab:
-        monthly_df = compute_monthly_steps(df)
-        render_monthly_progression(monthly_df, "steps")
-    with heatmap_tab:
-        setup_heatmap(df, "Steps")
+    render_year_statistics(overview_df)
 
 
 main()

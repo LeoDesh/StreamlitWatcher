@@ -32,7 +32,11 @@ PAGE_CONFIG = {
         "activities_over_time": {"icon": Icons.monitoring},
         "overview": {"icon": Icons.view},
     },
-    "Steps": {"steps": {"icon": Icons.steps}},
+    "Steps": {
+        "steps_progress": {"icon": Icons.steps},
+        "overview": {"icon": Icons.view},
+        "personal_records": {"icon": Icons.trophy},
+    },
 }
 
 SECTION_CONFIG = {"Running": "🏃", "Activities": "📊", "Steps": "👟"}

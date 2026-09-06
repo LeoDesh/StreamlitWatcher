@@ -44,12 +44,11 @@ def stream_metrics(
                 metric.render_metric()
 
 
-def create_metrics_container(header: str, activites: dict[str, str]) -> None:
+def create_metrics_container(header: str, data: dict[str, str]) -> None:
     with st.container(border=True, horizontal_alignment="center"):
         st.header(header)
         metrics = [
-            Metric(label=prettify(label), value=value)
-            for label, value in activites.items()
+            Metric(label=prettify(label), value=value) for label, value in data.items()
         ]
         stream_metrics(metrics, num_cols=len(metrics))
 
@@ -141,11 +140,11 @@ def setup_heatmap(df: DataFrame, target_column: str, unit: str = "") -> None:
     pivot_df = df.pivot_table(
         values=target_column, index="Year", columns="Month", aggfunc="sum"
     ).fillna(0)
-    column_details = f"in {unit}" if unit else ""
+    column_details = f" in {unit}" if unit else ""
     template_details = unit if unit else ""
     fig = create_heat_map_monthly_axis(
         pivot_df,
-        f"{target_column} {column_details} per month over years",
+        f"{target_column}{column_details} per month over years",
         hovertemplate=f"%{{y}}, %{{x}}: %{{z:.2f}} {template_details} <extra></extra>",
     )
     place_figure(fig, layout_tuple=(1, 22, 1))

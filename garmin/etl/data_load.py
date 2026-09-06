@@ -62,6 +62,9 @@ def load_records_file(file: Path, activity_df: DataFrame) -> DataFrame:
 def load_steps_file(file: Path) -> DataFrame:
     df = read_file(file)
     df = apply_date_transformation_date_format(df, "Date")
+    df["week"] = df["Date"].apply(
+        lambda x: f"{x.isocalendar()[0]}_{x.isocalendar()[1]}"
+    )
     df = df[df["year"] >= MIN_YEAR]
     df["goal_reached"] = df["Steps"] >= df["Goal"]
     return df
