@@ -16,4 +16,9 @@
 
 ### Running checks
 - uv run pytest
+- uv run ruff check .
+- uv run ruff format --check .
+
+### Fixing checks
 - uv run ruff check --fix 
+- uv run ruff format .
