@@ -7,7 +7,7 @@ ACTIVITY_TYPE_MAPPING = {
     "Laufbandtraining": "Treadmill",
     "Radfahren": "Cycling",
     "Indoor Cycling": "Indoor Cycling",
-    "Sontige": "Remaining",
+    "Sontige": "Cardio",
 }
 
 ACTIVITY_TRANSLATION_MAPPING = {

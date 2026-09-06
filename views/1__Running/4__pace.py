@@ -14,8 +14,8 @@ from garmin.plots.visualization import (
 from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
 from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace, filter_dataframe
 from garmin.utils.time_utils import get_current_year
-from streamlit_utils.model import GridConfig
 from streamlit_utils.utils import (
+    GridConfig,
     Metric,
     create_grid,
     stream_metrics,
