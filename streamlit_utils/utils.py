@@ -1,5 +1,5 @@
 from dataclasses import asdict, dataclass
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 import streamlit as st
@@ -56,16 +56,18 @@ def create_metrics_container(header: str, data: dict[str, str]) -> None:
 def time_options_provider() -> tuple[date, date]:
     pill_col, user_selection_col = st.columns([2, 1])
     current_date = get_current_date()
+    current_year = current_date.year
+    latest_date = current_date + timedelta(days=1)
     config = {
-        "Complete Timespan": (get_first_of_given_year(MIN_YEAR), current_date),
-        "YTD": (get_first_of_given_year(current_date.year), current_date),
+        "Complete Timespan": (get_first_of_given_year(MIN_YEAR), latest_date),
+        "YTD": (get_first_of_given_year(current_year), latest_date),
         "Last Year To Date": (
-            get_first_of_given_year(current_date.year - 1),
-            current_date,
+            get_first_of_given_year(current_year - 1),
+            latest_date,
         ),
         "Last 3 Years To Date": (
-            get_first_of_given_year(current_date.year - 3),
-            current_date,
+            get_first_of_given_year(current_year - 3),
+            latest_date,
         ),
     }
     options = [*config.keys(), "Custom Data"]
