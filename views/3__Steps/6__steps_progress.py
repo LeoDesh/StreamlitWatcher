@@ -2,17 +2,15 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import STEPS_DF
-from garmin.utils.misc import compute_delta
 from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
 from garmin.utils.time_utils import (
-    get_current_month,
     get_current_year,
-    get_month_previous_year,
 )
 from streamlit_utils.utils import (
     GridConfig,
     Metric,
     create_grid,
+    get_current_month_metric,
     render_monthly_progression,
     setup_heatmap,
     stream_metrics,
@@ -57,20 +55,7 @@ def get_month_with_highest_steps_metric(df: DataFrame) -> Metric:
 
 
 def get_current_month_steps_metric(df: DataFrame) -> Metric:
-    current_month = get_current_month()
-    previous_year_month = get_month_previous_year()
-    steps_dict = dict(zip(df["monthly_date"], df["steps"]))
-    current_steps, previous_steps = (
-        steps_dict.get(current_month, 0),
-        steps_dict.get(previous_year_month, 0),
-    )
-    delta = compute_delta(previous_steps, current_steps)
-    return Metric(
-        label="Steps Covered Current Month",
-        value=f"{current_steps:,.0f}",
-        delta=f"{delta} %",
-        help=f"Comparison with {previous_year_month.strftime('%b, %Y')}",
-    )
+    return get_current_month_metric(df, "steps", ",.0f", "Steps")
 
 
 # Monthly statistics as metrics for Progress/Month Distribution

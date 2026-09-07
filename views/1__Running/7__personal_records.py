@@ -25,8 +25,23 @@ def show_records(df: DataFrame) -> None:
         create_metrics_container(activity_title, activity)
 
 
+@st.dialog("Description")
+def show_description() -> None:
+    st.markdown(
+        """  
+        In the following individuel personal running records on different *timeframes* and the corresponding activity will be shown.  
+        In each container the date, the record type and the achieved time can be seen.  
+        Further in the brackets the pace for the corresponding distance is computed in min/km.
+        """
+    )
+
+
 def main() -> None:
-    st.title("Personal Records")
+    title_col, _, info_col = st.columns([10, 1, 1])
+    title_col.header("Personal Records")
+    btn = info_col.button(label="Info", icon=":material/info:", type="secondary")
+    if btn:
+        show_description()
     df = RECORDS_DF.copy()
     show_records(df)
 

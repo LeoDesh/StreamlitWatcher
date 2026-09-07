@@ -58,10 +58,10 @@ def get_week_highlight(df: DataFrame) -> None:
 
 
 @st.dialog("Description")
-def show_description():
+def show_description() -> None:
     st.markdown(
         """  
-        In the following individuel personal records on different *timeframes* will be shown.  
+        In the following individuel personal steps records on different *timeframes* will be shown.  
         **Record** is the highest amount of steps achieved in the corresponding timeframe.  
         **Median** shows the median steps amount.  
         The difference shows the relative difference between *record* and *median*.
@@ -69,7 +69,6 @@ def show_description():
     )
 
 
-# Monthly statistics as metrics for Progress/Month Distribution
 def main() -> None:
     header_col, _, btn_col = st.columns([10, 1, 1])
     header_col.header("Personal Records")

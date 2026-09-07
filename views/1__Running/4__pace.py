@@ -1,5 +1,5 @@
 import math
-from datetime import date, timedelta
+from datetime import date
 
 import streamlit as st
 from pandas import DataFrame, Timestamp
@@ -25,20 +25,6 @@ from streamlit_utils.utils import (
 type FilterParameters = list[
     tuple[date, date], tuple[float, float], tuple[float, float]
 ]
-
-
-def setup_date_range_selection(df: DataFrame) -> tuple[date, date]:
-    date_min = df["date"].min().date()
-    date_max: date = df["date"].max().date()
-    date_max = date_max + timedelta(days=1)
-    start_date, end_date = st.slider(
-        "Select date range:",
-        min_value=date_min,
-        max_value=date_max,
-        value=(date_min, date_max),
-        format="DD.MM.YYYY",
-    )
-    return (start_date, end_date)
 
 
 def setup_pace_range_selection() -> tuple[int, int]:

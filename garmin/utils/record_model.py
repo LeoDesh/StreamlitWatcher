@@ -42,10 +42,6 @@ def distance_mapping(name: str) -> float:
             return 0
 
 
-def is_1k_run(record: str) -> bool:
-    return record == "1k Run"
-
-
 def transform_1_km_record(record: str, value: float, *args) -> str:
     name = record_name_changer(record)
     pace = transform_activity_minutes_to_duration_minute_format(value)

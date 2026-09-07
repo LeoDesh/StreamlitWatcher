@@ -59,7 +59,7 @@ def get_step_metric(df: DataFrame) -> Metric:
     )
 
 
-def render_cards():
+def render_cards() -> None:
     section_home_page_mapping = {
         section: pages[0] for section, pages in get_page_mapping().items() if section
     }

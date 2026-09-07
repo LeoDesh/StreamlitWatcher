@@ -18,6 +18,7 @@ from streamlit_utils.model import GridConfig
 from streamlit_utils.utils import (
     Metric,
     create_grid,
+    get_current_month_metric,
     render_monthly_progression,
     setup_heatmap,
     stream_metrics,
@@ -40,21 +41,8 @@ def compute_monthly_distance(df: DataFrame) -> DataFrame:
     return aggregate_df_named_column(df, "monthly_date", "distance")
 
 
-def get_current_month_metric(df: DataFrame) -> Metric:
-    current_month = get_current_month()
-    previous_year_month = get_month_previous_year()
-    date_km_dict = dict(zip(df["monthly_date"], df["distance"]))
-    current_km, previous_km = (
-        date_km_dict.get(current_month, 0),
-        date_km_dict.get(previous_year_month, 0),
-    )
-    delta = compute_delta(previous_km, current_km)
-    return Metric(
-        label="Distance Covered Current Month",
-        value=f"{round(current_km, 2)} km",
-        delta=f"{delta} %",
-        help=f"Comparison with {previous_year_month.strftime('%b, %Y')}",
-    )
+def get_current_month_distance_metric(df: DataFrame) -> Metric:
+    return get_current_month_metric(df, "distance", ".2f", "km")
 
 
 def get_distance_before_given_date(df: DataFrame, selected_date: date) -> float:
@@ -63,7 +51,7 @@ def get_distance_before_given_date(df: DataFrame, selected_date: date) -> float:
     return 0 if df_filtered.empty else df_filtered["distance"].sum()
 
 
-def get_current_year_metric(df: DataFrame) -> Metric:
+def get_current_year_distance_metric(df: DataFrame) -> Metric:
     df["year"] = df["monthly_date"].apply(lambda x: x.year)
     current_year_km = get_distance_before_given_date(df, get_current_month())
     last_year_km = get_distance_before_given_date(df, get_month_previous_year())
@@ -79,8 +67,8 @@ def get_current_year_metric(df: DataFrame) -> Metric:
 
 def render_distance_metrics(df: DataFrame) -> None:
     monthly_distance_df = compute_monthly_distance(df)
-    month_metric = get_current_month_metric(monthly_distance_df)
-    year_metric = get_current_year_metric(monthly_distance_df)
+    month_metric = get_current_month_distance_metric(monthly_distance_df)
+    year_metric = get_current_year_distance_metric(monthly_distance_df)
     latest_run_metric = render_latest_run_metric(df)
     stream_metrics([month_metric, year_metric, latest_run_metric])
 

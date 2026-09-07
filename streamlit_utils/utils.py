@@ -11,12 +11,14 @@ from garmin.plots.visualization import (
     create_bar_chart_ordinary_axis,
     create_heat_map_monthly_axis,
 )
-from garmin.utils.misc import prettify
+from garmin.utils.misc import compute_delta, prettify
 from garmin.utils.pandas_helpers import generate_dates_df
 from garmin.utils.time_utils import (
     get_current_date,
+    get_current_month,
     get_first_of_given_year,
     get_last_day_of_date,
+    get_month_previous_year,
 )
 from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.model import GridConfig
@@ -162,3 +164,22 @@ def create_grid(grid_config: list[GridConfig]) -> list[list[DeltaGenerator]]:
         ]
         grid_layout.append(containers)
     return grid_layout
+
+
+def get_current_month_metric(
+    df: DataFrame, column: str, format: str, unit: str
+) -> Metric:
+    current_month = get_current_month()
+    previous_year_month = get_month_previous_year()
+    date_km_dict = dict(zip(df["monthly_date"], df[column]))
+    current_km, previous_km = (
+        date_km_dict.get(current_month, 0),
+        date_km_dict.get(previous_year_month, 0),
+    )
+    delta = compute_delta(previous_km, current_km)
+    return Metric(
+        label="Distance Covered Current Month",
+        value=f"{current_km:{format}} {unit}",
+        delta=f"{delta} %",
+        help=f"Comparison with {previous_year_month.strftime('%b, %Y')}",
+    )
