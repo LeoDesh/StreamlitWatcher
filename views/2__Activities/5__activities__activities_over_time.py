@@ -18,6 +18,7 @@ from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.utils import (
     GridConfig,
     Metric,
+    breadcrumbs,
     create_grid,
     create_metrics_container,
     stream_metrics,
@@ -184,6 +185,7 @@ def get_average_activities_per_month_metric(df: DataFrame, current_year: int) ->
 
 
 def main() -> None:
+    breadcrumbs(__file__)
     st.header("Activities over time", text_alignment="center")
     df = ACTIVITY_DF.copy()
     render_activities_metrics(df)

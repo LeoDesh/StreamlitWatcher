@@ -3,12 +3,11 @@ from pandas import DataFrame
 
 from garmin.constants import STEPS_DF
 from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
-from garmin.utils.time_utils import (
-    get_current_year,
-)
+from garmin.utils.time_utils import get_current_year
 from streamlit_utils.utils import (
     GridConfig,
     Metric,
+    breadcrumbs,
     create_grid,
     get_current_month_metric,
     render_monthly_progression,
@@ -60,6 +59,7 @@ def get_current_month_steps_metric(df: DataFrame) -> Metric:
 
 # Monthly statistics as metrics for Progress/Month Distribution
 def main() -> None:
+    breadcrumbs(__file__)
     st.header("Monthly Steps Progress")
     df = STEPS_DF.copy()
     monthly_df = compute_monthly_steps(df)

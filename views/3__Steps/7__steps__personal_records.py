@@ -6,7 +6,7 @@ from pandas import DataFrame
 from garmin.constants import STEPS_DF
 from garmin.utils.misc import compute_delta
 from garmin.utils.pandas_helpers import aggregate_df_named_column
-from streamlit_utils.utils import create_metrics_container, stream_metrics
+from streamlit_utils.utils import breadcrumbs, create_metrics_container, stream_metrics
 
 
 def render_metrics(df: DataFrame) -> None:
@@ -70,6 +70,7 @@ def show_description() -> None:
 
 
 def main() -> None:
+    breadcrumbs(__file__)
     header_col, _, btn_col = st.columns([10, 1, 1])
     header_col.header("Personal Records")
     btn = btn_col.button(label="Info", icon=":material/info:", type="secondary")

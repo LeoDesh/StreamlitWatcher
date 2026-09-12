@@ -17,6 +17,7 @@ from garmin.utils.time_utils import get_current_year
 from streamlit_utils.utils import (
     GridConfig,
     Metric,
+    breadcrumbs,
     create_grid,
     stream_metrics,
     time_options_provider,
@@ -145,6 +146,7 @@ def has_df_too_few_rows(df: DataFrame) -> bool:
 
 def main() -> None:
     df = RUNNING_DF.copy()
+    breadcrumbs(__file__)
     st.title("Pace Overview")
     render_pace_metrics(df)
     filters = render_filter_parameters(df)

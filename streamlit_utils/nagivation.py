@@ -16,8 +16,20 @@ VIEW_FOLDER = Path("views")
 
 
 def split_page_name(file_name: str) -> tuple[int, str]:
-    idx, page_name = file_name.split("__")
+    idx, *_, page_name = file_name.split("__")
     return (int(idx), page_name)
+
+
+def look_for_file_in_folder(folder: Path, file_stem: str) -> Path | None:
+    for file in folder.iterdir():
+        file_name_suffix = file.stem.split("__")[-1]
+        if file_name_suffix == file_stem and file.suffix == ".py":
+            return file
+    return None
+
+
+def get_page_part(file_path: Path) -> str:
+    return file_path.stem.split("__")[-1]
 
 
 def get_folders(path: Path) -> list[Path]:
@@ -36,7 +48,7 @@ def get_section_folder_mapping() -> dict[str, Path]:
 
 
 def generate_page_from_file_path(file: Path, parent_folder: str = "") -> StreamlitPage:
-    _, file_name = file.stem.split("__")
+    _, file_name = split_page_name(file.stem)
     page_name = " ".join(file.capitalize() for file in file_name.split("_"))
     if parent_folder:
         _, parent_folder = split_page_name(parent_folder)
@@ -51,7 +63,7 @@ def generate_page_from_file_path(file: Path, parent_folder: str = "") -> Streaml
 
 
 def extract_order_number_from_page(file: Path) -> int:
-    index, _ = file.stem.split("__")
+    index, *_ = file.stem.split("__")
     return int(index)
 
 
@@ -72,9 +84,13 @@ def prettify_section(section: str) -> str:
     return f"{icon} {section}" if icon else section
 
 
+def get_homepage() -> StreamlitPage:
+    return generate_page_from_file_path(VIEW_FOLDER / "0__home.py")
+
+
 def get_page_mapping() -> dict[str, list[StreamlitPage]]:
     page_layout = get_section_folder_mapping()
-    return {"": [generate_page_from_file_path(VIEW_FOLDER / "0__home.py")]} | {
+    return {"": [get_homepage()]} | {
         section: get_pages(folder_path) for section, folder_path in page_layout.items()
     }
 

@@ -7,6 +7,7 @@ from garmin.utils.time_utils import get_current_year
 from streamlit_utils.config import Icons
 from streamlit_utils.utils import (
     Metric,
+    breadcrumbs,
     construct_year_statistics,
     create_metrics_container,
     stream_metrics,
@@ -77,6 +78,7 @@ def render_year_statistics(df: DataFrame) -> None:
 
 
 def main() -> None:
+    breadcrumbs(__file__)
     df = RUNNING_DF.copy()
     overview_df = get_year_overview_table(df)
     render_metrics(overview_df)

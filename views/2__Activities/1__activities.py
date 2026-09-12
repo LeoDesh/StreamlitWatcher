@@ -10,7 +10,12 @@ from garmin.utils.pandas_helpers import (
     get_unique_values_per_column,
 )
 from garmin.utils.time_utils import get_current_month
-from streamlit_utils.utils import Metric, create_metrics_container, stream_metrics
+from streamlit_utils.utils import (
+    Metric,
+    breadcrumbs,
+    create_metrics_container,
+    stream_metrics,
+)
 
 
 def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:
@@ -108,7 +113,8 @@ def render_activities_metrics(df: DataFrame) -> None:
 
 
 def main() -> None:
-    st.header("Activity Overview", text_alignment="center")
+    breadcrumbs(__file__)
+    st.header("Overview", text_alignment="center")
     df = ACTIVITY_DF.copy()
     render_activities_metrics(df)
     filters = get_activity_filter(df)

@@ -4,7 +4,12 @@ from pandas import DataFrame
 from garmin.constants import STEPS_DF
 from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
 from garmin.utils.time_utils import get_current_year
-from streamlit_utils.utils import Metric, construct_year_statistics, stream_metrics
+from streamlit_utils.utils import (
+    Metric,
+    breadcrumbs,
+    construct_year_statistics,
+    stream_metrics,
+)
 
 
 def get_year_overview_table(df: DataFrame) -> DataFrame:
@@ -63,6 +68,7 @@ def render_year_statistics(df: DataFrame) -> None:
 
 
 def main() -> None:
+    breadcrumbs(__file__)
     st.header("Overview")
     df = STEPS_DF.copy()
     overview_df = get_year_overview_table(df)

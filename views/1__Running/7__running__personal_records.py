@@ -4,7 +4,7 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, RECORDS_DF
-from streamlit_utils.utils import create_metrics_container
+from streamlit_utils.utils import breadcrumbs, create_metrics_container
 
 
 def construct_activity_header(activity: dict[str, Any]) -> str:
@@ -37,6 +37,7 @@ def show_description() -> None:
 
 
 def main() -> None:
+    breadcrumbs(__file__)
     title_col, _, info_col = st.columns([10, 1, 1])
     title_col.header("Personal Records")
     btn = info_col.button(label="Info", icon=":material/info:", type="secondary")

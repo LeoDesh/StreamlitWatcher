@@ -82,7 +82,6 @@ def render_cards() -> None:
 
 def main() -> None:
     st.header("Activity Diary")
-    # st.write(RUNNING_DF)
     render_metrics([RUNNING_DF, ACTIVITY_DF, STEPS_DF])
     render_cards()
 

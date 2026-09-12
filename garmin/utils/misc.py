@@ -3,6 +3,7 @@ import re
 from collections.abc import Callable
 from datetime import datetime
 from itertools import pairwise
+from pathlib import Path
 
 import pandas as pd
 
@@ -217,3 +218,7 @@ def compute_delta(src: float, trg: float) -> float:
     if trg:
         return 100
     return 0
+
+
+def get_absolute_path(file_dunder: str) -> Path:
+    return Path(file_dunder).resolve()

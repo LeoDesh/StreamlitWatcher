@@ -17,12 +17,13 @@ class Icons(StrEnum):
     trophy = ":material/trophy:"
     view = ":material/grid_view:"
     explore = ":material/explore:"
+    arrow_right = ":material/chevron_right:"
 
 
 PAGE_CONFIG = {
     "": {"home": {"icon": Icons.home, "default": True}},
     "Running": {
-        "overview": {"icon": Icons.view},
+        "running": {"icon": Icons.view},
         "distance": {"icon": Icons.route},
         "comparison": {"icon": Icons.analytics},
         "pace": {"icon": Icons.monitoring},
@@ -30,11 +31,11 @@ PAGE_CONFIG = {
     },
     "Activities": {
         "activities_over_time": {"icon": Icons.monitoring},
-        "overview": {"icon": Icons.view},
+        "activities": {"icon": Icons.view},
     },
     "Steps": {
-        "steps_progress": {"icon": Icons.steps},
-        "overview": {"icon": Icons.view},
+        "progress": {"icon": Icons.steps},
+        "steps": {"icon": Icons.view},
         "personal_records": {"icon": Icons.trophy},
     },
 }

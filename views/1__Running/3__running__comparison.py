@@ -11,7 +11,7 @@ from garmin.utils.pace_calculations import (
 from garmin.utils.pandas_helpers import filter_dataframe
 from garmin.utils.time_utils import get_current_year
 from streamlit_utils.chart_helpers import place_figure
-from streamlit_utils.utils import Metric, stream_metrics
+from streamlit_utils.utils import Metric, breadcrumbs, stream_metrics
 
 
 def render_comparison_metrics(df: DataFrame) -> None:
@@ -50,6 +50,7 @@ def render_comparison_dashboard(df: DataFrame) -> None:
 
 
 def main() -> None:
+    breadcrumbs(__file__)
     st.header("Comparison")
     df = RUNNING_DF.copy()
     render_comparison_metrics(df)

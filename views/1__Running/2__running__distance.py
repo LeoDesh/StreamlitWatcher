@@ -17,6 +17,7 @@ from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.model import GridConfig
 from streamlit_utils.utils import (
     Metric,
+    breadcrumbs,
     create_grid,
     get_current_month_metric,
     render_monthly_progression,
@@ -92,6 +93,7 @@ def render_latest_run_metric(df: DataFrame) -> Metric:
 
 
 def main() -> None:
+    breadcrumbs(__file__)
     construct_header()
     df = RUNNING_DF.copy()
     render_distance_metrics(df)

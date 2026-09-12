@@ -1,17 +1,20 @@
 from dataclasses import asdict, dataclass
 from datetime import date, timedelta
+from pathlib import Path
 from typing import Any
 
 import streamlit as st
 from pandas import DataFrame
+from streamlit import page_link
 from streamlit.delta_generator import DeltaGenerator
+from streamlit.navigation.page import StreamlitPage
 
 from garmin.etl.constants import MIN_YEAR
 from garmin.plots.visualization import (
     create_bar_chart_ordinary_axis,
     create_heat_map_monthly_axis,
 )
-from garmin.utils.misc import compute_delta, prettify
+from garmin.utils.misc import compute_delta, get_absolute_path, prettify
 from garmin.utils.pandas_helpers import generate_dates_df
 from garmin.utils.time_utils import (
     get_current_date,
@@ -21,7 +24,14 @@ from garmin.utils.time_utils import (
     get_month_previous_year,
 )
 from streamlit_utils.chart_helpers import place_figure
+from streamlit_utils.config import Icons
 from streamlit_utils.model import GridConfig
+from streamlit_utils.nagivation import (
+    generate_page_from_file_path,
+    get_homepage,
+    get_page_part,
+    look_for_file_in_folder,
+)
 
 
 @dataclass
@@ -183,3 +193,36 @@ def get_current_month_metric(
         delta=f"{delta} %",
         help=f"Comparison with {previous_year_month.strftime('%b, %Y')}",
     )
+
+
+def get_file_references(file_path: Path) -> list[StreamlitPage]:
+    page_part = get_page_part(file_path)
+    parent_folder = file_path.parent
+    file_stem = file_path.stem
+    file_parts = [
+        part
+        for part in file_stem.split("__")
+        if not (part.isdigit() or part == page_part)
+    ]
+    return [
+        generate_page_from_file_path(
+            look_for_file_in_folder(parent_folder, file_part), parent_folder.stem
+        )
+        for file_part in file_parts
+        if look_for_file_in_folder(parent_folder, file_part)
+    ]
+
+
+def breadcrumbs(file_dunder: str) -> None:
+    file_path = get_absolute_path(file_dunder)
+    with st.container(horizontal=True, vertical_alignment="center"):
+        home_page = get_homepage()
+        page_link(home_page, label="Home", icon=home_page.icon)
+        st.markdown(Icons.arrow_right, width="content")
+        file_references = get_file_references(file_path)
+        for reference_page in file_references:
+            page_link(reference_page)
+            st.markdown(Icons.arrow_right, width="content")
+        page_part = get_page_part(file_path)
+        current_page_name = " ".join(prettify(part) for part in page_part.split("_"))
+        st.markdown(f"**{current_page_name}**")
