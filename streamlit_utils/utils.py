@@ -217,7 +217,7 @@ def breadcrumbs(file_dunder: str) -> None:
     file_path = get_absolute_path(file_dunder)
     with st.container(horizontal=True, vertical_alignment="center"):
         home_page = get_homepage()
-        page_link(home_page, label="Home", icon=home_page.icon)
+        page_link(home_page, label="Home")
         st.markdown(Icons.arrow_right, width="content")
         file_references = get_file_references(file_path)
         for reference_page in file_references:

@@ -48,7 +48,7 @@ def get_month_with_highest_steps_metric(df: DataFrame) -> Metric:
     df = df.copy().sort_values(by="steps", ascending=False).reset_index()
     value, date = df.loc[0, ["steps", "monthly_date"]]
     return Metric(
-        label=f"Month with highest Steps count: {date.strftime('%b, %Y')}",
+        label=f"Month with most Steps covered: {date.strftime('%b, %Y')}",
         value=f"{value:,.0f}",
     )
 
