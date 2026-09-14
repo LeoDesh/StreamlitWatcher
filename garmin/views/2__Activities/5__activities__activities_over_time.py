@@ -5,7 +5,6 @@ from pandas import DataFrame
 
 from garmin.charts.visualization import create_gantt_chart, create_heat_map_monthly_axis
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, ACTIVITY_DF
-from garmin.streamlit_helpers.chart_helpers import place_figure
 from garmin.streamlit_helpers.utils import (
     GridConfig,
     Metric,
@@ -88,7 +87,7 @@ def get_gantt_filters(df: DataFrame) -> dict[str, Any]:
 def show_activities_timeline(df: DataFrame) -> None:
     gantt_df = get_gantt_df(df, "date")
     fig = create_gantt_chart(gantt_df, "date", "date_end", "activity_type")
-    place_figure(fig)
+    st.plotly_chart(fig, width="stretch")
 
 
 def prepare_heatmap_df(df: DataFrame, category: str | list[str]) -> DataFrame:
@@ -127,7 +126,7 @@ def show_heat_map(df: DataFrame, category: str | list[str], unit_choice: bool) -
         title,
         hovertemplate="%{y}, %{x}: " + template + " <extra></extra>",
     )
-    place_figure(fig)
+    st.plotly_chart(fig, width="stretch")
 
 
 def heatmap_filter(df: DataFrame) -> tuple[list[str], bool]:

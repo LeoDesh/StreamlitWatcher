@@ -6,7 +6,6 @@ from pandas import DataFrame
 
 from garmin.charts.visualization import get_df_km_histogram
 from garmin.constants import RUNNING_DF
-from garmin.streamlit_helpers.chart_helpers import place_figure
 from garmin.streamlit_helpers.model import GridConfig
 from garmin.streamlit_helpers.utils import (
     Metric,
@@ -35,7 +34,7 @@ def setup_histogram(df: DataFrame) -> None:
     distance_max = math.ceil(df["distance"].max())
     bins = calculate_int_bins(distance_min, distance_max, 2)
     fig = get_df_km_histogram(df, "distance", bins)
-    place_figure(fig)
+    st.plotly_chart(fig, width="stretch")
 
 
 def compute_monthly_distance(df: DataFrame) -> DataFrame:

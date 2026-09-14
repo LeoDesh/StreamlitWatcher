@@ -14,7 +14,6 @@ from garmin.charts.visualization import (
     create_heat_map_monthly_axis,
 )
 from garmin.etl.constants import MIN_YEAR
-from garmin.streamlit_helpers.chart_helpers import place_figure
 from garmin.streamlit_helpers.config import VIEW_FOLDER, Icons
 from garmin.streamlit_helpers.model import GridConfig
 from garmin.streamlit_helpers.nagivation import (
@@ -121,7 +120,7 @@ def construct_year_statistics(
     fig = create_bar_chart_ordinary_axis(
         df, "year", category, y_title=f"{header} per", hovertemplate=hovertemplate
     )
-    place_figure(fig)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_monthly_progression(
@@ -145,7 +144,7 @@ def render_monthly_progression(
         hovertemplate=f"%{{y:,.0f}} {unit} covered up to %{{x}} <extra></extra>",
         show_x_title=False,
     )
-    place_figure(fig, layout_tuple=(1, 22, 1))
+    st.plotly_chart(fig, width="stretch")
 
 
 def setup_heatmap(df: DataFrame, target_column: str, unit: str = "") -> None:
@@ -161,7 +160,7 @@ def setup_heatmap(df: DataFrame, target_column: str, unit: str = "") -> None:
         f"{target_column}{column_details} per month over years",
         hovertemplate=f"%{{y}}, %{{x}}: %{{z:.2f}} {template_details} <extra></extra>",
     )
-    place_figure(fig, layout_tuple=(1, 22, 1))
+    st.plotly_chart(fig, width="stretch")
 
 
 def create_grid(grid_config: list[GridConfig]) -> list[list[DeltaGenerator]]:

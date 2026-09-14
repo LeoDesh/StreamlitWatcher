@@ -3,7 +3,6 @@ from pandas import DataFrame
 
 from garmin.charts.visualization import create_box_plot_chart
 from garmin.constants import RUNNING_DF
-from garmin.streamlit_helpers.chart_helpers import place_figure
 from garmin.streamlit_helpers.utils import Metric, breadcrumbs, stream_metrics
 from garmin.utils.misc import prettify
 from garmin.utils.pace_calculations import (
@@ -46,7 +45,7 @@ def render_comparison_dashboard(df: DataFrame) -> None:
         format_func=prettify,
     )
     fig = create_box_plot_chart(df, category)
-    place_figure(fig)
+    st.plotly_chart(fig, width="stretch")
 
 
 def main() -> None:
