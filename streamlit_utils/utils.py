@@ -14,7 +14,7 @@ from garmin.plots.visualization import (
     create_bar_chart_ordinary_axis,
     create_heat_map_monthly_axis,
 )
-from garmin.utils.misc import compute_delta, get_absolute_path, prettify
+from garmin.utils.misc import compute_delta, prettify
 from garmin.utils.pandas_helpers import generate_dates_df
 from garmin.utils.time_utils import (
     get_current_date,
@@ -27,6 +27,7 @@ from streamlit_utils.chart_helpers import place_figure
 from streamlit_utils.config import Icons
 from streamlit_utils.model import GridConfig
 from streamlit_utils.nagivation import (
+    VIEW_FOLDER,
     generate_page_from_file_path,
     get_homepage,
     get_page_part,
@@ -213,8 +214,18 @@ def get_file_references(file_path: Path) -> list[StreamlitPage]:
     ]
 
 
+def get_file_path(file_dunder: str) -> Path:
+    path = Path(file_dunder).resolve()
+    parts = path.parts
+    view_folder_name = VIEW_FOLDER.name
+    if view_folder_name in parts:
+        idx = parts.index(view_folder_name)
+        return Path(*parts[idx:])
+    return path
+
+
 def breadcrumbs(file_dunder: str) -> None:
-    file_path = get_absolute_path(file_dunder)
+    file_path = get_file_path(file_dunder)
     with st.container(horizontal=True, vertical_alignment="center"):
         home_page = get_homepage()
         page_link(home_page, label="Home")

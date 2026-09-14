@@ -10,9 +10,7 @@ from garmin.constants import (
     IMAGE_TRANSPARENT_PATH,
     RUNNING_DF,
 )
-from streamlit_utils.config import PAGE_CONFIG, SECTION_CONFIG, Icons
-
-VIEW_FOLDER = Path("views")
+from streamlit_utils.config import PAGE_CONFIG, SECTION_CONFIG, VIEW_FOLDER, Icons
 
 
 def split_page_name(file_name: str) -> tuple[int, str]:

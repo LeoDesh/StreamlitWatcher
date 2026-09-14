@@ -1,4 +1,5 @@
 from enum import StrEnum
+from pathlib import Path
 
 
 class Icons(StrEnum):
@@ -41,3 +42,4 @@ PAGE_CONFIG = {
 }
 
 SECTION_CONFIG = {"Running": "🏃", "Activities": "📊", "Steps": "👟"}
+VIEW_FOLDER = Path("views")
