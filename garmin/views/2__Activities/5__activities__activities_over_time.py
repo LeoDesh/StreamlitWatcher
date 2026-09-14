@@ -5,6 +5,15 @@ from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, ACTIVITY_DF
 from garmin.plots.visualization import create_gantt_chart, create_heat_map_monthly_axis
+from garmin.streamlit_utils.chart_helpers import place_figure
+from garmin.streamlit_utils.utils import (
+    GridConfig,
+    Metric,
+    breadcrumbs,
+    create_grid,
+    create_metrics_container,
+    stream_metrics,
+)
 from garmin.utils.pandas_helpers import (
     aggregate_df_named_column,
     filter_dataframe,
@@ -14,15 +23,6 @@ from garmin.utils.pandas_helpers import (
     get_unique_values_per_column,
 )
 from garmin.utils.time_utils import get_current_year
-from streamlit_utils.chart_helpers import place_figure
-from streamlit_utils.utils import (
-    GridConfig,
-    Metric,
-    breadcrumbs,
-    create_grid,
-    create_metrics_container,
-    stream_metrics,
-)
 
 
 def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:

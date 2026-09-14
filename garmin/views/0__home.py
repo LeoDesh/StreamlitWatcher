@@ -2,10 +2,10 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_DF, RUNNING_DF, STEPS_DF
+from garmin.streamlit_utils.nagivation import get_page_mapping, prettify_section
+from garmin.streamlit_utils.utils import Metric, stream_metrics
 from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
 from garmin.utils.time_utils import get_current_year
-from streamlit_utils.nagivation import get_page_mapping, prettify_section
-from streamlit_utils.utils import Metric, stream_metrics
 
 
 def filter_df_for_current_year(df: DataFrame, column: str = "year") -> DataFrame:

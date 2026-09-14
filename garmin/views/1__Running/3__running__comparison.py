@@ -3,6 +3,8 @@ from pandas import DataFrame
 
 from garmin.constants import RUNNING_DF
 from garmin.plots.visualization import create_box_plot_chart
+from garmin.streamlit_utils.chart_helpers import place_figure
+from garmin.streamlit_utils.utils import Metric, breadcrumbs, stream_metrics
 from garmin.utils.misc import prettify
 from garmin.utils.pace_calculations import (
     transform_seconds_to_hour_minutes_seconds_format,
@@ -10,8 +12,6 @@ from garmin.utils.pace_calculations import (
 )
 from garmin.utils.pandas_helpers import filter_dataframe
 from garmin.utils.time_utils import get_current_year
-from streamlit_utils.chart_helpers import place_figure
-from streamlit_utils.utils import Metric, breadcrumbs, stream_metrics
 
 
 def render_comparison_metrics(df: DataFrame) -> None:

@@ -14,6 +14,15 @@ from garmin.plots.visualization import (
     create_bar_chart_ordinary_axis,
     create_heat_map_monthly_axis,
 )
+from garmin.streamlit_utils.chart_helpers import place_figure
+from garmin.streamlit_utils.config import VIEW_FOLDER, Icons
+from garmin.streamlit_utils.model import GridConfig
+from garmin.streamlit_utils.nagivation import (
+    generate_page_from_file_path,
+    get_homepage,
+    get_page_part,
+    look_for_file_in_folder,
+)
 from garmin.utils.misc import compute_delta, prettify
 from garmin.utils.pandas_helpers import generate_dates_df
 from garmin.utils.time_utils import (
@@ -22,16 +31,6 @@ from garmin.utils.time_utils import (
     get_first_of_given_year,
     get_last_day_of_date,
     get_month_previous_year,
-)
-from streamlit_utils.chart_helpers import place_figure
-from streamlit_utils.config import Icons
-from streamlit_utils.model import GridConfig
-from streamlit_utils.nagivation import (
-    VIEW_FOLDER,
-    generate_page_from_file_path,
-    get_homepage,
-    get_page_part,
-    look_for_file_in_folder,
 )
 
 
@@ -218,8 +217,9 @@ def get_file_path(file_dunder: str) -> Path:
     path = Path(file_dunder).resolve()
     parts = path.parts
     view_folder_name = VIEW_FOLDER.name
-    if view_folder_name in parts:
-        idx = parts.index(view_folder_name)
+    parent_folder_name = VIEW_FOLDER.parent.name
+    if view_folder_name in parts and parent_folder_name in parts:
+        idx = parts.index(parent_folder_name)
         return Path(*parts[idx:])
     return path
 

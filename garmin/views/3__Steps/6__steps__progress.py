@@ -2,9 +2,7 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import STEPS_DF
-from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
-from garmin.utils.time_utils import get_current_year
-from streamlit_utils.utils import (
+from garmin.streamlit_utils.utils import (
     GridConfig,
     Metric,
     breadcrumbs,
@@ -14,6 +12,8 @@ from streamlit_utils.utils import (
     setup_heatmap,
     stream_metrics,
 )
+from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
+from garmin.utils.time_utils import get_current_year
 
 
 def render_metrics(df: DataFrame) -> None:

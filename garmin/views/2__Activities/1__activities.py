@@ -4,18 +4,18 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, ACTIVITY_DF
+from garmin.streamlit_utils.utils import (
+    Metric,
+    breadcrumbs,
+    create_metrics_container,
+    stream_metrics,
+)
 from garmin.utils.pandas_helpers import (
     aggregate_df_named_column,
     filter_dataframe,
     get_unique_values_per_column,
 )
 from garmin.utils.time_utils import get_current_month
-from streamlit_utils.utils import (
-    Metric,
-    breadcrumbs,
-    create_metrics_container,
-    stream_metrics,
-)
 
 
 def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:

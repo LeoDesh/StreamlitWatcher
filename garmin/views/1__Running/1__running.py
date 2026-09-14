@@ -2,16 +2,16 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, RUNNING_DF
-from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
-from garmin.utils.time_utils import get_current_year
-from streamlit_utils.config import Icons
-from streamlit_utils.utils import (
+from garmin.streamlit_utils.config import Icons
+from garmin.streamlit_utils.utils import (
     Metric,
     breadcrumbs,
     construct_year_statistics,
     create_metrics_container,
     stream_metrics,
 )
+from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
+from garmin.utils.time_utils import get_current_year
 
 
 def get_year_overview_table(df: DataFrame) -> DataFrame:

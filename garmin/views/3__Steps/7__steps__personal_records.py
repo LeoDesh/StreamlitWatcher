@@ -4,9 +4,13 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import STEPS_DF
+from garmin.streamlit_utils.utils import (
+    breadcrumbs,
+    create_metrics_container,
+    stream_metrics,
+)
 from garmin.utils.misc import compute_delta
 from garmin.utils.pandas_helpers import aggregate_df_named_column
-from streamlit_utils.utils import breadcrumbs, create_metrics_container, stream_metrics
 
 
 def render_metrics(df: DataFrame) -> None:

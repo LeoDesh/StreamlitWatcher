@@ -11,10 +11,7 @@ from garmin.plots.visualization import (
     get_df_pace_histogram,
     get_empty_figure,
 )
-from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
-from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace, filter_dataframe
-from garmin.utils.time_utils import get_current_year
-from streamlit_utils.utils import (
+from garmin.streamlit_utils.utils import (
     GridConfig,
     Metric,
     breadcrumbs,
@@ -22,6 +19,9 @@ from streamlit_utils.utils import (
     stream_metrics,
     time_options_provider,
 )
+from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
+from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace, filter_dataframe
+from garmin.utils.time_utils import get_current_year
 
 type FilterParameters = list[
     tuple[date, date], tuple[float, float], tuple[float, float]

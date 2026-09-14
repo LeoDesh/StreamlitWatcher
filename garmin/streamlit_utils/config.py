@@ -42,4 +42,4 @@ PAGE_CONFIG = {
 }
 
 SECTION_CONFIG = {"Running": "🏃", "Activities": "📊", "Steps": "👟"}
-VIEW_FOLDER = Path("views")
+VIEW_FOLDER = Path("garmin/views")

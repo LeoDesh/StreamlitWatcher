@@ -6,16 +6,9 @@ from pandas import DataFrame
 
 from garmin.constants import RUNNING_DF
 from garmin.plots.visualization import get_df_km_histogram
-from garmin.utils.misc import calculate_int_bins, compute_delta
-from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
-from garmin.utils.time_utils import (
-    get_current_month,
-    get_last_day_of_date,
-    get_month_previous_year,
-)
-from streamlit_utils.chart_helpers import place_figure
-from streamlit_utils.model import GridConfig
-from streamlit_utils.utils import (
+from garmin.streamlit_utils.chart_helpers import place_figure
+from garmin.streamlit_utils.model import GridConfig
+from garmin.streamlit_utils.utils import (
     Metric,
     breadcrumbs,
     create_grid,
@@ -23,6 +16,13 @@ from streamlit_utils.utils import (
     render_monthly_progression,
     setup_heatmap,
     stream_metrics,
+)
+from garmin.utils.misc import calculate_int_bins, compute_delta
+from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
+from garmin.utils.time_utils import (
+    get_current_month,
+    get_last_day_of_date,
+    get_month_previous_year,
 )
 
 
