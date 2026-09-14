@@ -17,3 +17,6 @@
 ### Fixing checks
 - uv run ruff check --fix 
 - uv run ruff format .
+
+### Starting the app
+- uv run streamlit run app.py
