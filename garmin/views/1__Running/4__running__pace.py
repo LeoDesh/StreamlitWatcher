@@ -4,14 +4,14 @@ from datetime import date
 import streamlit as st
 from pandas import DataFrame, Timestamp
 
-from garmin.constants import RUNNING_DF
-from garmin.plots.visualization import (
+from garmin.charts.visualization import (
     create_heat_map_ordinary,
     create_plotly_pace_chart,
     get_df_pace_histogram,
     get_empty_figure,
 )
-from garmin.streamlit_utils.utils import (
+from garmin.constants import RUNNING_DF
+from garmin.streamlit_helpers.utils import (
     GridConfig,
     Metric,
     breadcrumbs,

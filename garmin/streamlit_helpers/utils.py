@@ -9,15 +9,15 @@ from streamlit import page_link
 from streamlit.delta_generator import DeltaGenerator
 from streamlit.navigation.page import StreamlitPage
 
-from garmin.etl.constants import MIN_YEAR
-from garmin.plots.visualization import (
+from garmin.charts.visualization import (
     create_bar_chart_ordinary_axis,
     create_heat_map_monthly_axis,
 )
-from garmin.streamlit_utils.chart_helpers import place_figure
-from garmin.streamlit_utils.config import VIEW_FOLDER, Icons
-from garmin.streamlit_utils.model import GridConfig
-from garmin.streamlit_utils.nagivation import (
+from garmin.etl.constants import MIN_YEAR
+from garmin.streamlit_helpers.chart_helpers import place_figure
+from garmin.streamlit_helpers.config import VIEW_FOLDER, Icons
+from garmin.streamlit_helpers.model import GridConfig
+from garmin.streamlit_helpers.nagivation import (
     generate_page_from_file_path,
     get_homepage,
     get_page_part,

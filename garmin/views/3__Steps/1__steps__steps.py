@@ -2,7 +2,7 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import STEPS_DF
-from garmin.streamlit_utils.utils import (
+from garmin.streamlit_helpers.utils import (
     Metric,
     breadcrumbs,
     construct_year_statistics,

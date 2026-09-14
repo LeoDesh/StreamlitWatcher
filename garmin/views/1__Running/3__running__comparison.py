@@ -1,10 +1,10 @@
 import streamlit as st
 from pandas import DataFrame
 
+from garmin.charts.visualization import create_box_plot_chart
 from garmin.constants import RUNNING_DF
-from garmin.plots.visualization import create_box_plot_chart
-from garmin.streamlit_utils.chart_helpers import place_figure
-from garmin.streamlit_utils.utils import Metric, breadcrumbs, stream_metrics
+from garmin.streamlit_helpers.chart_helpers import place_figure
+from garmin.streamlit_helpers.utils import Metric, breadcrumbs, stream_metrics
 from garmin.utils.misc import prettify
 from garmin.utils.pace_calculations import (
     transform_seconds_to_hour_minutes_seconds_format,

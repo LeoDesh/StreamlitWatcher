@@ -2,8 +2,8 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, RUNNING_DF
-from garmin.streamlit_utils.config import Icons
-from garmin.streamlit_utils.utils import (
+from garmin.streamlit_helpers.config import Icons
+from garmin.streamlit_helpers.utils import (
     Metric,
     breadcrumbs,
     construct_year_statistics,

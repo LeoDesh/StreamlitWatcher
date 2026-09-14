@@ -4,13 +4,14 @@ import streamlit as st
 from streamlit.navigation.page import StreamlitPage
 
 from garmin.constants import (
+    ACTIVITY_DF,
     APP_VERSION,
     IMAGE_ICON_PATH,
     IMAGE_LOGO_PATH,
     IMAGE_TRANSPARENT_PATH,
     RUNNING_DF,
 )
-from garmin.streamlit_utils.config import (
+from garmin.streamlit_helpers.config import (
     PAGE_CONFIG,
     SECTION_CONFIG,
     VIEW_FOLDER,
@@ -124,13 +125,13 @@ def define_sidebar() -> None:
     with st.sidebar:
         st.image(IMAGE_LOGO_PATH)
         st.subheader(f"Version {APP_VERSION}")
-        min_date = RUNNING_DF["date"].min().strftime("%d.%m.%Y")
-        max_date = RUNNING_DF["date"].max().strftime("%d.%m.%Y")
-        time_hours = RUNNING_DF["time_in_minutes"].sum() // 60
+        activity_min_date = ACTIVITY_DF["date"].min().strftime("%d.%m.%Y")
+        activity_max_date = ACTIVITY_DF["date"].max().strftime("%d.%m.%Y")
+        running_max_date = RUNNING_DF["date"].max().strftime("%d.%m.%Y")
         total_runs = len(RUNNING_DF)
-        distance = round(RUNNING_DF["distance"].sum(), 2)
-        st.metric(label="Last Recorded Run", value=max_date)
-        st.metric(label="Total Distance", value=f"{distance} km")
-        st.metric(label="Total Time", value=f"{time_hours} h")
+        total_activities = len(ACTIVITY_DF)
+        st.metric(label="Last Recorded Activity", value=activity_max_date)
+        st.metric(label="Total Activities", value=f"{total_activities} units")
+        st.metric(label="Last Recorded Run", value=running_max_date)
         st.metric(label="Total Runs", value=f"{total_runs} units")
-        st.metric(label="First Recorded Run", value=min_date)
+        st.metric(label="First Recorded Activity", value=activity_min_date)

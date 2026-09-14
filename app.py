@@ -1,4 +1,4 @@
-from garmin.streamlit_utils.nagivation import (
+from garmin.streamlit_helpers.nagivation import (
     define_sidebar,
     get_navigation,
     render_logo,

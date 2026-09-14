@@ -1,7 +1,7 @@
 import tomllib  # Use 'import tomli as tomllib' on Python < 3.11
 from pathlib import Path
 
-from garmin.etl.data_load import (
+from garmin.etl.load import (
     get_running_data,
     load_activity_file,
     load_records_file,

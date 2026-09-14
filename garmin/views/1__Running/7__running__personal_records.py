@@ -4,7 +4,7 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.constants import ACTIVITY_ATTR_COLUMNS, RECORDS_DF
-from garmin.streamlit_utils.utils import breadcrumbs, create_metrics_container
+from garmin.streamlit_helpers.utils import breadcrumbs, create_metrics_container
 
 
 def construct_activity_header(activity: dict[str, Any]) -> str:

@@ -4,11 +4,11 @@ from datetime import date
 import streamlit as st
 from pandas import DataFrame
 
+from garmin.charts.visualization import get_df_km_histogram
 from garmin.constants import RUNNING_DF
-from garmin.plots.visualization import get_df_km_histogram
-from garmin.streamlit_utils.chart_helpers import place_figure
-from garmin.streamlit_utils.model import GridConfig
-from garmin.streamlit_utils.utils import (
+from garmin.streamlit_helpers.chart_helpers import place_figure
+from garmin.streamlit_helpers.model import GridConfig
+from garmin.streamlit_helpers.utils import (
     Metric,
     breadcrumbs,
     create_grid,

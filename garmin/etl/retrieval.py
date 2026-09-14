@@ -1,6 +1,7 @@
 from datetime import timedelta
 from typing import Any
 
+from garmin.etl.load import load_json, save_dict_to_json
 from pandas import DataFrame, to_datetime
 
 from garmin.constants import (
@@ -10,7 +11,6 @@ from garmin.constants import (
     STEPS_DATA_FILE,
 )
 from garmin.etl.client import DataClient
-from garmin.etl.data_load import load_json, save_dict_to_json
 from garmin.etl.transformation import (
     scale_distance,
     scale_hour,

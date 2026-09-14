@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from pandas import DataFrame, cut
 from plotly.graph_objects import Figure
 
-from garmin.plots.config import X_AXIS_BASE_CONFIG, X_AXIS_MONTH_CONFIG
+from garmin.charts.config import X_AXIS_BASE_CONFIG, X_AXIS_MONTH_CONFIG
 from garmin.themes import THEME
 from garmin.utils.misc import calculate_ticker_values, categorize_df_column, prettify
 from garmin.utils.pace_calculations import transform_speed_to_pace

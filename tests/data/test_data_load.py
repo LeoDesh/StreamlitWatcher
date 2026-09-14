@@ -1,7 +1,5 @@
 import pytest
-from pandas import DataFrame
-
-from garmin.etl.data_load import (
+from garmin.etl.load import (
     add_distance,
     add_pace,
     load_activity_file,
@@ -9,6 +7,7 @@ from garmin.etl.data_load import (
     transform_activity,
     transform_dataframe,
 )
+from pandas import DataFrame
 
 
 @pytest.mark.data
