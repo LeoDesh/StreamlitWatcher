@@ -9,11 +9,6 @@
 - garmin folder
 - loads, translates and operates on the data
 
-### Updating data
-- USE to UPDATE: download.py takes the auth tokens to get the data
-- ONLY ONCE: workaround.py fakes login to get auth tokens
-
-
 ### Running checks
 - uv run pytest
 - uv run ruff check .
