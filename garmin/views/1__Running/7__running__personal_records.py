@@ -3,7 +3,8 @@ from typing import Any
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import ACTIVITY_ATTR_COLUMNS, RECORDS_DF
+from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
+from garmin.streamlit_helpers.load import load_records_df
 from garmin.streamlit_helpers.utils import breadcrumbs, create_metrics_container
 
 
@@ -43,7 +44,7 @@ def main() -> None:
     btn = info_col.button(label="Info", icon=":material/info:", type="secondary")
     if btn:
         show_description()
-    df = RECORDS_DF.copy()
+    df = load_records_df()
     show_records(df)
 
 

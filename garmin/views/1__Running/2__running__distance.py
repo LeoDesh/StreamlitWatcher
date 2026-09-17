@@ -5,7 +5,7 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.charts.visualization import get_df_km_histogram
-from garmin.constants import RUNNING_DF
+from garmin.streamlit_helpers.load import load_running_df
 from garmin.streamlit_helpers.model import GridConfig
 from garmin.streamlit_helpers.utils import (
     Metric,
@@ -94,7 +94,7 @@ def render_latest_run_metric(df: DataFrame) -> Metric:
 def main() -> None:
     breadcrumbs(__file__)
     construct_header()
-    df = RUNNING_DF.copy()
+    df = load_running_df()
     render_distance_metrics(df)
     grid_config = [GridConfig(1, height=550), GridConfig(2)]
     grid = create_grid(grid_config)

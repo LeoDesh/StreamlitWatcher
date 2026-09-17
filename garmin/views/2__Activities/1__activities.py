@@ -3,7 +3,8 @@ from typing import Any
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import ACTIVITY_ATTR_COLUMNS, ACTIVITY_DF
+from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
+from garmin.streamlit_helpers.load import load_activity_df
 from garmin.streamlit_helpers.utils import (
     Metric,
     breadcrumbs,
@@ -115,7 +116,7 @@ def render_activities_metrics(df: DataFrame) -> None:
 def main() -> None:
     breadcrumbs(__file__)
     st.header("Overview", text_alignment="center")
-    df = ACTIVITY_DF.copy()
+    df = load_activity_df()
     render_activities_metrics(df)
     filters = get_activity_filter(df)
     activity_df = filter_dataframe(df, filters)

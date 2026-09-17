@@ -2,7 +2,7 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.charts.visualization import create_box_plot_chart
-from garmin.constants import RUNNING_DF
+from garmin.streamlit_helpers.load import load_running_df
 from garmin.streamlit_helpers.utils import Metric, breadcrumbs, stream_metrics
 from garmin.utils.misc import prettify
 from garmin.utils.pace_calculations import (
@@ -51,7 +51,7 @@ def render_comparison_dashboard(df: DataFrame) -> None:
 def main() -> None:
     breadcrumbs(__file__)
     st.header("Comparison")
-    df = RUNNING_DF.copy()
+    df = load_running_df()
     render_comparison_metrics(df)
     render_comparison_dashboard(df)
 

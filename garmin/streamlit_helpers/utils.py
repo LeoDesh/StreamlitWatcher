@@ -13,7 +13,7 @@ from garmin.charts.visualization import (
     create_bar_chart_ordinary_axis,
     create_heat_map_monthly_axis,
 )
-from garmin.etl.constants import MIN_YEAR
+from garmin.etl.config import MIN_YEAR
 from garmin.streamlit_helpers.config import VIEW_FOLDER, Icons
 from garmin.streamlit_helpers.model import GridConfig
 from garmin.streamlit_helpers.nagivation import (

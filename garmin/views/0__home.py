@@ -1,7 +1,11 @@
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import ACTIVITY_DF, RUNNING_DF, STEPS_DF
+from garmin.streamlit_helpers.load import (
+    load_activity_df,
+    load_running_df,
+    load_steps_df,
+)
 from garmin.streamlit_helpers.nagivation import get_page_mapping, prettify_section
 from garmin.streamlit_helpers.utils import Metric, stream_metrics
 from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
@@ -82,7 +86,12 @@ def render_cards() -> None:
 
 def main() -> None:
     st.header("Activity Diary")
-    render_metrics([RUNNING_DF, ACTIVITY_DF, STEPS_DF])
+    running_df, activity_df, steps_df = (
+        load_running_df(),
+        load_activity_df(),
+        load_steps_df(),
+    )
+    render_metrics([running_df, activity_df, steps_df])
     render_cards()
 
 

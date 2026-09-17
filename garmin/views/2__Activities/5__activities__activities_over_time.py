@@ -4,7 +4,8 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.charts.visualization import create_gantt_chart, create_heat_map_monthly_axis
-from garmin.constants import ACTIVITY_ATTR_COLUMNS, ACTIVITY_DF
+from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
+from garmin.streamlit_helpers.load import load_activity_df
 from garmin.streamlit_helpers.utils import (
     GridConfig,
     Metric,
@@ -186,7 +187,7 @@ def get_average_activities_per_month_metric(df: DataFrame, current_year: int) ->
 def main() -> None:
     breadcrumbs(__file__)
     st.header("Activities over time", text_alignment="center")
-    df = ACTIVITY_DF.copy()
+    df = load_activity_df()
     render_activities_metrics(df)
     grid = create_grid([GridConfig(columns=2)])
     with grid[0][0]:

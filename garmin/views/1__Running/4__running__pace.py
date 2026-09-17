@@ -10,7 +10,7 @@ from garmin.charts.visualization import (
     get_df_pace_histogram,
     get_empty_figure,
 )
-from garmin.constants import RUNNING_DF
+from garmin.streamlit_helpers.load import load_running_df
 from garmin.streamlit_helpers.utils import (
     GridConfig,
     Metric,
@@ -145,7 +145,7 @@ def has_df_too_few_rows(df: DataFrame) -> bool:
 
 
 def main() -> None:
-    df = RUNNING_DF.copy()
+    df = load_running_df()
     breadcrumbs(__file__)
     st.title("Pace Overview")
     render_pace_metrics(df)

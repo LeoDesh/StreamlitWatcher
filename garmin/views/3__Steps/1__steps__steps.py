@@ -1,7 +1,7 @@
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import STEPS_DF
+from garmin.streamlit_helpers.load import load_steps_df
 from garmin.streamlit_helpers.utils import (
     Metric,
     breadcrumbs,
@@ -70,7 +70,7 @@ def render_year_statistics(df: DataFrame) -> None:
 def main() -> None:
     breadcrumbs(__file__)
     st.header("Overview")
-    df = STEPS_DF.copy()
+    df = load_steps_df()
     overview_df = get_year_overview_table(df)
     render_metrics(overview_df)
     render_year_statistics(overview_df)

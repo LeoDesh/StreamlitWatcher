@@ -1,5 +1,6 @@
 import math
 import re
+import tomllib
 from collections.abc import Callable
 from datetime import datetime
 from itertools import pairwise
@@ -217,3 +218,9 @@ def compute_delta(src: float, trg: float) -> float:
     if trg:
         return 100
     return 0
+
+
+def get_app_version() -> str:
+    with open("pyproject.toml", "rb") as f:
+        data = tomllib.load(f)
+        return data.get("project", {}).get("version", "unknown")

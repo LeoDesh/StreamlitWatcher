@@ -1,16 +1,15 @@
 import json
 from collections.abc import Callable
 from datetime import date, datetime
-from functools import cache
 from pathlib import Path
 from typing import Any
 
-from garmin.etl.mapping import GARMIN_COLUMNS
 from pandas import DataFrame
 
-from garmin.etl.constants import (
+from garmin.etl.config import (
     ACTIVITY_TRANSLATION_MAPPING,
     ACTIVITY_TYPE_MAPPING,
+    GARMIN_COLUMNS,
     MIN_DISTANCE,
     MIN_YEAR,
 )
@@ -32,7 +31,6 @@ from garmin.utils.pandas_helpers import filter_dataframe, read_file
 from garmin.utils.record_model import create_formatted_record_value
 
 
-@cache
 def load_activity_file(file: Path) -> DataFrame:
     validate_csv_file(file)
     df = read_file(file)
@@ -40,7 +38,7 @@ def load_activity_file(file: Path) -> DataFrame:
     return transform_dataframe(df)
 
 
-def get_running_data(file: Path) -> DataFrame:
+def load_running_data(file: Path) -> DataFrame:
     df = load_activity_file(file)
     return filter_garmin_df(df)
 
@@ -58,7 +56,6 @@ def load_records_file(file: Path, activity_df: DataFrame) -> DataFrame:
     return df
 
 
-@cache
 def load_steps_file(file: Path) -> DataFrame:
     df = read_file(file)
     df = apply_date_transformation_date_format(df, "Date")

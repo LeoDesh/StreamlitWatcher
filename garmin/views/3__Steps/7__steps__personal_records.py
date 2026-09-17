@@ -3,7 +3,7 @@ from typing import Any
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import STEPS_DF
+from garmin.streamlit_helpers.load import load_steps_df
 from garmin.streamlit_helpers.utils import (
     breadcrumbs,
     create_metrics_container,
@@ -80,7 +80,7 @@ def main() -> None:
     btn = btn_col.button(label="Info", icon=":material/info:", type="secondary")
     if btn:
         show_description()
-    df = STEPS_DF.copy()
+    df = load_steps_df()
     get_day_highlight(df)
     get_week_highlight(df)
     get_month_highlight(df)

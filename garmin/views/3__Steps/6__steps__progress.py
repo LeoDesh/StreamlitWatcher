@@ -1,7 +1,7 @@
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import STEPS_DF
+from garmin.streamlit_helpers.load import load_steps_df
 from garmin.streamlit_helpers.utils import (
     GridConfig,
     Metric,
@@ -61,7 +61,7 @@ def get_current_month_steps_metric(df: DataFrame) -> Metric:
 def main() -> None:
     breadcrumbs(__file__)
     st.header("Monthly Steps Progress")
-    df = STEPS_DF.copy()
+    df = load_steps_df()
     monthly_df = compute_monthly_steps(df)
     render_metrics(monthly_df)
     grid = create_grid([GridConfig(columns=2)])

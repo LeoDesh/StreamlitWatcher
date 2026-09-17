@@ -1,8 +1,9 @@
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.constants import ACTIVITY_ATTR_COLUMNS, RUNNING_DF
 from garmin.streamlit_helpers.config import Icons
+from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
+from garmin.streamlit_helpers.load import load_running_df
 from garmin.streamlit_helpers.utils import (
     Metric,
     breadcrumbs,
@@ -79,7 +80,7 @@ def render_year_statistics(df: DataFrame) -> None:
 
 def main() -> None:
     breadcrumbs(__file__)
-    df = RUNNING_DF.copy()
+    df = load_running_df()
     overview_df = get_year_overview_table(df)
     render_metrics(overview_df)
     home_tab, distance_tab, speed_tab = st.tabs(

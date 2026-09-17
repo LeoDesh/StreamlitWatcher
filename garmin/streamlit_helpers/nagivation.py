@@ -3,20 +3,19 @@ from pathlib import Path
 import streamlit as st
 from streamlit.navigation.page import StreamlitPage
 
-from garmin.constants import (
-    ACTIVITY_DF,
-    APP_VERSION,
-    IMAGE_ICON_PATH,
-    IMAGE_LOGO_PATH,
-    IMAGE_TRANSPARENT_PATH,
-    RUNNING_DF,
-)
 from garmin.streamlit_helpers.config import (
     PAGE_CONFIG,
     SECTION_CONFIG,
     VIEW_FOLDER,
     Icons,
 )
+from garmin.streamlit_helpers.constants import (
+    APP_VERSION,
+    IMAGE_ICON_PATH,
+    IMAGE_LOGO_PATH,
+    IMAGE_TRANSPARENT_PATH,
+)
+from garmin.streamlit_helpers.load import load_activity_df, load_running_df
 
 
 def split_page_name(file_name: str) -> tuple[int, str]:
@@ -125,11 +124,13 @@ def define_sidebar() -> None:
     with st.sidebar:
         st.image(IMAGE_LOGO_PATH)
         st.subheader(f"Version {APP_VERSION}")
-        activity_min_date = ACTIVITY_DF["date"].min().strftime("%d.%m.%Y")
-        activity_max_date = ACTIVITY_DF["date"].max().strftime("%d.%m.%Y")
-        running_max_date = RUNNING_DF["date"].max().strftime("%d.%m.%Y")
-        total_runs = len(RUNNING_DF)
-        total_activities = len(ACTIVITY_DF)
+        activity_df = load_activity_df()
+        running_df = load_running_df()
+        activity_min_date = activity_df["date"].min().strftime("%d.%m.%Y")
+        activity_max_date = activity_df["date"].max().strftime("%d.%m.%Y")
+        running_max_date = running_df["date"].max().strftime("%d.%m.%Y")
+        total_runs = len(running_df)
+        total_activities = len(activity_df)
         st.metric(label="Last Recorded Activity", value=activity_max_date)
         st.metric(label="Total Activities", value=f"{total_activities} units")
         st.metric(label="Last Recorded Run", value=running_max_date)

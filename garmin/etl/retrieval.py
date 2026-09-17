@@ -1,16 +1,10 @@
 from datetime import timedelta
 from typing import Any
 
-from garmin.etl.load import load_json, save_dict_to_json
 from pandas import DataFrame, to_datetime
 
-from garmin.constants import (
-    ACTIVITY_FILE_PATH,
-    ARCHIVE_PATH,
-    DATA_PATH,
-    STEPS_DATA_FILE,
-)
 from garmin.etl.client import DataClient
+from garmin.etl.load import load_json, save_dict_to_json
 from garmin.etl.transformation import (
     scale_distance,
     scale_hour,
@@ -18,6 +12,12 @@ from garmin.etl.transformation import (
     scale_minute,
     scale_steps,
     scale_streak,
+)
+from garmin.streamlit_helpers.load import (
+    ACTIVITY_FILE_PATH,
+    ARCHIVE_PATH,
+    DATA_PATH,
+    STEPS_DATA_FILE,
 )
 from garmin.utils.misc import prettify_by_sep
 from garmin.utils.pace_calculations import (
