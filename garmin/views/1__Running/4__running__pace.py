@@ -4,7 +4,7 @@ from datetime import date
 import streamlit as st
 from pandas import DataFrame, Timestamp
 
-from garmin.charts.visualization import (
+from garmin.charts.tools import (
     create_heat_map_ordinary,
     create_plotly_pace_chart,
     get_df_pace_histogram,

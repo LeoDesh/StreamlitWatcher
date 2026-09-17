@@ -85,9 +85,9 @@ def main() -> None:
     render_metrics(overview_df)
     home_tab, distance_tab, speed_tab = st.tabs(
         [
-            f"{Icons.analytics} Statistics",
-            f"{Icons.route} Top Distance Runs",
-            f"{Icons.speed} Top Speed Runs",
+            f"{Icons.ANALYTICS} Statistics",
+            f"{Icons.ROUTE} Top Distance Runs",
+            f"{Icons.SPEED} Top Speed Runs",
         ]
     )
     with home_tab:

@@ -56,7 +56,7 @@ def generate_page_from_file_path(file: Path, parent_folder: str = "") -> Streaml
     if parent_folder:
         _, parent_folder = split_page_name(parent_folder)
     page_config = PAGE_CONFIG.get(parent_folder).get(file_name)
-    initial_config = {"icon": Icons.monitoring} if not page_config else page_config
+    initial_config = {"icon": Icons.MONITORING} if not page_config else page_config
     config = initial_config | {
         "title": page_name,
         "page": file,

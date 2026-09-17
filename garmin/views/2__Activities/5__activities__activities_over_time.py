@@ -3,7 +3,7 @@ from typing import Any
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.charts.visualization import create_gantt_chart, create_heat_map_monthly_axis
+from garmin.charts.tools import create_gantt_chart, create_heat_map_monthly_axis
 from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
 from garmin.streamlit_helpers.load import load_activity_df
 from garmin.streamlit_helpers.utils import (

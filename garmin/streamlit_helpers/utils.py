@@ -9,7 +9,7 @@ from streamlit import page_link
 from streamlit.delta_generator import DeltaGenerator
 from streamlit.navigation.page import StreamlitPage
 
-from garmin.charts.visualization import (
+from garmin.charts.tools import (
     create_bar_chart_ordinary_axis,
     create_heat_map_monthly_axis,
 )
@@ -228,11 +228,11 @@ def breadcrumbs(file_dunder: str) -> None:
     with st.container(horizontal=True, vertical_alignment="center"):
         home_page = get_homepage()
         page_link(home_page, label="Home")
-        st.markdown(Icons.arrow_right, width="content")
+        st.markdown(Icons.ARROW_RIGHT, width="content")
         file_references = get_file_references(file_path)
         for reference_page in file_references:
             page_link(reference_page)
-            st.markdown(Icons.arrow_right, width="content")
+            st.markdown(Icons.ARROW_RIGHT, width="content")
         page_part = get_page_part(file_path)
         current_page_name = " ".join(prettify(part) for part in page_part.split("_"))
         st.markdown(f"**{current_page_name}**")

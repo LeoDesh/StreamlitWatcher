@@ -4,7 +4,7 @@ from datetime import date
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.charts.visualization import get_df_km_histogram
+from garmin.charts.tools import get_df_km_histogram
 from garmin.streamlit_helpers.load import load_running_df
 from garmin.streamlit_helpers.model import GridConfig
 from garmin.streamlit_helpers.utils import (
