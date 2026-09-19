@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from datetime import date
 from itertools import pairwise
 from pathlib import Path
@@ -8,16 +9,13 @@ from pandas import (
     Series,
     Timedelta,
     concat,
+    cut,
     date_range,
     read_csv,
     to_datetime,
 )
 
-from garmin.utils.misc import (
-    calculate_bins_from_min_max_value,
-    calculate_ticker_values,
-    categorize_df_column,
-)
+from garmin.utils.misc import calculate_bins_from_min_max_value, calculate_ticker_values
 from garmin.utils.pace_calculations import transform_pace_float_to_pace
 
 
@@ -52,6 +50,19 @@ def get_pace_bins_labels_for_dataframe(
         for current_pace, next_pace in pairwise(pace_str_bins)
     ]
     return (bins, labels)
+
+
+def categorize_df_column(
+    df: DataFrame,
+    trg_column: str,
+    number_of_bins: int,
+    bins_labels_func: Callable[[DataFrame, int, str], tuple[list, list]],
+) -> DataFrame:
+    bins, labels = bins_labels_func(df, number_of_bins, trg_column)
+    df = df.copy()
+    df.loc[:, f"new_{trg_column}"] = cut(df[trg_column], bins=bins, labels=labels)
+    df[trg_column] = df[f"new_{trg_column}"]
+    return df
 
 
 def create_df_pivot_hpm_pace(df: DataFrame) -> DataFrame:

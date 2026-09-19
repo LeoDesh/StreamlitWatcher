@@ -20,11 +20,9 @@ from garmin.streamlit_helpers.utils import (
     stream_metrics,
     time_options_provider,
 )
-from garmin.utils.misc import categorize_df_column
-from garmin.utils.pace_calculations import (
-    transform_speed_to_pace_prettified,
-)
+from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
 from garmin.utils.pandas_helpers import (
+    categorize_df_column,
     create_df_pivot_hpm_pace,
     filter_dataframe,
     get_pace_bins_labels_for_dataframe,

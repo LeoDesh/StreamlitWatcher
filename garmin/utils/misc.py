@@ -1,18 +1,14 @@
 import math
 import re
 import tomllib
-from collections.abc import Callable
 from datetime import datetime
-from itertools import pairwise
-
-import pandas as pd
 
 from garmin.utils.time_utils import parse_date
 
 TIME_PATTERN = r"(\d{2}):([0-5]\d|60):([0-5]\d|60)(\.\d+)?"
 
 
-def parse_str_to_int(value: str | int) -> int:
+def parse_steps_number(value: str | int) -> int:
     if isinstance(value, int):
         return value
     if value.find("--") > -1:
@@ -20,20 +16,12 @@ def parse_str_to_int(value: str | int) -> int:
     return int(value.replace(",", ""))
 
 
-def get_all_regex_matches(regex_pattern: str, target_str: str) -> str:
+def get_all_regex_matches(regex_pattern: str, target_str: str) -> list[str]:
     regex = re.compile(regex_pattern)
     return regex.findall(target_str)
 
 
-"""Keep it. May still be used"""
-
-
-def get_regex_match(regex_pattern: str, target_str: str, idx: int) -> str:
-    regex = re.compile(regex_pattern)
-    return regex.findall(target_str)[idx]
-
-
-def search_with_regex(regex_pattern: str, target_str: str, idx: int = 0) -> str:
+def find_regex_match(regex_pattern: str, target_str: str, idx: int = 0) -> str:
     match = re.search(regex_pattern, target_str)
     if match:
         group = match.group(idx)
@@ -48,9 +36,9 @@ def calculate_bins_from_min_max_value(
     return sorted({min_value + step * idx for idx in range(number_of_bins + 1)})
 
 
-def calculate_int_bins(min_value: int, max_value: int, factor: int) -> list[float]:
-    steps = int(float(max_value - min_value) // factor)
-    return [min_value + factor * idx for idx in range(steps + 2)]
+def calculate_int_bins(min_value: int, max_value: int, bin_size: int) -> list[int]:
+    intervals = int(float(max_value - min_value) // bin_size)
+    return [min_value + bin_size * interval for interval in range(intervals + 2)]
 
 
 def calculate_ticker_values(values: list[float], max_numb: int = 7) -> list[float]:
@@ -61,39 +49,12 @@ def calculate_ticker_values(values: list[float], max_numb: int = 7) -> list[floa
     return calculate_bins_from_min_max_value(min_val, max_val, number_of_bins)
 
 
-def bin_label_heartbeat(
-    df: pd.DataFrame, number_of_bins: int, trg_column: str
-) -> tuple[list[int], list[str]]:
-    values = df[trg_column].tolist()
-    bin_values = [
-        int(value) for value in calculate_ticker_values(values, number_of_bins)
-    ]
-    labels = [
-        f"{current_value}-{next_value}"
-        for current_value, next_value in pairwise(bin_values)
-    ]
-    return (bin_values, labels)
-
-
-def categorize_df_column(
-    df: pd.DataFrame,
-    trg_column: str,
-    number_of_bins: int,
-    bins_labels_func: Callable[[pd.DataFrame, int, str], tuple[list, list]],
-) -> pd.DataFrame:
-    bins, labels = bins_labels_func(df, number_of_bins, trg_column)
-    df = df.copy()
-    df.loc[:, f"new_{trg_column}"] = pd.cut(df[trg_column], bins=bins, labels=labels)
-    df[trg_column] = df[f"new_{trg_column}"]
-    return df
-
-
 def verify_activity_duration(duration_str: str) -> bool:
     if not get_all_regex_matches(TIME_PATTERN, duration_str):
         return False
     minutes = parse_minutes_from_activity_duration(duration_str)
     seconds = parse_seconds_from_activity_duration(duration_str)
-    hundreth = search_with_regex(r"\.(\d+)", duration_str, 1)
+    hundreth = find_regex_match(r"\.(\d+)", duration_str, 1)
     hundreth = int(hundreth) if hundreth else 0
     if minutes == 60 and seconds > 0:
         return False
@@ -136,7 +97,7 @@ def _parse_time_components_from_activity_duration(
     duration_str: str, component_part: int
 ) -> int:
     regex_pattern = TIME_PATTERN
-    return int(search_with_regex(regex_pattern, duration_str, component_part))
+    return int(find_regex_match(regex_pattern, duration_str, component_part))
 
 
 def parse_hours_from_activity_duration(duration_str: str) -> int:
@@ -197,7 +158,7 @@ def replace_comma_in_number(line: str) -> str:
 
 def parse_indoor_cycling_title(line: str) -> float | str:
     pattern = r"(\d+([\.,]\s*\d+)?)\s*KM"
-    value = search_with_regex(pattern, line.upper(), 1)
+    value = find_regex_match(pattern, line.upper(), 1)
     return transform_str_to_float(value)
 
 

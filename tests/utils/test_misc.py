@@ -8,16 +8,15 @@ from garmin.utils.misc import (
     calculate_bins_from_min_max_value,
     calculate_minutes,
     compute_delta,
+    find_regex_match,
     get_all_regex_matches,
-    get_regex_match,
     parse_activity_duration_to_minutes,
     parse_hours_from_activity_duration,
     parse_indoor_cycling_title,
     parse_minutes_from_activity_duration,
     parse_seconds_from_activity_duration,
-    parse_str_to_int,
+    parse_steps_number,
     replace_comma_in_number,
-    search_with_regex,
     transform_activity_minutes_to_duration_format,
     transform_str_to_datetime,
     verify_activity_duration,
@@ -27,15 +26,15 @@ REGEX_TEXT = "545 343 754"
 
 
 @pytest.mark.misc
-def test_parse_str_to_int_identity():
+def test_parse_steps_number_identity():
     value = 5
-    assert parse_str_to_int(value) == 5
+    assert parse_steps_number(value) == 5
 
 
 @pytest.mark.misc
-def test_parse_str_to_int_str_with_comma():
+def test_parse_steps_number_str_with_comma():
     value = "5,453"
-    parsed_value = parse_str_to_int(value)
+    parsed_value = parse_steps_number(value)
     assert parsed_value == 5453
 
 
@@ -49,36 +48,6 @@ def test_parse_str_to_int_str_with_comma():
 )
 def test_get_all_regex_match(pattern: str, expected: list[str]):
     assert get_all_regex_matches(pattern, REGEX_TEXT) == expected
-
-
-@pytest.mark.misc
-@pytest.mark.parametrize(
-    "pattern,idx,expected,expected_context",
-    [
-        (
-            r"\d{3}",
-            1,
-            "343",
-            nullcontext(),
-        ),  # simply get all numbers
-        (
-            r"\d{3}",
-            3,
-            "343",
-            pytest.raises(IndexError),
-        ),  # not enough matches
-        (
-            r"\d{4}",
-            0,
-            "545",
-            pytest.raises(IndexError),
-        ),  # no match
-    ],
-)
-def test_get_regex_match(pattern: str, idx: int, expected: str, expected_context):
-    with expected_context:
-        value = get_regex_match(pattern, REGEX_TEXT, idx)
-        assert value == expected
 
 
 @pytest.mark.misc
@@ -105,9 +74,9 @@ def test_get_regex_match(pattern: str, idx: int, expected: str, expected_context
         ),  # not enough matched values
     ],
 )
-def test_search_with_regex(pattern: str, idx: int, expected: str, expected_context):
+def test_find_regex_match(pattern: str, idx: int, expected: str, expected_context):
     with expected_context:
-        assert search_with_regex(pattern, REGEX_TEXT, idx) == expected
+        assert find_regex_match(pattern, REGEX_TEXT, idx) == expected
 
 
 @pytest.mark.misc

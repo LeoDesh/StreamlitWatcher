@@ -18,7 +18,7 @@ from garmin.utils.misc import (
     parse_activity_duration_to_hours,
     parse_activity_duration_to_minutes,
     parse_indoor_cycling_title,
-    parse_str_to_int,
+    parse_steps_number,
     transform_str_to_datetime,
     transform_str_to_datetime_date_str,
 )
@@ -166,7 +166,7 @@ def transform_distance_pace_columns(df: DataFrame) -> DataFrame:
         ),
         axis=1,
     )
-    df["steps"] = df["steps"].apply(parse_str_to_int)
+    df["steps"] = df["steps"].apply(parse_steps_number)
     df["speed"] = df["average_pace"].apply(transform_pace_to_speed)
     df["pace_float"] = df["average_pace"].apply(
         lambda x: round(transform_pace_to_pace_float(x), 2)
