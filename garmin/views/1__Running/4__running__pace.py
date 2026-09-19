@@ -3,11 +3,12 @@ from datetime import date
 
 import streamlit as st
 from pandas import DataFrame, Timestamp
+from plotly.graph_objects import Figure
 
 from garmin.charts.tools import (
-    create_heat_map_ordinary,
-    create_plotly_pace_chart,
-    get_df_pace_histogram,
+    create_histogram,
+    create_hpm_heatmap,
+    create_pace_chart,
     get_empty_figure,
 )
 from garmin.streamlit_helpers.load import load_running_df
@@ -19,8 +20,15 @@ from garmin.streamlit_helpers.utils import (
     stream_metrics,
     time_options_provider,
 )
-from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
-from garmin.utils.pandas_helpers import create_df_pivot_hpm_pace, filter_dataframe
+from garmin.utils.misc import categorize_df_column
+from garmin.utils.pace_calculations import (
+    transform_speed_to_pace_prettified,
+)
+from garmin.utils.pandas_helpers import (
+    create_df_pivot_hpm_pace,
+    filter_dataframe,
+    get_pace_bins_labels_for_dataframe,
+)
 from garmin.utils.time_utils import get_current_year
 
 type FilterParameters = list[
@@ -52,21 +60,26 @@ def setup_distance_range_selection(df: DataFrame) -> tuple[int, int]:
     return (chosen_distance_min, chosen_distance_max)
 
 
-def setup_line_plot(df: DataFrame) -> None:
-    return create_plotly_pace_chart(
-        df,
-        x_col="date",
-        y_col="speed",
-        y_text_col="average_pace",
-        y_col_2="average_heart_rate",
+def create_pace_histogram_df(df: DataFrame, number_of_bins: int) -> DataFrame:
+    column = "pace_float"
+    df = categorize_df_column(
+        df, column, number_of_bins, get_pace_bins_labels_for_dataframe
     )
+    counts_df = df[column].value_counts().sort_index().reset_index()
+    counts_df.columns = ["Minute per km", "Amount"]
+    return counts_df
 
 
-def setup_pace_histogram(df: DataFrame, number_of_bins: int) -> None:
+def setup_pace_histogram(df: DataFrame, number_of_bins: int) -> Figure:
     if df.empty:
         fig = get_empty_figure()
     else:
-        fig = get_df_pace_histogram(df, "pace_float", number_of_bins)
+        df = create_pace_histogram_df(df, number_of_bins)
+        fig = create_histogram(
+            df,
+            "Pace Distribution",
+            hovertemplate="%{y} units exercised within pace of %{x} min/km<extra></extra>",
+        )
     return fig
 
 
@@ -161,12 +174,12 @@ def main() -> None:
         fig = setup_pace_histogram(df, 15)
         st.plotly_chart(fig)
     with grid[1][0]:
-        fig = setup_line_plot(df)
+        fig = create_pace_chart(df)
         st.plotly_chart(fig)
     with grid[0][1]:
         pivot_df = create_df_pivot_hpm_pace(df)
         pivot_df.columns.name = "Pace km/min"
-        fig = create_heat_map_ordinary(pivot_df, "Pace & HPM Correlation in %")
+        fig = create_hpm_heatmap(pivot_df, "Pace & HPM Correlation in %")
         st.plotly_chart(fig)
 
 

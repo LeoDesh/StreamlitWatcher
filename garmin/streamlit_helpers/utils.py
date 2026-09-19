@@ -10,7 +10,7 @@ from streamlit.delta_generator import DeltaGenerator
 from streamlit.navigation.page import StreamlitPage
 
 from garmin.charts.tools import (
-    create_bar_chart_ordinary_axis,
+    create_bar_chart,
     create_heat_map_monthly_axis,
 )
 from garmin.etl.config import MIN_YEAR
@@ -117,7 +117,7 @@ def construct_year_statistics(
     category = category if category else default
     header, template = config.get(category)
     hovertemplate = f"{template} in %{{x}} <extra></extra>"
-    fig = create_bar_chart_ordinary_axis(
+    fig = create_bar_chart(
         df, "year", category, y_title=f"{header} per", hovertemplate=hovertemplate
     )
     st.plotly_chart(fig, width="stretch")
@@ -136,11 +136,11 @@ def render_monthly_progression(
     df = date_df.merge(df, how="left", on="monthly_date").fillna(0)
     df[target_column] = df[target_column].cumsum()
     df["month"] = df["monthly_date"].apply(get_last_day_of_date)
-    fig = create_bar_chart_ordinary_axis(
+    fig = create_bar_chart(
         df,
         "month",
         target_column,
-        f"Total {target_column} covered per",
+        y_title=f"Total {target_column} covered per",
         hovertemplate=f"%{{y:,.0f}} {unit} covered up to %{{x}} <extra></extra>",
         show_x_title=False,
     )

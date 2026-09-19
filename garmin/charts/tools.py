@@ -1,44 +1,13 @@
-from itertools import pairwise
 from typing import Any
 
 import plotly.express as px
-import plotly.graph_objects as go
-from pandas import DataFrame, cut
-from plotly.graph_objects import Figure
+from pandas import DataFrame
+from plotly.graph_objects import Box, Figure, Scatter
 
 from garmin.charts.config import X_AXIS_BASE_CONFIG, X_AXIS_MONTH_CONFIG
 from garmin.themes import THEME
-from garmin.utils.misc import calculate_ticker_values, categorize_df_column, prettify
+from garmin.utils.misc import calculate_ticker_values, prettify
 from garmin.utils.pace_calculations import transform_speed_to_pace
-from garmin.utils.pandas_helpers import get_pace_bins_labels_for_dataframe
-
-
-def get_df_pace_histogram(
-    df: DataFrame, pace_float_column: str, number_of_bins: int
-) -> Figure:
-    df = categorize_df_column(
-        df, pace_float_column, number_of_bins, get_pace_bins_labels_for_dataframe
-    )
-    counts_df = df[pace_float_column].value_counts().sort_index().reset_index()
-    counts_df.columns = ["Minute per km", "Amount"]
-    return create_histogram(
-        counts_df,
-        "Pace Distribution",
-        hovertemplate="%{y} units exercised within pace of %{x} min/km<extra></extra>",
-    )
-
-
-def get_df_km_histogram(df: DataFrame, trg_col: str, bins: list[int]) -> Figure:
-    labels = [f"{current_km}-{next_km} km" for current_km, next_km in pairwise(bins)]
-    df = df.copy()
-    df.loc[:, "binned"] = cut(df[trg_col], bins=bins, labels=labels)
-    counts = df["binned"].value_counts().sort_index().reset_index()
-    counts.columns = ["km", "Amount"]
-    return create_histogram(
-        counts,
-        "Distribution of kilometres run per unit",
-        hovertemplate="%{y} units exercised within range of %{x} km<extra></extra>",
-    )
 
 
 def create_histogram(df: DataFrame, title: str, hovertemplate: str) -> Figure:
@@ -63,7 +32,7 @@ def create_bar_chart(
     x_col: str,
     y_col: str,
     *,
-    x_axis_config: dict[str, Any],
+    x_axis_config: dict[str, Any] = X_AXIS_BASE_CONFIG,
     show_x_title: bool = True,
     y_title: str = "km run per",
     hovertemplate: str = "",
@@ -80,53 +49,37 @@ def create_bar_chart(
     return fig
 
 
-def create_bar_chart_ordinary_axis(
-    df: DataFrame,
-    x_col: str,
-    y_col: str,
-    y_title: str = "km run per",
-    hovertemplate: str = "",
-    show_x_title: bool = True,
-) -> DataFrame:
-    return create_bar_chart(
-        df,
-        x_col,
-        y_col,
-        x_axis_config=X_AXIS_BASE_CONFIG,
-        show_x_title=show_x_title,
-        y_title=y_title,
-        hovertemplate=hovertemplate,
+def create_pace_chart(df: DataFrame) -> Figure:
+    date_col, speed_col, pace_col, hpm_col = (
+        "date",
+        "speed",
+        "average_pace",
+        "average_heart_rate",
     )
-
-
-def create_plotly_pace_chart(
-    df: DataFrame, x_col: str, y_col: str, y_text_col: str, y_col_2: str
-) -> Figure:
-    values = df[y_col].tolist()
+    values = df[speed_col].tolist()
     tickvals = calculate_ticker_values(values)
     ticktext = [transform_speed_to_pace(speed) for speed in tickvals]
     fig = Figure()
     fig.add_trace(
-        go.Scatter(
-            x=df[x_col],
-            y=df[y_col],
+        Scatter(
+            x=df[date_col],
+            y=df[speed_col],
             mode="lines+markers",
-            # mode="lines",
-            name=prettify(y_col),
+            name=prettify(speed_col),
             connectgaps=False,
             line={"width": 2.5, "color": THEME.primary_blue},
-            customdata=df[y_text_col],
+            customdata=df[pace_col],
             hovertemplate="Speed: %{y} km/h<br>" + "Pace: %{customdata}<extra></extra>",
             yaxis="y1",
         )
     )
     fig.add_trace(
-        go.Scatter(
-            x=df[x_col],
-            y=df[y_col_2],
+        Scatter(
+            x=df[date_col],
+            y=df[hpm_col],
             mode="lines+markers",
             opacity=0.25,
-            name=prettify(y_col_2),
+            name=prettify(hpm_col),
             connectgaps=False,
             line={"width": 2.5, "color": THEME.primary_red},
             hovertemplate="HPM: %{y}",
@@ -204,7 +157,7 @@ def create_heat_map(
     return fig
 
 
-def create_heat_map_ordinary(df: DataFrame, title: str) -> Figure:
+def create_hpm_heatmap(df: DataFrame, title: str) -> Figure:
     hovertemplate = "With Avg. Heart Rate %{y}: %{z:.2f} % chance of a run with Pace %{x}<extra></extra>"
     return create_heat_map(
         df, title, x_axis_kwargs=X_AXIS_BASE_CONFIG, hovertemplate=hovertemplate
@@ -222,7 +175,7 @@ def create_heat_map_monthly_axis(
 def create_box_plot_chart(df: DataFrame, column: str) -> Figure:
     fig = Figure()
     fig.add_trace(
-        go.Box(
+        Box(
             x=df["year"].astype(
                 str
             ),  # Convert to string so years are distinct categories

@@ -1,10 +1,11 @@
 import math
 from datetime import date
+from itertools import pairwise
 
 import streamlit as st
-from pandas import DataFrame
+from pandas import DataFrame, cut
 
-from garmin.charts.tools import get_df_km_histogram
+from garmin.charts.tools import create_histogram
 from garmin.streamlit_helpers.load import load_running_df
 from garmin.streamlit_helpers.model import GridConfig
 from garmin.streamlit_helpers.utils import (
@@ -30,11 +31,25 @@ def construct_header() -> None:
 
 
 def setup_histogram(df: DataFrame) -> None:
+    df = create_histogram_distance_df(df)
+    fig = create_histogram(
+        df,
+        "Distribution of kilometres run per unit",
+        hovertemplate="%{y} units exercised within range of %{x} km<extra></extra>",
+    )
+    st.plotly_chart(fig, width="stretch")
+
+
+def create_histogram_distance_df(df: DataFrame) -> DataFrame:
     distance_min = math.floor(df["distance"].min())
     distance_max = math.ceil(df["distance"].max())
     bins = calculate_int_bins(distance_min, distance_max, 2)
-    fig = get_df_km_histogram(df, "distance", bins)
-    st.plotly_chart(fig, width="stretch")
+    labels = [f"{current_km}-{next_km} km" for current_km, next_km in pairwise(bins)]
+    df = df.copy()
+    df.loc[:, "binned"] = cut(df["distance"], bins=bins, labels=labels)
+    counts = df["binned"].value_counts().sort_index().reset_index()
+    counts.columns = ["km", "Amount"]
+    return counts
 
 
 def compute_monthly_distance(df: DataFrame) -> DataFrame:

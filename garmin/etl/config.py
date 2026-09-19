@@ -1,6 +1,12 @@
 from enum import StrEnum, auto
 from pathlib import Path
 
+DATA_PATH = Path("garmin/etl/data/")
+ARCHIVE_PATH = Path("garmin/etl/data/archive")
+ACTIVITY_FILE_PATH = DATA_PATH / "Activities.csv"
+RECORDS_DATA_FILE = DATA_PATH / "PersonalRecords.csv"
+STEPS_DATA_FILE = DATA_PATH / "Steps.csv"
+
 MIN_YEAR = 2022
 MIN_DISTANCE = 2.5
 ACTIVITY_TYPE_MAPPING = {
@@ -52,9 +58,3 @@ GARMIN_COLUMNS = {
     "Maximale Geschwindigkeit": Activity.MAX_PACE,
     "Schritte": Activity.STEPS,
 }
-
-DATA_PATH = Path("garmin/etl/data/")
-ARCHIVE_PATH = Path("garmin/etl/data/archive")
-ACTIVITY_FILE_PATH = DATA_PATH / "Activities.csv"
-RECORDS_DATA_FILE = DATA_PATH / "PersonalRecords.csv"
-STEPS_DATA_FILE = DATA_PATH / "Steps.csv"
