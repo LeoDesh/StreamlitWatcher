@@ -20,9 +20,8 @@ from garmin.utils.pace_calculations import transform_pace_float_to_pace
 
 
 def bin_label_heartbeat(
-    df: DataFrame, number_of_bins: int, trg_column: str
+    values: list[float], number_of_bins: int
 ) -> tuple[list[int], list[str]]:
-    values = df[trg_column].tolist()
     bin_values = [
         int(value)
         for value in create_bins_by_series(
@@ -34,13 +33,10 @@ def bin_label_heartbeat(
 
 
 def get_pace_bins_labels_for_dataframe(
-    df: DataFrame, number_of_bins: int, pace_float_column: str
+    values: list[float], number_of_bins: int
 ) -> tuple[list[float], list[str]]:
     bins = create_bins_by_series(
-        df[pace_float_column].tolist(),
-        number_of_bins=number_of_bins,
-        bin_size=0.1,
-        enhancer=0.01,
+        values, number_of_bins=number_of_bins, bin_size=0.1, enhancer=0.01
     )
     pace_bins = [transform_pace_float_to_pace(bin) for bin in bins]
     labels = create_label_pairs_from_values(pace_bins)
@@ -51,9 +47,9 @@ def categorize_df_column(
     df: DataFrame,
     trg_column: str,
     number_of_bins: int,
-    bins_labels_func: Callable[[DataFrame, int, str], tuple[list, list]],
+    bins_labels_func: Callable[[list[float], int], tuple[list, list]],
 ) -> DataFrame:
-    bins, labels = bins_labels_func(df, number_of_bins, trg_column)
+    bins, labels = bins_labels_func(df[trg_column].tolist(), number_of_bins)
     df = df.copy()
     df.loc[:, f"new_{trg_column}"] = cut(df[trg_column], bins=bins, labels=labels)
     df[trg_column] = df[f"new_{trg_column}"]

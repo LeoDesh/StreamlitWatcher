@@ -1,7 +1,11 @@
 ### Changes
 
-#### 0.3.2
+#### 0.3.3
+- refactoring functions
+- breaking models apart
+- test suite expansion
 
+#### 0.3.2
 - project migration, views & streamlit_utils moved into garmin folder
 - reformatted sidebar to also highlight activities
 - renaming packages

@@ -1,6 +1,6 @@
 [project]
 name = "ActivityDiary"
-version = "0.3.2"
+version = "0.3.3"
 description = "Monitoring activities and showing highlights"
 readme = "README.md"
 requires-python = ">=3.13"
