@@ -1,6 +1,5 @@
 from collections.abc import Callable
 from datetime import date
-from itertools import pairwise
 from pathlib import Path
 from typing import Any, Literal
 
@@ -15,10 +14,8 @@ from pandas import (
     to_datetime,
 )
 
-from garmin.utils.bucketing import (
-    calculate_bins_from_min_max_value,
-    calculate_ticker_values,
-)
+from garmin.utils.bucketing import create_bins_by_series
+from garmin.utils.misc import create_label_pairs_from_values
 from garmin.utils.pace_calculations import transform_pace_float_to_pace
 
 
@@ -27,31 +24,26 @@ def bin_label_heartbeat(
 ) -> tuple[list[int], list[str]]:
     values = df[trg_column].tolist()
     bin_values = [
-        int(value) for value in calculate_ticker_values(values, number_of_bins)
+        int(value)
+        for value in create_bins_by_series(
+            values, number_of_bins=number_of_bins, bin_size=5
+        )
     ]
-    labels = [
-        f"{current_value}-{next_value}"
-        for current_value, next_value in pairwise(bin_values)
-    ]
+    labels = create_label_pairs_from_values(bin_values)
     return (bin_values, labels)
-
-
-def calculate_bins_values_dataframe(
-    df: DataFrame, number_of_bins: int, column: str
-) -> list[float]:
-    min_value, max_value = max(df[column].min() - 0.2, 0), df[column].max() + 0.2
-    return calculate_bins_from_min_max_value(min_value, max_value, number_of_bins)
 
 
 def get_pace_bins_labels_for_dataframe(
     df: DataFrame, number_of_bins: int, pace_float_column: str
 ) -> tuple[list[float], list[str]]:
-    bins = calculate_bins_values_dataframe(df, number_of_bins, pace_float_column)
-    pace_str_bins = [transform_pace_float_to_pace(bin) for bin in bins]
-    labels = [
-        f"{current_pace}-{next_pace}"
-        for current_pace, next_pace in pairwise(pace_str_bins)
-    ]
+    bins = create_bins_by_series(
+        df[pace_float_column].tolist(),
+        number_of_bins=number_of_bins,
+        bin_size=0.1,
+        enhancer=0.01,
+    )
+    pace_bins = [transform_pace_float_to_pace(bin) for bin in bins]
+    labels = create_label_pairs_from_values(pace_bins)
     return (bins, labels)
 
 

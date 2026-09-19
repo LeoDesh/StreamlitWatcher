@@ -1,6 +1,5 @@
 import math
 from datetime import date
-from itertools import pairwise
 
 import streamlit as st
 from pandas import DataFrame, cut
@@ -17,8 +16,8 @@ from garmin.streamlit_helpers.utils import (
     setup_heatmap,
     stream_metrics,
 )
-from garmin.utils.bucketing import calculate_int_bins
-from garmin.utils.misc import compute_delta
+from garmin.utils.bucketing import create_bins_by_bounds
+from garmin.utils.misc import compute_delta, create_label_pairs_from_values
 from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
 from garmin.utils.time_utils import (
     get_current_month,
@@ -44,8 +43,8 @@ def setup_histogram(df: DataFrame) -> None:
 def create_histogram_distance_df(df: DataFrame) -> DataFrame:
     distance_min = math.floor(df["distance"].min())
     distance_max = math.ceil(df["distance"].max())
-    bins = calculate_int_bins(distance_min, distance_max, 2)
-    labels = [f"{current_km}-{next_km} km" for current_km, next_km in pairwise(bins)]
+    bins = create_bins_by_bounds(distance_min, distance_max, bin_size=2)
+    labels = create_label_pairs_from_values(bins, suffix="km")
     df = df.copy()
     df.loc[:, "binned"] = cut(df["distance"], bins=bins, labels=labels)
     counts = df["binned"].value_counts().sort_index().reset_index()

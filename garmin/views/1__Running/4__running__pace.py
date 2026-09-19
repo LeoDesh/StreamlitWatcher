@@ -176,7 +176,7 @@ def main() -> None:
         st.plotly_chart(fig)
     with grid[0][1]:
         pivot_df = create_df_pivot_hpm_pace(df)
-        pivot_df.columns.name = "Pace km/min"
+        pivot_df.columns.name = "Pace min/km"
         fig = create_hpm_heatmap(pivot_df, "Pace & HPM Correlation in %")
         st.plotly_chart(fig)
 

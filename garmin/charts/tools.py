@@ -6,7 +6,7 @@ from plotly.graph_objects import Box, Figure, Scatter
 
 from garmin.charts.config import X_AXIS_BASE_CONFIG, X_AXIS_MONTH_CONFIG
 from garmin.themes import THEME
-from garmin.utils.bucketing import calculate_ticker_values
+from garmin.utils.bucketing import create_bins_by_series
 from garmin.utils.misc import prettify
 from garmin.utils.pace_calculations import transform_speed_to_pace
 
@@ -58,7 +58,7 @@ def create_pace_chart(df: DataFrame) -> Figure:
         "average_heart_rate",
     )
     values = df[speed_col].tolist()
-    tickvals = calculate_ticker_values(values)
+    tickvals = create_bins_by_series(values, number_of_bins=7, enhancer=0.05)
     ticktext = [transform_speed_to_pace(speed) for speed in tickvals]
     fig = Figure()
     fig.add_trace(

@@ -1,5 +1,6 @@
 import re
 import tomllib
+from itertools import pairwise
 
 
 def parse_steps_number(value: str | int) -> int:
@@ -70,6 +71,16 @@ def compute_delta(src: float, trg: float) -> float:
     if trg:
         return 100
     return 0
+
+
+def create_label_pairs_from_values(
+    data: list[float | str | int], *, delimiter: str = "-", suffix: str = ""
+) -> list[str]:
+    suffix = f" {suffix}" if suffix else ""
+    return [
+        f"{current_value}{delimiter}{next_value}{suffix}"
+        for current_value, next_value in pairwise(data)
+    ]
 
 
 def get_app_version() -> str:
