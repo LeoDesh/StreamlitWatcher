@@ -42,3 +42,15 @@ def get_first_of_given_year(yr: int) -> date:
 def get_last_day_of_date(given_date: date) -> date:
     _, last_day = calendar.monthrange(given_date.year, given_date.month)
     return given_date.replace(day=last_day)
+
+
+def transform_str_to_datetime(
+    date_str: str, src_format: str = "%Y-%m-%d %H:%M:%S"
+) -> datetime:
+    if isinstance(date_str, datetime):
+        return date_str
+    return parse_date(date_str, src_format)
+
+
+def transform_str_to_datetime_date_str(date_str: str) -> datetime:
+    return transform_str_to_datetime(date_str, "%Y-%m-%d")

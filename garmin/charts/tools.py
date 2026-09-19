@@ -6,7 +6,8 @@ from plotly.graph_objects import Box, Figure, Scatter
 
 from garmin.charts.config import X_AXIS_BASE_CONFIG, X_AXIS_MONTH_CONFIG
 from garmin.themes import THEME
-from garmin.utils.misc import calculate_ticker_values, prettify
+from garmin.utils.bucketing import calculate_ticker_values
+from garmin.utils.misc import prettify
 from garmin.utils.pace_calculations import transform_speed_to_pace
 
 

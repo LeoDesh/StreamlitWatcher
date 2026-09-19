@@ -17,7 +17,8 @@ from garmin.streamlit_helpers.utils import (
     setup_heatmap,
     stream_metrics,
 )
-from garmin.utils.misc import calculate_int_bins, compute_delta
+from garmin.utils.bucketing import calculate_int_bins
+from garmin.utils.misc import compute_delta
 from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
 from garmin.utils.time_utils import (
     get_current_month,

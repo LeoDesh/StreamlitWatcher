@@ -14,14 +14,12 @@ from garmin.etl.config import (
     MIN_YEAR,
 )
 from garmin.etl.verification import validate_csv_file
-from garmin.utils.misc import (
+from garmin.utils.duration_parsing import (
     parse_activity_duration_to_hours,
     parse_activity_duration_to_minutes,
     parse_indoor_cycling_title,
-    parse_steps_number,
-    transform_str_to_datetime,
-    transform_str_to_datetime_date_str,
 )
+from garmin.utils.misc import parse_steps_number
 from garmin.utils.pace_calculations import (
     transform_pace_to_pace_float,
     transform_pace_to_speed,
@@ -29,6 +27,10 @@ from garmin.utils.pace_calculations import (
 )
 from garmin.utils.pandas_helpers import filter_dataframe, read_file
 from garmin.utils.record_model import create_formatted_record_value
+from garmin.utils.time_utils import (
+    transform_str_to_datetime,
+    transform_str_to_datetime_date_str,
+)
 
 
 def load_activity_file(file: Path) -> DataFrame:

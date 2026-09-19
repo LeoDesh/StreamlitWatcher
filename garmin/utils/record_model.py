@@ -1,4 +1,4 @@
-from garmin.utils.misc import (
+from garmin.utils.duration_parsing import (
     transform_activity_minutes_to_duration_format,
     transform_activity_minutes_to_duration_minute_format,
 )

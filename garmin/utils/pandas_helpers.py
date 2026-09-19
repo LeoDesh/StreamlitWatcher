@@ -15,7 +15,10 @@ from pandas import (
     to_datetime,
 )
 
-from garmin.utils.misc import calculate_bins_from_min_max_value, calculate_ticker_values
+from garmin.utils.bucketing import (
+    calculate_bins_from_min_max_value,
+    calculate_ticker_values,
+)
 from garmin.utils.pace_calculations import transform_pace_float_to_pace
 
 

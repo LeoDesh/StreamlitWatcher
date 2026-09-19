@@ -1,11 +1,5 @@
-import math
 import re
 import tomllib
-from datetime import datetime
-
-from garmin.utils.time_utils import parse_date
-
-TIME_PATTERN = r"(\d{2}):([0-5]\d|60):([0-5]\d|60)(\.\d+)?"
 
 
 def parse_steps_number(value: str | int) -> int:
@@ -29,39 +23,6 @@ def find_regex_match(regex_pattern: str, target_str: str, idx: int = 0) -> str:
     return ""
 
 
-def calculate_bins_from_min_max_value(
-    min_value: float, max_value: float, number_of_bins: int
-) -> list[float]:
-    step = (max_value - min_value) / number_of_bins
-    return sorted({min_value + step * idx for idx in range(number_of_bins + 1)})
-
-
-def calculate_int_bins(min_value: int, max_value: int, bin_size: int) -> list[int]:
-    intervals = int(float(max_value - min_value) // bin_size)
-    return [min_value + bin_size * interval for interval in range(intervals + 2)]
-
-
-def calculate_ticker_values(values: list[float], max_numb: int = 7) -> list[float]:
-    sample_number = len(set(values))
-    number_of_bins = min(sample_number, max_numb)
-    min_val = min(values) * 0.98
-    max_val = max(values) * 1.02
-    return calculate_bins_from_min_max_value(min_val, max_val, number_of_bins)
-
-
-def verify_activity_duration(duration_str: str) -> bool:
-    if not get_all_regex_matches(TIME_PATTERN, duration_str):
-        return False
-    minutes = parse_minutes_from_activity_duration(duration_str)
-    seconds = parse_seconds_from_activity_duration(duration_str)
-    hundreth = find_regex_match(r"\.(\d+)", duration_str, 1)
-    hundreth = int(hundreth) if hundreth else 0
-    if minutes == 60 and seconds > 0:
-        return False
-    return not (seconds == 60 and hundreth > 0)
-    # 00:02:56.8
-
-
 def check_prettified(text: str) -> bool:
     text_parts = text.split(" ")
     return all(part == part.capitalize() for part in text_parts)
@@ -75,76 +36,12 @@ def prettify_by_sep(text: str, sep: str = "_") -> str:
     return " ".join(part.capitalize() for part in text.split(sep))
 
 
-def parse_activity_duration_to_minutes(duration_str: str) -> float:
-    if not verify_activity_duration(duration_str):
-        return 0.0
-    hours = parse_hours_from_activity_duration(duration_str)
-    minutes = parse_minutes_from_activity_duration(duration_str)
-    seconds = parse_seconds_from_activity_duration(duration_str)
-    return calculate_minutes(hours, minutes, seconds)
-
-
-def parse_activity_duration_to_hours(duration_str: str) -> float:
-    if not verify_activity_duration(duration_str):
-        return 0.0
-    hours = parse_hours_from_activity_duration(duration_str)
-    minutes = parse_minutes_from_activity_duration(duration_str)
-    seconds = parse_seconds_from_activity_duration(duration_str)
-    return calculate_hours(hours, minutes, seconds)
-
-
-def _parse_time_components_from_activity_duration(
-    duration_str: str, component_part: int
-) -> int:
-    regex_pattern = TIME_PATTERN
-    return int(find_regex_match(regex_pattern, duration_str, component_part))
-
-
-def parse_hours_from_activity_duration(duration_str: str) -> int:
-    return _parse_time_components_from_activity_duration(duration_str, 1)
-
-
-def parse_minutes_from_activity_duration(duration_str: str) -> int:
-    return _parse_time_components_from_activity_duration(duration_str, 2)
-
-
-def parse_seconds_from_activity_duration(duration_str: str) -> int:
-    return _parse_time_components_from_activity_duration(duration_str, 3)
-
-
 def calculate_minutes(hours: float, minutes: float, seconds: float) -> float:
     return round(hours * 60 + minutes + seconds / 60, 5)
 
 
 def calculate_hours(hours: float, minutes: float, seconds: float) -> float:
     return round(hours + minutes / 60 + seconds / 3600, 5)
-
-
-def transform_activity_minutes_to_duration_format(duration_in_minutes: float) -> str:
-    hours = int(duration_in_minutes // 60)
-    minutes = math.floor(duration_in_minutes - hours * 60)
-    seconds = int(round((duration_in_minutes - hours * 60 - minutes) * 60, 0))
-    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-
-
-def transform_activity_minutes_to_duration_minute_format(
-    duration_in_minutes: float,
-) -> str:
-    minutes = math.floor(duration_in_minutes)
-    seconds = math.floor((duration_in_minutes - minutes) * 60)
-    return f"{minutes:02d}:{seconds:02d}"
-
-
-def transform_str_to_datetime(
-    date_str: str, src_format: str = "%Y-%m-%d %H:%M:%S"
-) -> datetime:
-    if isinstance(date_str, datetime):
-        return date_str
-    return parse_date(date_str, src_format)
-
-
-def transform_str_to_datetime_date_str(date_str: str) -> datetime:
-    return transform_str_to_datetime(date_str, "%Y-%m-%d")
 
 
 def replace_comma_in_number(line: str) -> str:
@@ -154,12 +51,6 @@ def replace_comma_in_number(line: str) -> str:
         replacement_match = match.replace(",", "")
         line = line.replace(match, replacement_match)
     return line
-
-
-def parse_indoor_cycling_title(line: str) -> float | str:
-    pattern = r"(\d+([\.,]\s*\d+)?)\s*KM"
-    value = find_regex_match(pattern, line.upper(), 1)
-    return transform_str_to_float(value)
 
 
 def transform_str_to_float(value: str) -> float | str:
