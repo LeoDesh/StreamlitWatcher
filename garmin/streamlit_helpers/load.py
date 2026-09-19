@@ -1,8 +1,7 @@
-from pathlib import Path
-
 import streamlit as st
 from pandas import DataFrame
 
+from garmin.etl.config import ACTIVITY_FILE_PATH, RECORDS_DATA_FILE, STEPS_DATA_FILE
 from garmin.etl.load import (
     load_activity_file,
     load_records_file,
@@ -11,11 +10,6 @@ from garmin.etl.load import (
 )
 
 CACHE_KWARGS = {"ttl": 3600}
-DATA_PATH = Path("garmin/etl/data/")
-ARCHIVE_PATH = Path("garmin/etl/data/archive")
-ACTIVITY_FILE_PATH = DATA_PATH / "Activities.csv"
-RECORDS_DATA_FILE = DATA_PATH / "PersonalRecords.csv"
-STEPS_DATA_FILE = DATA_PATH / "Steps.csv"
 
 
 @st.cache_data(**CACHE_KWARGS)
