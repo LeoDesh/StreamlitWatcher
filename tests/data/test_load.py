@@ -1,19 +1,20 @@
 import pytest
+from pandas import DataFrame
+
 from garmin.etl.load import (
-    add_distance,
-    add_pace,
+    add_distance_to_indoor_cycling,
+    add_pace_to_indoor_cycling,
     load_activity_file,
-    rename_df_columns,
+    rename_activity_df_columns,
     transform_activity,
     transform_dataframe,
 )
-from pandas import DataFrame
 
 
 @pytest.mark.data
 def test_import_filter_columns_success(load_appropriate_garmin_df: DataFrame):
     df = load_appropriate_garmin_df
-    df = rename_df_columns(df)
+    df = rename_activity_df_columns(df)
     assert "average_pace" in df.columns
 
 
@@ -21,12 +22,12 @@ def test_import_filter_columns_success(load_appropriate_garmin_df: DataFrame):
 def test_import_filter_columns_fail(load_wrong_header_garmin_df: DataFrame):
     df = load_wrong_header_garmin_df
     with pytest.raises(KeyError):
-        df = rename_df_columns(df)
+        df = rename_activity_df_columns(df)
 
 
 @pytest.mark.data
 def test_transform_dataframe(load_appropriate_garmin_df):
-    df = rename_df_columns(load_appropriate_garmin_df)
+    df = rename_activity_df_columns(load_appropriate_garmin_df)
     df = transform_dataframe(df)
     additional_columns = [
         "hour",
@@ -79,7 +80,9 @@ def test_add_pace(
     time_in_hours: float,
     expected: str,
 ):
-    assert add_pace(activity, pace, distance, time_in_hours) == expected
+    assert (
+        add_pace_to_indoor_cycling(activity, pace, distance, time_in_hours) == expected
+    )
 
 
 @pytest.mark.data
@@ -94,4 +97,4 @@ def test_add_pace(
     ],
 )
 def test_add_distance(activity: str, title: str, distance: float, expected: float):
-    assert add_distance(activity, title, distance) == expected
+    assert add_distance_to_indoor_cycling(activity, title, distance) == expected

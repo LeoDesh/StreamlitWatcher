@@ -1,6 +1,5 @@
 import json
-from collections.abc import Callable
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -27,22 +26,19 @@ from garmin.utils.pace_calculations import (
 )
 from garmin.utils.pandas_helpers import filter_dataframe, read_file
 from garmin.utils.record_model import create_formatted_record_value
-from garmin.utils.time_utils import (
-    transform_str_to_datetime,
-    transform_str_to_datetime_date_str,
-)
+from garmin.utils.time_utils import parse_value_to_datetime
 
 
 def load_activity_file(file: Path) -> DataFrame:
     validate_csv_file(file)
     df = read_file(file)
-    df = rename_df_columns(df)
+    df = rename_activity_df_columns(df)
     return transform_dataframe(df)
 
 
 def load_running_data(file: Path) -> DataFrame:
     df = load_activity_file(file)
-    return filter_garmin_df(df)
+    return filter_valid_running_activities(df)
 
 
 def load_records_file(file: Path, activity_df: DataFrame) -> DataFrame:
@@ -60,7 +56,7 @@ def load_records_file(file: Path, activity_df: DataFrame) -> DataFrame:
 
 def load_steps_file(file: Path) -> DataFrame:
     df = read_file(file)
-    df = apply_date_transformation_date_format(df, "Date")
+    df = apply_date_transformation(df, "Date", "%Y-%m-%d")
     df["week"] = df["Date"].apply(
         lambda x: f"{x.isocalendar()[0]}_{x.isocalendar()[1]}"
     )
@@ -69,14 +65,14 @@ def load_steps_file(file: Path) -> DataFrame:
     return df
 
 
-def rename_df_columns(df: DataFrame) -> DataFrame:
+def rename_activity_df_columns(df: DataFrame) -> DataFrame:
     selected_columns = [col for col in GARMIN_COLUMNS]
     df = df[selected_columns].copy()
     df.columns = [str(GARMIN_COLUMNS[col]) for col in df.columns]
     return df
 
 
-def filter_garmin_df(df: DataFrame) -> DataFrame:
+def filter_valid_running_activities(df: DataFrame) -> DataFrame:
     df = df.copy()
     filter_mask = (
         (df["average_pace"] != "--")
@@ -99,13 +95,15 @@ def validate_valid_indoor_cycling(activity: str, title: str) -> bool:
     return activity == "Indoor Cycling" and "KM" in title.upper()
 
 
-def add_pace(activity: str, pace: str, distance: float, time_in_hours: float) -> str:
+def add_pace_to_indoor_cycling(
+    activity: str, pace: str, distance: float, time_in_hours: float
+) -> str:
     if activity == "Indoor Cycling" and distance > 0:
         return transform_speed_to_pace(distance / time_in_hours) if distance else pace
     return pace
 
 
-def add_distance(activity: str, title: str, distance: float) -> float:
+def add_distance_to_indoor_cycling(activity: str, title: str, distance: float) -> float:
     if validate_valid_indoor_cycling(activity, title):
         value = parse_indoor_cycling_title(title)
         return value if value else distance
@@ -113,9 +111,11 @@ def add_distance(activity: str, title: str, distance: float) -> float:
 
 
 def apply_date_transformation(
-    df: DataFrame, date_column: str, conversion_function: Callable[[str], datetime]
+    df: DataFrame, date_column: str, format: str
 ) -> DataFrame:
-    df[date_column] = df[date_column].apply(conversion_function)
+    df[date_column] = df[date_column].apply(
+        lambda x: parse_value_to_datetime(x, format)
+    )
     df["hour"] = df[date_column].apply(lambda x: x.hour)
     df["month"] = df[date_column].apply(lambda x: x.month)
     df["year"] = df[date_column].apply(lambda x: x.year)
@@ -123,20 +123,8 @@ def apply_date_transformation(
     return df
 
 
-def apply_date_transformation_datetime_format(
-    df: DataFrame, date_column: str
-) -> DataFrame:
-    return apply_date_transformation(df, date_column, transform_str_to_datetime)
-
-
-def apply_date_transformation_date_format(df: DataFrame, date_column: str) -> DataFrame:
-    return apply_date_transformation(
-        df, date_column, transform_str_to_datetime_date_str
-    )
-
-
 def transform_date_columns(df: DataFrame) -> DataFrame:
-    df = apply_date_transformation_datetime_format(df, "date")
+    df = apply_date_transformation(df, "date", "%Y-%m-%d %H:%M:%S")
     df["time_in_minutes"] = df["time"].apply(parse_activity_duration_to_minutes)
     df["time_in_hours"] = df["time"].apply(parse_activity_duration_to_hours)
     return df
@@ -152,7 +140,7 @@ def transform_activity_columns(df: DataFrame) -> DataFrame:
 
 def transform_distance_pace_columns(df: DataFrame) -> DataFrame:
     df["distance"] = df.apply(
-        lambda row: add_distance(
+        lambda row: add_distance_to_indoor_cycling(
             row["activity_type"],
             row["title"],
             row["distance"],
@@ -160,7 +148,7 @@ def transform_distance_pace_columns(df: DataFrame) -> DataFrame:
         axis=1,
     )
     df["average_pace"] = df.apply(
-        lambda row: add_pace(
+        lambda row: add_pace_to_indoor_cycling(
             row["activity_type"],
             row["average_pace"],
             row["distance"],

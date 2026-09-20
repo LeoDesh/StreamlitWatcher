@@ -9,23 +9,35 @@ from garmin.utils.time_utils import (
     get_current_year,
     get_first_of_given_year,
     get_month_previous_year,
-    transform_str_to_datetime,
+    parse_value_to_datetime,
 )
 
 
 @pytest.mark.time_utils
-def test_transform_str_to_datetime_correct_format():
+def test_parse_value_to_datetime_correct_format():
     date_str = "2025-05-03 18:05:04"
-    assert transform_str_to_datetime(date_str) == datetime(
+    assert parse_value_to_datetime(date_str) == datetime(
         2025, 5, 3, 18, 5, 4, tzinfo=ZoneInfo("UTC")
     )
 
 
 @pytest.mark.time_utils
-def test_transform_str_to_datetime_failure():
+def test_parse_value_to_datetime_failure():
     date_str = "2025.05.03 18:05:04"
     with pytest.raises(ValueError):
-        transform_str_to_datetime(date_str)
+        parse_value_to_datetime(date_str)
+
+
+@pytest.mark.time_utils
+def test_parse_value_to_datetime_datetime():
+    example_date = datetime(2025, 5, 3, 18, 5, 4, tzinfo=ZoneInfo("UTC"))
+    assert parse_value_to_datetime(example_date) == example_date
+
+
+@pytest.mark.time_utils
+def test_transform_str_to_datetim_date():
+    example_date = date(2025, 5, 3)
+    assert parse_value_to_datetime(example_date) == datetime(2025, 5, 3, 0, 0, 0)  # noqa: DTZ001
 
 
 @pytest.mark.time_utils

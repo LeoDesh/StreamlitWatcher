@@ -41,7 +41,7 @@ ACTIVITY_MAPPING = {
     "running": "Laufen",
     "cycling": "Radfahren",
 }
-CONFIG = {
+RECORD_TRANSLATION_CONFIG = {
     1: scale_minute,
     2: scale_minute,
     3: scale_minute,
@@ -61,8 +61,10 @@ ACTIVITY_COUNT_THRESHOLD = 50
 RECORD_CONFIG_FILE = DATA_PATH / "PersonalRecordsConfig.json"
 RECORD_DATA_FILE = DATA_PATH / "PersonalRecords.csv"
 
+### Activities
 
-def extract_data_from_entry(activity_entry: dict[str, Any]) -> dict[str, Any]:
+
+def translate_activity_line(activity_entry: dict[str, Any]) -> dict[str, Any]:
     activity_id = activity_entry["activityId"]
     name = activity_entry["activityName"]
     activity_time = activity_entry["startTimeLocal"]
@@ -95,12 +97,14 @@ def extract_data_from_entry(activity_entry: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def prepare_data(data: dict[str, Any]) -> DataFrame:
-    df_data = [extract_data_from_entry(line) for line in data]
-    return DataFrame(df_data)
+def refine_activities(activities: dict[str, Any]) -> DataFrame:
+    translated_activities = [
+        translate_activity_line(activity) for activity in activities
+    ]
+    return DataFrame(translated_activities)
 
 
-def archive_data(df: DataFrame) -> None:
+def archive_activities(df: DataFrame) -> None:
     date_stamp = get_current_date_str()
     filename = ARCHIVE_PATH / f"{date_stamp}_activities.csv"
     save_df_to_csv(df, filename)
@@ -108,29 +112,18 @@ def archive_data(df: DataFrame) -> None:
 
 def update_garmin_activities(client: DataClient) -> None:
     activities = client.get_activities(0, ACTIVITY_COUNT_THRESHOLD)
-    update_activities(activities)
+    extend_garmin_activities(activities)
 
 
-def convert_personal_records_to_csv(personal_records: dict[str, Any]) -> None:
-    mapping = load_json(RECORD_CONFIG_FILE)
-    converted_records = []
-    for record in personal_records:
-        record_id = record["typeId"]
-        record_type = mapping[str(record_id)]
-        value_converter = CONFIG[record_id]
-        value, unit = value_converter(record["value"])
-        converted_record = {
-            "Record": prettify_by_sep(record_type, "."),
-            "Date": convert_iso_format_to_date(
-                record["actStartDateTimeInGMTFormatted"]
-            ),
-            "Value": value,
-            "Unit": unit,
-            "ActivityID": record["activityId"],
-        }
-        converted_records.append(converted_record)
-    df = DataFrame(converted_records)
-    save_df_to_csv(df, RECORD_DATA_FILE)
+def extend_garmin_activities(activities: dict[str, Any]) -> None:
+    df = refine_activities(activities)
+    archive_activities(df)
+    current_activities_df = read_file(ACTIVITY_FILE_PATH)
+    updated_activities_df = extend_df_by_columns(current_activities_df, df)
+    save_df_to_csv(updated_activities_df, ACTIVITY_FILE_PATH)
+
+
+### Records
 
 
 def update_personal_records(client: DataClient) -> None:
@@ -138,12 +131,29 @@ def update_personal_records(client: DataClient) -> None:
     convert_personal_records_to_csv(personal_records)
 
 
-def update_activities(activities: dict[str, Any]) -> None:
-    df = prepare_data(activities)
-    archive_data(df)
-    current_activities_df = read_file(ACTIVITY_FILE_PATH)
-    updated_activities_df = extend_df_by_columns(current_activities_df, df)
-    save_df_to_csv(updated_activities_df, ACTIVITY_FILE_PATH)
+def translate_raw_record_data(
+    record: dict[str, Any], mapping: dict[str, str]
+) -> list[dict[str, Any]]:
+    record_id = record["typeId"]
+    record_type = mapping[str(record_id)]
+    value_converter = RECORD_TRANSLATION_CONFIG[record_id]
+    value, unit = value_converter(record["value"])
+    return {
+        "Record": prettify_by_sep(record_type, "."),
+        "Date": convert_iso_format_to_date(record["actStartDateTimeInGMTFormatted"]),
+        "Value": value,
+        "Unit": unit,
+        "ActivityID": record["activityId"],
+    }
+
+
+def convert_personal_records_to_csv(personal_records: list[dict[str, Any]]) -> None:
+    mapping = load_json(RECORD_CONFIG_FILE)
+    converted_records = [
+        translate_raw_record_data(record, mapping) for record in personal_records
+    ]
+    df = DataFrame(converted_records)
+    save_df_to_csv(df, RECORD_DATA_FILE)
 
 
 def refine_personal_record_mapping(
@@ -158,6 +168,9 @@ def refresh_personal_record_ids_mapping(client: DataClient) -> list[dict[str, An
     )
     refined_mapping = refine_personal_record_mapping(initial_mapping)
     save_dict_to_json(RECORD_CONFIG_FILE, refined_mapping)
+
+
+### Steps
 
 
 def get_daily_steps(
