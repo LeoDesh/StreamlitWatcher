@@ -12,7 +12,7 @@ from garmin.etl.config import (
     MIN_DISTANCE,
     MIN_YEAR,
 )
-from garmin.etl.verification import validate_csv_file
+from garmin.etl.verification import validate_activities_file
 from garmin.utils.duration_parsing import (
     parse_activity_duration_to_hours,
     parse_activity_duration_to_minutes,
@@ -30,7 +30,7 @@ from garmin.utils.time_utils import parse_value_to_datetime
 
 
 def load_activity_file(file: Path) -> DataFrame:
-    validate_csv_file(file)
+    validate_activities_file(file)
     df = read_file(file)
     df = rename_activity_df_columns(df)
     return transform_dataframe(df)

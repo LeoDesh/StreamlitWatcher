@@ -7,22 +7,24 @@ def validate_file_type(file: Path) -> bool:
     return file.suffix == ".csv"
 
 
-def validate_structure_of_csv_file(file: Path) -> bool:
+def validate_file_structure(file: Path) -> bool:
     with open(str(file), "r", encoding="utf-8") as f:
         lines = f.readlines()
         return analyze_lines(lines)
 
 
 def analyze_lines(lines: list[str], sep: str = ",") -> bool:
+    if not lines:
+        return False
     line_sizes = [len(list(line.split(sep))) for line in lines]
     return all(x == line_sizes[0] for x in line_sizes)
 
 
-def validate_csv_file(file: Path) -> bool:
+def validate_activities_file(file: Path) -> bool:
     validators = [
         (validate_file_type, "Wrong File Type"),
         (
-            validate_structure_of_csv_file,
+            validate_file_structure,
             "Not all Lines have the same elements, concerning the seperator ','.",
         ),
     ]

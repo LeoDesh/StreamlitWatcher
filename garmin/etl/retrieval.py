@@ -123,7 +123,7 @@ def extend_garmin_activities(activities: dict[str, Any]) -> None:
     save_df_to_csv(updated_activities_df, ACTIVITY_FILE_PATH)
 
 
-### Records
+### Personal Records
 
 
 def update_personal_records(client: DataClient) -> None:
