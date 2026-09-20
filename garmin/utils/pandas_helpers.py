@@ -94,7 +94,7 @@ def filter_dataframe(df: DataFrame, filter_kwargs: dict[str, Any]) -> DataFrame:
             mask &= df[col].isin(val)
         else:
             mask &= df[col] == val
-    return df[mask].copy()
+    return df[mask]
 
 
 def get_gantt_df(df: DataFrame, date_column: str) -> DataFrame:
@@ -144,7 +144,7 @@ def aggregrate_df_by_dict(
     return df.groupby(by=groupby_col, as_index=False).agg(**agg_dict)
 
 
-def update_data(df_existing: DataFrame, df_new: DataFrame) -> DataFrame:
+def extend_df_by_columns(df_existing: DataFrame, df_new: DataFrame) -> DataFrame:
     df_difference = df_new.merge(df_existing, how="left", indicator=True)
     df_difference = df_difference[df_difference["_merge"] == "left_only"].drop(
         columns="_merge"
@@ -152,7 +152,7 @@ def update_data(df_existing: DataFrame, df_new: DataFrame) -> DataFrame:
     return concat([df_difference, df_existing], ignore_index=True)
 
 
-def update_data_on_column(
+def extend_df_by_id(
     df_existing: DataFrame, df_new: DataFrame, column: str
 ) -> DataFrame:
     ids = df_new[column].tolist()

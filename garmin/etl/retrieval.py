@@ -25,10 +25,10 @@ from garmin.utils.pace_calculations import (
     transform_speed_to_pace,
 )
 from garmin.utils.pandas_helpers import (
+    extend_df_by_columns,
+    extend_df_by_id,
     read_file,
     save_df_to_csv,
-    update_data,
-    update_data_on_column,
 )
 from garmin.utils.time_utils import convert_iso_format_to_date, get_current_date_str
 
@@ -142,7 +142,7 @@ def update_activities(activities: dict[str, Any]) -> None:
     df = prepare_data(activities)
     archive_data(df)
     current_activities_df = read_file(ACTIVITY_FILE_PATH)
-    updated_activities_df = update_data(current_activities_df, df)
+    updated_activities_df = extend_df_by_columns(current_activities_df, df)
     save_df_to_csv(updated_activities_df, ACTIVITY_FILE_PATH)
 
 
@@ -186,5 +186,5 @@ def update_garmin_steps(garmin: DataClient) -> None:
         start = start_date.strftime("%Y-%m-%d")
     steps_data = get_daily_steps(garmin, start=start)
     new_steps_df = transform_daily_steps(steps_data)
-    df = update_data_on_column(new_steps_df, steps_df, "Date")
+    df = extend_df_by_id(new_steps_df, steps_df, "Date")
     save_df_to_csv(df, STEPS_DATA_FILE)

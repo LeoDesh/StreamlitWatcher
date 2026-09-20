@@ -1,7 +1,11 @@
 ### Changes
 
+#### 0.3.4 ToDo
+- refactoring remaining packages
+- test suite
+
 #### 0.3.3
-- refactoring functions
+- refactoring utils
 - breaking models apart
 - test suite expansion
 
