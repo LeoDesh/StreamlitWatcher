@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+
 from garmin.etl.load import read_file
 
 PATH_TO_CSV_FILES = Path("tests/data/files")

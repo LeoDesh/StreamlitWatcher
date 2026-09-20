@@ -9,21 +9,13 @@ def validate_file_type(file: Path) -> bool:
 
 def validate_structure_of_csv_file(file: Path) -> bool:
     with open(str(file), "r", encoding="utf-8") as f:
-        lines = [line for line in f]
-        if not check_for_valid_container(lines):
-            return False
+        lines = f.readlines()
         return analyze_lines(lines)
 
 
 def analyze_lines(lines: list[str], sep: str = ",") -> bool:
     line_sizes = [len(list(line.split(sep))) for line in lines]
     return all(x == line_sizes[0] for x in line_sizes)
-
-
-def check_for_valid_container(container: list | tuple | set) -> bool:
-    if not container:
-        return False
-    return isinstance(container, (list, tuple, set))
 
 
 def validate_csv_file(file: Path) -> bool:

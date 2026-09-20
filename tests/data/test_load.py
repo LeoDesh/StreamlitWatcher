@@ -11,21 +11,21 @@ from garmin.etl.load import (
 )
 
 
-@pytest.mark.data
+@pytest.mark.etl
 def test_import_filter_columns_success(load_appropriate_garmin_df: DataFrame):
     df = load_appropriate_garmin_df
     df = rename_activity_df_columns(df)
     assert "average_pace" in df.columns
 
 
-@pytest.mark.data
+@pytest.mark.etl
 def test_import_filter_columns_fail(load_wrong_header_garmin_df: DataFrame):
     df = load_wrong_header_garmin_df
     with pytest.raises(KeyError):
         df = rename_activity_df_columns(df)
 
 
-@pytest.mark.data
+@pytest.mark.etl
 def test_transform_dataframe(load_appropriate_garmin_df):
     df = rename_activity_df_columns(load_appropriate_garmin_df)
     df = transform_dataframe(df)
@@ -42,13 +42,13 @@ def test_transform_dataframe(load_appropriate_garmin_df):
         assert col in df.columns
 
 
-@pytest.mark.data
+@pytest.mark.etl
 def test_import_file_fail(get_missing_value_garmin_csv_file):
     with pytest.raises(ValueError):
         load_activity_file(get_missing_value_garmin_csv_file)
 
 
-@pytest.mark.data
+@pytest.mark.etl
 @pytest.mark.parametrize(
     "activity, title, expected",
     [
@@ -65,7 +65,7 @@ def test_transform_activity(activity: str, title: str, expected: str):
     assert transform_activity(activity, title) == expected
 
 
-@pytest.mark.data
+@pytest.mark.etl
 @pytest.mark.parametrize(
     "activity,pace,distance,time_in_hours,expected",
     [
@@ -85,7 +85,7 @@ def test_add_pace(
     )
 
 
-@pytest.mark.data
+@pytest.mark.etl
 @pytest.mark.parametrize(
     "activity,title,distance,expected",
     [

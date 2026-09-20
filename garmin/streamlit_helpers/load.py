@@ -1,8 +1,10 @@
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.etl.config import ACTIVITY_FILE_PATH, RECORDS_DATA_FILE, STEPS_DATA_FILE
-from garmin.etl.load import (
+from garmin.etl import (
+    ACTIVITY_FILE_PATH,
+    RECORDS_DATA_FILE,
+    STEPS_DATA_FILE,
     load_activity_file,
     load_records_file,
     load_running_data,
