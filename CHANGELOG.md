@@ -1,8 +1,13 @@
 ### Changes
 
-#### 0.3.4 ToDo
-- refactoring remaining packages
-- test suite
+#### 0.3.4
+
+- refactored navigation. path utilities moved to **utils package**
+- split streamlit_helpers.utils module into *components*,*model*,*navigation*
+- docstrings for navigation utilities with examples
+- renaming functions to better reflect their purpose
+- renamed tests to match app folders
+- extending test suite
 
 #### 0.3.3
 - refactoring utils

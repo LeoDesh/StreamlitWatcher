@@ -19,7 +19,7 @@ def get_year_overview_table(df: DataFrame) -> DataFrame:
     agg_dict = {
         "Distance": ("distance", "sum"),
         "Time": ("time_in_minutes", "sum"),
-        "Count": ("distance", "count"),
+        "Units": ("distance", "count"),
         "Average Time": ("time_in_minutes", "mean"),
         "Average Distance": ("distance", "mean"),
     }
@@ -48,7 +48,7 @@ def render_metrics(df: DataFrame) -> None:
     df = filter_dataframe(df, {"year": current_year})
     df_dict = df.to_dict(orient="records")[0]
     description_mapping = {
-        "Count": ("Total Runs", "Units"),
+        "Units": ("Total Runs", "Units"),
         "Distance": ("Distance Covered by Runs", "km"),
         "Time": ("Time Spent Running", "hours"),
     }
@@ -63,7 +63,7 @@ def render_metrics(df: DataFrame) -> None:
 
 def render_year_statistics(df: DataFrame) -> None:
     mapping = {
-        "Count": ("Total Runs", "%{y} Runs"),
+        "Units": ("Total Runs", "%{y} Runs"),
         "Distance": ("Distance Covered", "%{y} km covered "),
         "Time": ("Time Spent", "%{y} hours spent "),
         "Average Time": (
@@ -75,7 +75,7 @@ def render_year_statistics(df: DataFrame) -> None:
             "Average of %{y:.2f} km per run",
         ),
     }
-    construct_year_statistics(df, mapping, "Count")
+    construct_year_statistics(df, mapping, "Units")
 
 
 def main() -> None:
