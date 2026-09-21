@@ -5,12 +5,12 @@ from pandas import DataFrame
 
 from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
 from garmin.streamlit_helpers.load import load_activity_df
-from garmin.streamlit_helpers.utils import (
+from garmin.streamlit_helpers.model import (
     Metric,
-    breadcrumbs,
     create_metrics_container,
     stream_metrics,
 )
+from garmin.streamlit_helpers.nagivation import breadcrumbs
 from garmin.utils.pandas_helpers import (
     aggregate_df_named_column,
     filter_dataframe,

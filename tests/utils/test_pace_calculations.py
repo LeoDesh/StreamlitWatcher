@@ -62,6 +62,10 @@ def test_transform_speed_to_pace():
         ("14:53", True),
         ("04:53", True),
         ("a14:53", False),
+        ("79:42", False),
+        ("06:87", False),
+        ("00:00", True),
+        ("4:00", True),
     ],
 )
 def test_verify_pace_format_correct(pace_str: str, expected: bool):

@@ -1,17 +1,19 @@
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.streamlit_helpers.load import load_steps_df
-from garmin.streamlit_helpers.utils import (
-    GridConfig,
-    Metric,
-    breadcrumbs,
-    create_grid,
+from garmin.streamlit_helpers.components import (
     get_current_month_metric,
     render_monthly_progression,
     setup_heatmap,
+)
+from garmin.streamlit_helpers.load import load_steps_df
+from garmin.streamlit_helpers.model import (
+    GridConfig,
+    Metric,
+    create_grid,
     stream_metrics,
 )
+from garmin.streamlit_helpers.nagivation import breadcrumbs
 from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
 from garmin.utils.time_utils import get_current_year
 

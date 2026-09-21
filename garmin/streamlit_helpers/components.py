@@ -1,27 +1,11 @@
-from dataclasses import asdict, dataclass
 from datetime import date, timedelta
-from pathlib import Path
-from typing import Any
 
 import streamlit as st
 from pandas import DataFrame
-from streamlit import page_link
-from streamlit.delta_generator import DeltaGenerator
-from streamlit.navigation.page import StreamlitPage
 
-from garmin.charts.tools import (
-    create_bar_chart,
-    create_heat_map_monthly_axis,
-)
+from garmin.charts.tools import create_bar_chart, create_heat_map_monthly_axis
 from garmin.etl import MIN_YEAR
-from garmin.streamlit_helpers.config import VIEW_FOLDER, Icons
-from garmin.streamlit_helpers.model import GridConfig
-from garmin.streamlit_helpers.nagivation import (
-    generate_page_from_file_path,
-    get_homepage,
-    get_page_part,
-    look_for_file_in_folder,
-)
+from garmin.streamlit_helpers.model import Metric
 from garmin.utils.misc import compute_delta, prettify
 from garmin.utils.pandas_helpers import generate_dates_df
 from garmin.utils.time_utils import (
@@ -31,37 +15,6 @@ from garmin.utils.time_utils import (
     get_last_day_of_date,
     get_month_previous_year,
 )
-
-
-@dataclass
-class Metric:
-    label: str
-    value: Any
-    delta: Any | None = None
-    help: str | None = None
-
-    def render_metric(self) -> None:
-        return st.metric(**asdict(self))
-
-
-def stream_metrics(
-    metrics: list[Metric], *, num_cols: int = 4, border: bool = False
-) -> None:
-    with st.container(border=border):
-        cols = st.columns(num_cols)
-        for idx, metric in enumerate(metrics):
-            col_idx = idx % num_cols
-            with cols[col_idx]:
-                metric.render_metric()
-
-
-def create_metrics_container(header: str, data: dict[str, str]) -> None:
-    with st.container(border=True, horizontal_alignment="center"):
-        st.header(header)
-        metrics = [
-            Metric(label=prettify(label), value=value) for label, value in data.items()
-        ]
-        stream_metrics(metrics, num_cols=len(metrics))
 
 
 def time_options_provider() -> tuple[date, date]:
@@ -163,18 +116,6 @@ def setup_heatmap(df: DataFrame, target_column: str, unit: str = "") -> None:
     st.plotly_chart(fig, width="stretch")
 
 
-def create_grid(grid_config: list[GridConfig]) -> list[list[DeltaGenerator]]:
-    grid_layout = []
-    for config in grid_config:
-        cols_config = st.columns(config.columns, gap=config.gap)
-        containers = [
-            col.container(border=config.has_border, height=config.height)
-            for col in cols_config
-        ]
-        grid_layout.append(containers)
-    return grid_layout
-
-
 def get_current_month_metric(
     df: DataFrame, column: str, format: str, unit: str
 ) -> Metric:
@@ -192,47 +133,3 @@ def get_current_month_metric(
         delta=f"{delta} %",
         help=f"Comparison with {previous_year_month.strftime('%b, %Y')}",
     )
-
-
-def get_file_references(file_path: Path) -> list[StreamlitPage]:
-    page_part = get_page_part(file_path)
-    parent_folder = file_path.parent
-    file_stem = file_path.stem
-    file_parts = [
-        part
-        for part in file_stem.split("__")
-        if not (part.isdigit() or part == page_part)
-    ]
-    return [
-        generate_page_from_file_path(
-            look_for_file_in_folder(parent_folder, file_part), parent_folder.stem
-        )
-        for file_part in file_parts
-        if look_for_file_in_folder(parent_folder, file_part)
-    ]
-
-
-def get_file_path(file_dunder: str) -> Path:
-    path = Path(file_dunder).resolve()
-    parts = path.parts
-    view_folder_name = VIEW_FOLDER.name
-    parent_folder_name = VIEW_FOLDER.parent.name
-    if view_folder_name in parts and parent_folder_name in parts:
-        idx = parts.index(parent_folder_name)
-        return Path(*parts[idx:])
-    return path
-
-
-def breadcrumbs(file_dunder: str) -> None:
-    file_path = get_file_path(file_dunder)
-    with st.container(horizontal=True, vertical_alignment="center"):
-        home_page = get_homepage()
-        page_link(home_page, label="Home")
-        st.markdown(Icons.ARROW_RIGHT, width="content")
-        file_references = get_file_references(file_path)
-        for reference_page in file_references:
-            page_link(reference_page)
-            st.markdown(Icons.ARROW_RIGHT, width="content")
-        page_part = get_page_part(file_path)
-        current_page_name = " ".join(prettify(part) for part in page_part.split("_"))
-        st.markdown(f"**{current_page_name}**")

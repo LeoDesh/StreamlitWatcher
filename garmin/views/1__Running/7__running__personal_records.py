@@ -5,7 +5,8 @@ from pandas import DataFrame
 
 from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
 from garmin.streamlit_helpers.load import load_records_df
-from garmin.streamlit_helpers.utils import breadcrumbs, create_metrics_container
+from garmin.streamlit_helpers.model import create_metrics_container
+from garmin.streamlit_helpers.nagivation import breadcrumbs
 
 
 def construct_activity_header(activity: dict[str, Any]) -> str:

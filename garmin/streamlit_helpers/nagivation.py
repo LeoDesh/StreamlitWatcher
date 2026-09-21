@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import streamlit as st
+from streamlit import page_link
 from streamlit.navigation.page import StreamlitPage
 
 from garmin.streamlit_helpers.config import (
@@ -16,38 +17,15 @@ from garmin.streamlit_helpers.constants import (
     IMAGE_TRANSPARENT_PATH,
 )
 from garmin.streamlit_helpers.load import load_activity_df, load_running_df
-
-
-def split_page_name(file_name: str) -> tuple[int, str]:
-    idx, *_, page_name = file_name.split("__")
-    return (int(idx), page_name)
-
-
-def look_for_file_in_folder(folder: Path, file_stem: str) -> Path | None:
-    for file in folder.iterdir():
-        file_name_suffix = file.stem.split("__")[-1]
-        if file_name_suffix == file_stem and file.suffix == ".py":
-            return file
-    return None
-
-
-def get_page_part(file_path: Path) -> str:
-    return file_path.stem.split("__")[-1]
-
-
-def get_folders(path: Path) -> list[Path]:
-    return [folder for folder in path.iterdir() if folder.is_dir()]
-
-
-def get_section_folder_mapping() -> dict[str, Path]:
-    folder_dict = {}
-    for folder_path in get_folders(VIEW_FOLDER):
-        idx, section_name = split_page_name(folder_path.name)
-        folder_dict[idx] = (section_name, folder_path)
-    sorted_folder_dict = dict(sorted(folder_dict.items()))
-    return {
-        section_name: folder for (section_name, folder) in sorted_folder_dict.values()
-    }
+from garmin.utils.misc import prettify
+from garmin.utils.path_utils import (
+    extract_order_number_from_page,
+    get_page_part,
+    get_relative_file_path,
+    get_section_folder_mapping,
+    look_for_file_in_folder,
+    split_page_name,
+)
 
 
 def generate_page_from_file_path(file: Path, parent_folder: str = "") -> StreamlitPage:
@@ -63,11 +41,6 @@ def generate_page_from_file_path(file: Path, parent_folder: str = "") -> Streaml
         "url_path": str(file).replace("/", "-"),
     }
     return st.Page(**config)
-
-
-def extract_order_number_from_page(file: Path) -> int:
-    index, *_ = file.stem.split("__")
-    return int(index)
 
 
 def get_pages(path: Path) -> list[StreamlitPage]:
@@ -92,7 +65,7 @@ def get_homepage() -> StreamlitPage:
 
 
 def get_page_mapping() -> dict[str, list[StreamlitPage]]:
-    page_layout = get_section_folder_mapping()
+    page_layout = get_section_folder_mapping(VIEW_FOLDER)
     return {"": [get_homepage()]} | {
         section: get_pages(folder_path) for section, folder_path in page_layout.items()
     }
@@ -109,6 +82,57 @@ def get_navigation() -> StreamlitPage:
     page_mapping = get_page_mapping()
     streamlit_pages = prettify_page_mapping(page_mapping)
     return st.navigation(streamlit_pages, position="top")
+
+
+def get_file_references(file_path: Path) -> list[StreamlitPage]:
+    """Breaks up the file name in parts and generates pages from it.
+    Args:
+        file_path (Path): Path for streamlit page
+
+    Returns:
+        list[StreamlitPage]: pages associated with the provided path.
+
+    Example:
+    ```
+    #### 1__running/1__running__distance.py
+
+    Page Name: distance
+
+    Another File Part: 'running', which is also in the same folder.
+
+    Therefore Returns: [StreamlitPage of '1__running.py']
+    ```
+    """
+    page_part = get_page_part(file_path)
+    parent_folder = file_path.parent
+    file_stem = file_path.stem
+    file_parts = [
+        part
+        for part in file_stem.split("__")
+        if not (part.isdigit() or part == page_part)
+    ]
+    return [
+        generate_page_from_file_path(
+            look_for_file_in_folder(parent_folder, file_part), parent_folder.stem
+        )
+        for file_part in file_parts
+        if look_for_file_in_folder(parent_folder, file_part)
+    ]
+
+
+def breadcrumbs(file_dunder: str) -> None:
+    file_path = get_relative_file_path(file_dunder, VIEW_FOLDER)
+    with st.container(horizontal=True, vertical_alignment="center"):
+        home_page = get_homepage()
+        page_link(home_page, label="Home")
+        st.markdown(Icons.ARROW_RIGHT, width="content")
+        file_references = get_file_references(file_path)
+        for reference_page in file_references:
+            page_link(reference_page)
+            st.markdown(Icons.ARROW_RIGHT, width="content")
+        page_part = get_page_part(file_path)
+        current_page_name = " ".join(prettify(part) for part in page_part.split("_"))
+        st.markdown(f"**{current_page_name}**")
 
 
 def render_logo() -> None:

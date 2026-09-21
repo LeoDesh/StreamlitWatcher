@@ -5,17 +5,19 @@ import streamlit as st
 from pandas import DataFrame, cut
 
 from garmin.charts.tools import create_histogram
-from garmin.streamlit_helpers.load import load_running_df
-from garmin.streamlit_helpers.model import GridConfig
-from garmin.streamlit_helpers.utils import (
-    Metric,
-    breadcrumbs,
-    create_grid,
+from garmin.streamlit_helpers.components import (
     get_current_month_metric,
     render_monthly_progression,
     setup_heatmap,
+)
+from garmin.streamlit_helpers.load import load_running_df
+from garmin.streamlit_helpers.model import (
+    GridConfig,
+    Metric,
+    create_grid,
     stream_metrics,
 )
+from garmin.streamlit_helpers.nagivation import breadcrumbs
 from garmin.utils.bucketing import create_bins_by_bounds
 from garmin.utils.misc import compute_delta, create_label_pairs_from_values
 from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe

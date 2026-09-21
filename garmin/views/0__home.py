@@ -6,8 +6,8 @@ from garmin.streamlit_helpers.load import (
     load_running_df,
     load_steps_df,
 )
+from garmin.streamlit_helpers.model import Metric, stream_metrics
 from garmin.streamlit_helpers.nagivation import get_page_mapping, prettify_section
-from garmin.streamlit_helpers.utils import Metric, stream_metrics
 from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
 from garmin.utils.time_utils import get_current_year
 

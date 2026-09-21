@@ -3,7 +3,8 @@ from pandas import DataFrame
 
 from garmin.charts.tools import create_box_plot_chart
 from garmin.streamlit_helpers.load import load_running_df
-from garmin.streamlit_helpers.utils import Metric, breadcrumbs, stream_metrics
+from garmin.streamlit_helpers.model import Metric, stream_metrics
+from garmin.streamlit_helpers.nagivation import breadcrumbs
 from garmin.utils.misc import prettify
 from garmin.utils.pace_calculations import (
     transform_seconds_to_hour_minutes_seconds_format,

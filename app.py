@@ -4,7 +4,12 @@ from garmin.streamlit_helpers.nagivation import (
     render_logo,
 )
 
-render_logo()
-define_sidebar()
-nav = get_navigation()
-nav.run()
+
+def run_app():
+    render_logo()
+    define_sidebar()
+    nav = get_navigation()
+    nav.run()
+
+
+run_app()

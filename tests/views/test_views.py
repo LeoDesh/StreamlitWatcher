@@ -1,7 +1,8 @@
 import pytest
 from streamlit.testing.v1 import AppTest
 
-from garmin.streamlit_helpers.nagivation import VIEW_FOLDER, get_folders
+from garmin.streamlit_helpers.nagivation import VIEW_FOLDER
+from garmin.utils.path_utils import get_folders
 
 FOLDERS = [VIEW_FOLDER, *get_folders(VIEW_FOLDER)]
 page_files = [str(p) for folder in FOLDERS for p in folder.glob("*.py")]

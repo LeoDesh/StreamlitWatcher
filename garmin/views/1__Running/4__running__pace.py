@@ -11,15 +11,15 @@ from garmin.charts.tools import (
     create_pace_chart,
     get_empty_figure,
 )
+from garmin.streamlit_helpers.components import time_options_provider
 from garmin.streamlit_helpers.load import load_running_df
-from garmin.streamlit_helpers.utils import (
+from garmin.streamlit_helpers.model import (
     GridConfig,
     Metric,
-    breadcrumbs,
     create_grid,
     stream_metrics,
-    time_options_provider,
 )
+from garmin.streamlit_helpers.nagivation import breadcrumbs
 from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
 from garmin.utils.pandas_helpers import (
     categorize_df_column,

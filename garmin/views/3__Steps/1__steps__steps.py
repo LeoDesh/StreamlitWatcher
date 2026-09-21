@@ -1,13 +1,10 @@
 import streamlit as st
 from pandas import DataFrame
 
+from garmin.streamlit_helpers.components import construct_year_statistics
 from garmin.streamlit_helpers.load import load_steps_df
-from garmin.streamlit_helpers.utils import (
-    Metric,
-    breadcrumbs,
-    construct_year_statistics,
-    stream_metrics,
-)
+from garmin.streamlit_helpers.model import Metric, stream_metrics
+from garmin.streamlit_helpers.nagivation import breadcrumbs
 from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
 from garmin.utils.time_utils import get_current_year
 
