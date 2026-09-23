@@ -28,3 +28,26 @@ def mock_get_current_date(monkeypatch):
 @pytest.fixture(scope="session")
 def get_test_data() -> DataFrame:
     return read_file(Path("tests/utils/test_data.csv"))
+
+
+@pytest.fixture
+def get_test_path(tmp_path) -> Path:
+    """Creates a folder structure simulating the view"""
+    outside_dir = tmp_path / "outside"
+    base_dir = tmp_path / "views"
+    running_dir = base_dir / "1__Running"
+    steps_dir = base_dir / "2__Steps"
+    folders = [outside_dir, base_dir, running_dir, steps_dir]
+    for folder in folders:
+        folder.mkdir()
+
+    # 2. Populate files
+    (running_dir / "1__running.py").touch()
+    (running_dir / "2__running__distance.py").touch()
+    (running_dir / "3__pace.py").touch()
+    (outside_dir / "4_test.py").touch()
+    (outside_dir / "utils.py").touch()
+    (base_dir / "1__t.txt").touch()
+    (outside_dir / "x__t.txt").touch()
+
+    return tmp_path

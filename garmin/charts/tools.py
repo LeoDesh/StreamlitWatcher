@@ -143,7 +143,7 @@ def create_heat_map(
     columns_name = prettify(df.columns.name)
     fig = px.imshow(
         df,
-        color_continuous_scale="Viridis",
+        color_continuous_scale="Blues",
         text_auto=True,
         aspect="auto",
     )

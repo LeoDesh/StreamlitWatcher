@@ -1,5 +1,10 @@
 ### Changes
 
+#### 0.3.5
+
+- heatmap color scale change
+- path utils tests implemented
+
 #### 0.3.4
 
 - refactored navigation. path utilities moved to **utils package**

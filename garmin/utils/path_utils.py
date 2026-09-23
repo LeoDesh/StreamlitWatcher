@@ -69,7 +69,8 @@ def get_section_folder_mapping(view_folder: Path) -> dict[str, Path]:
         folder_dict[idx] = (section_name, folder_path)
     sorted_folder_dict = dict(sorted(folder_dict.items()))
     return {
-        section_name: folder for (section_name, folder) in sorted_folder_dict.values()
+        section_name: folder_path
+        for (section_name, folder_path) in sorted_folder_dict.values()
     }
 
 
