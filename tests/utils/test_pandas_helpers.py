@@ -36,8 +36,8 @@ def test_aggregate_df_named_column(get_test_data: DataFrame):
     )
     assert list(df.columns) == ["Datum", "Anzahl"]
     assert len(df) == 2
-    _, umsatz = df.loc[0, :]
-    assert umsatz == 10
+    _, revenue = df.loc[0, :]
+    assert revenue == 10
 
 
 @pytest.mark.pandas_helpers
@@ -45,12 +45,14 @@ def test_aggregrate_df_by_dict(get_test_data: DataFrame):
     df = get_test_data.copy()
     filters = {"Datum": ["2026-01-01", "2026-01-02"]}
     df = filter_dataframe(df, filters)
-    agg_dict = {"Umsatz": ("Umsatz", "sum")}
-    df = aggregrate_df_by_dict(df, groupby_col="Datum", agg_dict=agg_dict)
+    aggregation_mapping = {"Umsatz": ("Umsatz", "sum")}
+    df = aggregrate_df_by_dict(
+        df, groupby_col="Datum", aggregation_mapping=aggregation_mapping
+    )
     assert list(df.columns) == ["Datum", "Umsatz"]
     assert len(df) == 2
-    _, umsatz = df.loc[0, :]
-    assert umsatz == 31460.95
+    _, revenue = df.loc[0, :]
+    assert revenue == 31460.95
 
 
 @pytest.mark.pandas_helpers

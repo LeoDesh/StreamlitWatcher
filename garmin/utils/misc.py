@@ -1,6 +1,7 @@
 import re
 import tomllib
 from itertools import pairwise
+from typing import Any
 
 
 def parse_steps_number(value: str | int) -> int:
@@ -71,6 +72,10 @@ def compute_delta(src: float, trg: float) -> float:
     if trg:
         return 100
     return 0
+
+
+def filter_mapping(data: dict[str, Any], filter_columns: list[str]) -> dict[str, Any]:
+    return {key: value for key, value in data.items() if key in filter_columns}
 
 
 def create_label_pairs_from_values(

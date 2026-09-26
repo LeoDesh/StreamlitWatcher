@@ -1,4 +1,5 @@
 from contextlib import AbstractContextManager, nullcontext
+from typing import Any
 
 import pytest
 
@@ -6,6 +7,7 @@ from garmin.utils.misc import (
     calculate_minutes,
     check_prettified,
     compute_delta,
+    filter_mapping,
     find_regex_match,
     get_all_regex_matches,
     parse_steps_number,
@@ -152,3 +154,19 @@ def test_prettify_by_sep(txt: str, sep: str, expected: str):
 )
 def test_prettify(txt: str, expected: bool):
     assert prettify(txt) == expected
+
+
+@pytest.mark.misc
+@pytest.mark.parametrize(
+    "data,columns,expected",
+    [
+        ({}, [], {}),
+        ({"Activity": "Running", "Time": "45"}, [], {}),
+        ({"Activity": "Running", "Time": "45"}, ["Activity"], {"Activity": "Running"}),
+        ({"Activity": "Running", "Time": "45"}, [1], {}),
+    ],
+)
+def test_filter_mapping(
+    data: dict[str, Any], columns: list[str], expected: dict[str, Any]
+):
+    assert filter_mapping(data, columns) == expected

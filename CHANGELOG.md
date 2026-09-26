@@ -4,6 +4,9 @@
 
 - heatmap color scale change
 - path utils tests implemented
+- consistent naming of variables
+- refactoring
+- additional tests
 
 #### 0.3.4
 

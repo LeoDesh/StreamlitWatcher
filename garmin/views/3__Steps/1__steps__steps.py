@@ -10,7 +10,7 @@ from garmin.utils.time_utils import get_current_year
 
 
 def get_year_overview_table(df: DataFrame) -> DataFrame:
-    agg_dict = {
+    aggregation_mapping = {
         "Distance": ("Distance", "sum"),
         "Steps": ("Steps", "sum"),
         "Daily Steps": ("Steps", "mean"),
@@ -18,7 +18,7 @@ def get_year_overview_table(df: DataFrame) -> DataFrame:
         "Goal Reached": ("goal_reached", "sum"),
         "Daily Goal": ("Goal", "mean"),
     }
-    df = aggregrate_df_by_dict(df, "year", agg_dict)
+    df = aggregrate_df_by_dict(df, "year", aggregation_mapping)
     df["Distance"] = df["Distance"] / 1000
     df["Goal Conversion"] = df["Goal Reached"] / df["Total"]
     df["Goal Conversion"] = df["Goal Conversion"].apply(lambda x: round(x * 100, 2))

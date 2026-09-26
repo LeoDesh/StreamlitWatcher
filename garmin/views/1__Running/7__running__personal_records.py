@@ -7,6 +7,7 @@ from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
 from garmin.streamlit_helpers.load import load_records_df
 from garmin.streamlit_helpers.model import create_metrics_container
 from garmin.streamlit_helpers.nagivation import breadcrumbs
+from garmin.utils.misc import filter_mapping
 
 
 def construct_activity_header(activity: dict[str, Any]) -> str:
@@ -19,11 +20,7 @@ def show_records(df: DataFrame) -> None:
     activity_records = df.to_dict(orient="records")
     for activity in activity_records:
         activity_title = construct_activity_header(activity)
-        activity = {
-            attr: value
-            for attr, value in activity.items()
-            if attr in ACTIVITY_ATTR_COLUMNS
-        }
+        activity = filter_mapping(activity, ACTIVITY_ATTR_COLUMNS)
         create_metrics_container(activity_title, activity)
 
 

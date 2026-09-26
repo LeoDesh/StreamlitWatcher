@@ -13,16 +13,19 @@ from garmin.utils.bucketing import (
 
 @pytest.mark.bucketing
 @pytest.mark.parametrize(
-    "start,step,interval,expected",
+    "start,step,intervals,expected",
     [
         (1, 2, 4, list(range(1, 11, 2))),
         (1, 1, 0, [1, 2]),
         (1, 1, 4, list(range(1, 6, 1))),
         (1, 1.5, 4, [1, 2.5, 4, 5.5, 7.0]),
+        (1, 0, 3, [1]),
+        (1, 4, 0, [1, 5]),
+        (1, 4, 1, [1, 5]),
     ],
 )
-def test_build_bins(start: int, step: int, interval: int, expected: list[int]) -> None:
-    assert build_bins(start, step, interval) == expected
+def test_build_bins(start: int, step: int, intervals: int, expected: list[int]) -> None:
+    assert build_bins(start, step, intervals) == expected
 
 
 @pytest.mark.bucketing
@@ -60,24 +63,29 @@ def test_calculate_bins_by_size(
 
 @pytest.mark.bucketing
 @pytest.mark.parametrize(
-    "min_value,max_value,number_of_bins,enhancer,interval_start,interval_end,context",
+    "min_value,max_value,number_of_bins,bin_size,enhancer,interval_start,interval_end,context",
     [
-        (1, 10, 1, 0.5, 1, 10, nullcontext()),
-        (5.0, 10.0, 5, 0.5, 2.5, 15.0, nullcontext()),
-        (5.0, 10.0, None, 0.5, 2.5, 15.0, pytest.raises(ValueError)),
+        (1, 10, 1, None, 0.5, 1, 10, nullcontext()),
+        (5.0, 10.0, 5, None, 0.5, 2.5, 15.0, nullcontext()),
+        (0.0, 10.0, None, 1, 0.5, 0, 15.0, nullcontext()),
+        (0, 10.0, None, 1, -0.5, 0, 15.0, pytest.raises(ValueError)),
+        (5.0, 10.0, None, None, 0.5, 2.5, 15.0, pytest.raises(ValueError)),
     ],
 )
 def test_bin_planer_initialization(
     min_value: float,
     max_value: float,
     number_of_bins: int,
+    bin_size: float,
     enhancer: float,
     interval_start: float,
     interval_end: float,
     context: AbstractContextManager,
 ):
     with context:
-        bin_planer = BinPlaner(min_value, max_value, number_of_bins, enhancer=enhancer)
+        bin_planer = BinPlaner(
+            min_value, max_value, number_of_bins, bin_size, enhancer=enhancer
+        )
         assert bin_planer.interval_start == interval_start
         assert bin_planer.interval_end == interval_end
 

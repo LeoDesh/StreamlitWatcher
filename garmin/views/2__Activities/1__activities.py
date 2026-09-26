@@ -11,6 +11,7 @@ from garmin.streamlit_helpers.model import (
     stream_metrics,
 )
 from garmin.streamlit_helpers.nagivation import breadcrumbs
+from garmin.utils.misc import filter_mapping
 from garmin.utils.pandas_helpers import (
     aggregate_df_named_column,
     filter_dataframe,
@@ -42,11 +43,7 @@ def show_latest_activities(df: DataFrame, rows: int = 20) -> None:
         clean_up_dict(activity)
         activity_title = construct_activity_header(activity)
         header = f"{idx + 1}: {activity_title}"
-        activity = {
-            attr: value
-            for attr, value in activity.items()
-            if attr in ACTIVITY_ATTR_COLUMNS
-        }
+        activity = filter_mapping(activity, ACTIVITY_ATTR_COLUMNS)
         create_metrics_container(header, activity)
 
 

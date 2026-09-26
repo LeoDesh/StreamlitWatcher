@@ -90,7 +90,7 @@ def render_distance_metrics(df: DataFrame) -> None:
     stream_metrics([month_metric, year_metric, latest_run_metric])
 
 
-def get_latest_run(df: DataFrame) -> tuple[date, float]:
+def get_date_distance_of_last_run(df: DataFrame) -> tuple[date, float]:
     df = df.copy().sort_values(by="date", ascending=False)
     run_date, distance = df.loc[0, ["date", "distance"]]
     return (run_date.date(), distance)
@@ -104,7 +104,7 @@ def render_run_metric(run_date: date, distance: float) -> Metric:
 
 
 def render_latest_run_metric(df: DataFrame) -> Metric:
-    run_time, distance = get_latest_run(df)
+    run_time, distance = get_date_distance_of_last_run(df)
     return render_run_metric(run_time, distance)
 
 

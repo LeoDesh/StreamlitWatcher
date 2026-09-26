@@ -131,17 +131,17 @@ def aggregate_df_named_column(
     sort_asc: bool | None = None,
 ) -> DataFrame:
     col_name = col_name if col_name else value_col
-    agg_dict = {col_name: (value_col, agg_func)}
-    df = aggregrate_df_by_dict(df, groupby_col, agg_dict)
+    aggregation_mapping = {col_name: (value_col, agg_func)}
+    df = aggregrate_df_by_dict(df, groupby_col, aggregation_mapping)
     return df if sort_asc is None else df.sort_values(by=col_name, ascending=sort_asc)
 
 
 def aggregrate_df_by_dict(
     df: DataFrame,
     groupby_col: str,
-    agg_dict: dict[str, tuple[str, str]],
+    aggregation_mapping: dict[str, tuple[str, str]],
 ) -> DataFrame:
-    return df.groupby(by=groupby_col, as_index=False).agg(**agg_dict)
+    return df.groupby(by=groupby_col, as_index=False).agg(**aggregation_mapping)
 
 
 def extend_df_by_columns(base_df: DataFrame, current_df: DataFrame) -> DataFrame:

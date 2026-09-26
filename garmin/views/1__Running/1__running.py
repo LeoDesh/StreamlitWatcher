@@ -11,19 +11,20 @@ from garmin.streamlit_helpers.model import (
     stream_metrics,
 )
 from garmin.streamlit_helpers.nagivation import breadcrumbs
+from garmin.utils.misc import filter_mapping
 from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
 from garmin.utils.time_utils import get_current_year
 
 
 def get_year_overview_table(df: DataFrame) -> DataFrame:
-    agg_dict = {
+    aggregation_mapping = {
         "Distance": ("distance", "sum"),
         "Time": ("time_in_minutes", "sum"),
         "Units": ("distance", "count"),
         "Average Time": ("time_in_minutes", "mean"),
         "Average Distance": ("distance", "mean"),
     }
-    df = aggregrate_df_by_dict(df, "year", agg_dict)
+    df = aggregrate_df_by_dict(df, "year", aggregation_mapping)
     df["Time"] = df["Time"].apply(lambda x: round(x / 60, 2))
     return df
 
@@ -34,11 +35,7 @@ def construct_column_highlights(df: DataFrame, column: str, amount: int = 3) -> 
     activity_records = df.to_dict(orient="records")
     for activity in activity_records:
         date_str = f"{activity['date'].strftime('%d.%m.%Y')}"
-        activity = {
-            attr: value
-            for attr, value in activity.items()
-            if attr in ACTIVITY_ATTR_COLUMNS
-        }
+        activity = filter_mapping(activity, ACTIVITY_ATTR_COLUMNS)
         create_metrics_container(date_str, activity)
 
 

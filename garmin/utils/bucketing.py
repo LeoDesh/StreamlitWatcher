@@ -17,8 +17,8 @@ class BinPlaner[T]:
     enhancer: float = 0.02
 
     def __post_init__(self) -> None:
-        self._set_values()
         self._validate_inputs()
+        self._set_values()
 
     def determine_strategy(self) -> BinStrategy:
         if self.number_of_bins is not None and self.bin_size is not None:
@@ -31,6 +31,8 @@ class BinPlaner[T]:
     def _validate_inputs(self) -> None:
         if self.number_of_bins is None and self.bin_size is None:
             raise ValueError("Either Number of Bins or Bin Size must be set.")
+        if self.enhancer < 0:
+            raise ValueError(f"Enhancer must be positive ({self.enhancer})")
 
     def _set_values(self) -> None:
         self.enhancer = self.enhancer if not isinstance(self.min_value, int) else 0
@@ -67,8 +69,8 @@ def calculate_bins_by_number(
 def build_bins[T](start: T, step: T, intervals: int) -> list[T]:
     return (
         [start + step * interval for interval in range(intervals + 1)]
-        if intervals > 0
-        else [start, start + step]
+        if intervals > 0 and step > 0
+        else list({start, start + step})
     )
 
 

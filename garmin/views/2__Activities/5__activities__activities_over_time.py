@@ -63,7 +63,6 @@ def get_gantt_filters(df: DataFrame) -> dict[str, Any]:
         label="Year Selection",
         options=values,
         default=values[0],
-        # label_visibility="hidden",
     )
     return {"year": years}
 
