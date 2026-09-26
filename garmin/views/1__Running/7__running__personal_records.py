@@ -16,8 +16,8 @@ def construct_activity_header(activity: dict[str, Any]) -> str:
 
 
 def show_records(df: DataFrame) -> None:
-    df_dict = df.to_dict(orient="records")
-    for activity in df_dict:
+    activity_records = df.to_dict(orient="records")
+    for activity in activity_records:
         activity_title = construct_activity_header(activity)
         activity = {
             attr: value

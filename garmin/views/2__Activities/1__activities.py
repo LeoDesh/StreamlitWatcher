@@ -37,8 +37,8 @@ def get_activities(df: DataFrame) -> list[str]:
 
 def show_latest_activities(df: DataFrame, rows: int = 20) -> None:
     df = df.head(rows)
-    df_dict = df.to_dict(orient="records")
-    for idx, activity in enumerate(df_dict):
+    latest_activity_records = df.to_dict(orient="records")
+    for idx, activity in enumerate(latest_activity_records):
         clean_up_dict(activity)
         activity_title = construct_activity_header(activity)
         header = f"{idx + 1}: {activity_title}"

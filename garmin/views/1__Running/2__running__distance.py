@@ -63,9 +63,9 @@ def get_current_month_distance_metric(df: DataFrame) -> Metric:
 
 
 def get_distance_before_given_date(df: DataFrame, selected_date: date) -> float:
-    df_current_year = filter_dataframe(df, {"year": selected_date.year})
-    df_filtered = df_current_year[df_current_year["monthly_date"] <= selected_date]
-    return 0 if df_filtered.empty else df_filtered["distance"].sum()
+    current_year_df = filter_dataframe(df, {"year": selected_date.year})
+    filtered_df = current_year_df[current_year_df["monthly_date"] <= selected_date]
+    return 0 if filtered_df.empty else filtered_df["distance"].sum()
 
 
 def get_current_year_distance_metric(df: DataFrame) -> Metric:

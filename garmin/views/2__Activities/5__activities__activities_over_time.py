@@ -4,13 +4,11 @@ import streamlit as st
 from pandas import DataFrame
 
 from garmin.charts.tools import create_gantt_chart, create_heat_map_monthly_axis
-from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
 from garmin.streamlit_helpers.load import load_activity_df
 from garmin.streamlit_helpers.model import (
     GridConfig,
     Metric,
     create_grid,
-    create_metrics_container,
     stream_metrics,
 )
 from garmin.streamlit_helpers.nagivation import breadcrumbs
@@ -39,21 +37,6 @@ def construct_activity_header(activity: dict[str, Any]) -> str:
 
 def get_activities(df: DataFrame) -> list[str]:
     return get_unique_values_per_column(df, ["activity_type"])["activity_type"]
-
-
-def show_latest_activities(df: DataFrame, rows: int = 20) -> None:
-    df = df.head(rows)
-    df_dict = df.to_dict(orient="records")
-    for idx, activity in enumerate(df_dict):
-        clean_up_dict(activity)
-        activity_title = construct_activity_header(activity)
-        header = f"{idx + 1}: {activity_title}"
-        activity = {
-            attr: value
-            for attr, value in activity.items()
-            if attr in ACTIVITY_ATTR_COLUMNS
-        }
-        create_metrics_container(header, activity)
 
 
 def get_activity_filter(df: DataFrame) -> dict[str, list[str]]:

@@ -31,8 +31,8 @@ def get_year_overview_table(df: DataFrame) -> DataFrame:
 def construct_column_highlights(df: DataFrame, column: str, amount: int = 3) -> None:
     df = df.sort_values(by=column, ascending=False)
     df = df.head(amount).reset_index()
-    df_dict = df.to_dict(orient="records")
-    for activity in df_dict:
+    activity_records = df.to_dict(orient="records")
+    for activity in activity_records:
         date_str = f"{activity['date'].strftime('%d.%m.%Y')}"
         activity = {
             attr: value
@@ -46,7 +46,7 @@ def render_metrics(df: DataFrame) -> None:
     current_year = get_current_year()
     st.header("Overview")
     df = filter_dataframe(df, {"year": current_year})
-    df_dict = df.to_dict(orient="records")[0]
+    running_record = df.to_dict(orient="records")[0]
     description_mapping = {
         "Units": ("Total Runs", "Units"),
         "Distance": ("Distance Covered by Runs", "km"),
@@ -54,7 +54,8 @@ def render_metrics(df: DataFrame) -> None:
     }
     metrics = [
         Metric(
-            label=f"{description} in {current_year}", value=f"{df_dict[attr]} {suffix}"
+            label=f"{description} in {current_year}",
+            value=f"{running_record[attr]} {suffix}",
         )
         for attr, (description, suffix) in description_mapping.items()
     ]

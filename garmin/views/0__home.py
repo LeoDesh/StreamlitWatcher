@@ -30,10 +30,10 @@ def get_running_metric(df: DataFrame) -> Metric:
     agg_df = aggregrate_df_by_dict(
         df, "year", {"units": ("year", "count"), "distance": ("distance", "sum")}
     )
-    df_dict = agg_df.to_dict(orient="records")[0]
+    running_record = agg_df.to_dict(orient="records")[0]
     return Metric(
-        label=f"Runs in {df_dict['year']}",
-        value=f"{df_dict['distance']} km in {df_dict['units']} Units",
+        label=f"Runs in {running_record['year']}",
+        value=f"{running_record['distance']} km in {running_record['units']} Units",
     )
 
 
@@ -43,10 +43,10 @@ def get_activity_metric(df: DataFrame) -> Metric:
         "year",
         {"units": ("year", "count"), "activities": ("activity_type", "nunique")},
     )
-    df_dict = agg_df.to_dict(orient="records")[0]
+    activity_record = agg_df.to_dict(orient="records")[0]
     return Metric(
-        label=f"Activities in {df_dict['year']}",
-        value=f"Total of  {df_dict['units']} activities",
+        label=f"Activities in {activity_record['year']}",
+        value=f"Total of  {activity_record['units']} activities",
     )
 
 
@@ -56,10 +56,10 @@ def get_step_metric(df: DataFrame) -> Metric:
         "year",
         {"steps": ("Steps", "sum"), "distance": ("Distance", "sum")},
     )
-    df_dict = agg_df.to_dict(orient="records")[0]
+    steps_record = agg_df.to_dict(orient="records")[0]
     return Metric(
-        label=f"Steps in {df_dict['year']}",
-        value=f"{df_dict['steps']:,.0f} steps taken",
+        label=f"Steps in {steps_record['year']}",
+        value=f"{steps_record['steps']:,.0f} steps taken",
     )
 
 

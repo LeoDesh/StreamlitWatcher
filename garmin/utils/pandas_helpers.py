@@ -144,20 +144,20 @@ def aggregrate_df_by_dict(
     return df.groupby(by=groupby_col, as_index=False).agg(**agg_dict)
 
 
-def extend_df_by_columns(df_existing: DataFrame, df_new: DataFrame) -> DataFrame:
-    df_difference = df_new.merge(df_existing, how="left", indicator=True)
-    df_difference = df_difference[df_difference["_merge"] == "left_only"].drop(
+def extend_df_by_columns(base_df: DataFrame, current_df: DataFrame) -> DataFrame:
+    missing_data_df = current_df.merge(base_df, how="left", indicator=True)
+    missing_data_df = missing_data_df[missing_data_df["_merge"] == "left_only"].drop(
         columns="_merge"
     )
-    return concat([df_difference, df_existing], ignore_index=True)
+    return concat([missing_data_df, base_df], ignore_index=True)
 
 
 def extend_df_by_id(
-    df_existing: DataFrame, df_new: DataFrame, column: str
+    base_df: DataFrame, current_df: DataFrame, column: str
 ) -> DataFrame:
-    ids = df_new[column].tolist()
-    df_base = df_existing[~df_existing[column].isin(ids)]
-    return concat([df_new, df_base], ignore_index=True)
+    ids = current_df[column].tolist()
+    missing_data_df = base_df[~base_df[column].isin(ids)]
+    return concat([current_df, missing_data_df], ignore_index=True)
 
 
 def save_df_to_csv(

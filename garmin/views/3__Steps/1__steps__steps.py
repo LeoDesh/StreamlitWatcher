@@ -28,7 +28,7 @@ def get_year_overview_table(df: DataFrame) -> DataFrame:
 def render_metrics(df: DataFrame) -> None:
     current_year = get_current_year()
     df = filter_dataframe(df, {"year": current_year})
-    df_dict = df.to_dict(orient="records")[0]
+    step_record = df.to_dict(orient="records")[0]
     description_mapping = {
         "Steps": ("Total Steps", "Steps", ",.0f"),
         "Distance": ("Distance Covered by Steps", "km", ".1f"),
@@ -37,7 +37,7 @@ def render_metrics(df: DataFrame) -> None:
     metrics = [
         Metric(
             label=f"{description} in {current_year}",
-            value=f"{df_dict[attr]:{formatter}} {suffix}",
+            value=f"{step_record[attr]:{formatter}} {suffix}",
         )
         for attr, (description, suffix, formatter) in description_mapping.items()
     ]
