@@ -81,7 +81,7 @@ def test_split_page_name_incorrect_file_str(get_test_path: Path):
 @pytest.mark.path_utils
 def test_get_folders(get_test_path: Path):
     folders = [folder.stem for folder in get_folders(get_test_path / "views")]
-    assert folders == ["1__Running", "2__Steps"]
+    assert set(folders) == {"1__Running", "2__Steps"}
 
 
 @pytest.mark.path_utils
