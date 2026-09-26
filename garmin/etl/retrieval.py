@@ -10,7 +10,7 @@ from garmin.etl.config import (
     DATA_PATH,
     STEPS_DATA_FILE,
 )
-from garmin.etl.load import load_json, save_dict_to_json
+from garmin.etl.load import load_json, save_as_json
 from garmin.etl.transformation import (
     scale_distance,
     scale_hour,
@@ -167,7 +167,7 @@ def refresh_personal_record_ids_mapping(client: DataClient) -> list[dict[str, An
         f"/personalrecord-service/personalrecordtype/prtypes/{client.display_name}"
     )
     refined_mapping = refine_personal_record_mapping(initial_mapping)
-    save_dict_to_json(RECORD_CONFIG_FILE, refined_mapping)
+    save_as_json(RECORD_CONFIG_FILE, refined_mapping)
 
 
 ### Steps

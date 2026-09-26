@@ -171,7 +171,7 @@ def transform_dataframe(df: DataFrame) -> DataFrame:
     return df[df["year"] >= MIN_YEAR]
 
 
-def save_dict_to_json(filename: Path, data: dict[str, Any]) -> None:
+def save_as_json(filename: Path, data: dict[str, Any]) -> None:
     with open(filename, "w") as f:
         json.dump(data, f)
 
