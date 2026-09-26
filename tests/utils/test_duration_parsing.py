@@ -1,6 +1,7 @@
 import pytest
 
 from garmin.utils.duration_parsing import (
+    parse_activity_duration,
     parse_activity_duration_to_minutes,
     parse_hours_from_activity_duration,
     parse_indoor_cycling_title,
@@ -75,3 +76,19 @@ def test_parse_indoor_cycling_title(title: str, expected: str | float):
 )
 def test_verify_duration_minutes_part_incorrect(duration_str, expected):
     assert verify_activity_duration(duration_str) is expected
+
+
+@pytest.mark.duration_parsing
+@pytest.mark.parametrize(
+    "duration_str,expected",
+    [
+        ("04:61:56.8", (0.0, 0.0, 0.0)),  # Minutes Part incorrect
+        ("04:51:65.8", (0.0, 0.0, 0.0)),  # Seconds Part incorrect
+        ("00:51:54", (0, 51, 54)),  # Simple Time Display
+        ("04:51:60", (4, 51, 60)),  # Full 60 Seconds Fine, if no dot
+        ("02:60:00.0", (2, 60, 0)),  # Full 60 Minutes Fine, if no seconds, hundreth
+        ("03:02:56.8", (3, 2, 56)),  # Ordinary Time
+    ],
+)
+def test_parse_activity_duration(duration_str, expected):
+    assert parse_activity_duration(duration_str) == expected

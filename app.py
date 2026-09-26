@@ -7,7 +7,7 @@ from garmin.streamlit_helpers.nagivation import (
 )
 
 
-def run_app():
+def run_app() -> None:
     st.set_page_config(layout="wide")
     render_logo()
     define_sidebar()

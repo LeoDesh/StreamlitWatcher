@@ -32,21 +32,22 @@ def transform_activity_minutes_to_duration_minute_format(
     return f"{minutes:02d}:{seconds:02d}"
 
 
-def parse_activity_duration_to_minutes(duration_str: str) -> float:
+def parse_activity_duration(duration_str: str) -> tuple[int, int, int]:
     if not verify_activity_duration(duration_str):
-        return 0.0
+        return (0, 0, 0)
     hours = parse_hours_from_activity_duration(duration_str)
     minutes = parse_minutes_from_activity_duration(duration_str)
     seconds = parse_seconds_from_activity_duration(duration_str)
+    return (hours, minutes, seconds)
+
+
+def parse_activity_duration_to_minutes(duration_str: str) -> float:
+    hours, minutes, seconds = parse_activity_duration(duration_str)
     return calculate_minutes(hours, minutes, seconds)
 
 
 def parse_activity_duration_to_hours(duration_str: str) -> float:
-    if not verify_activity_duration(duration_str):
-        return 0.0
-    hours = parse_hours_from_activity_duration(duration_str)
-    minutes = parse_minutes_from_activity_duration(duration_str)
-    seconds = parse_seconds_from_activity_duration(duration_str)
+    hours, minutes, seconds = parse_activity_duration(duration_str)
     return calculate_hours(hours, minutes, seconds)
 
 
