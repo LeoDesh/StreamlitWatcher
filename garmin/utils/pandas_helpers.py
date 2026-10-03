@@ -1,5 +1,5 @@
+from collections.abc import Callable
 from datetime import date
-from itertools import pairwise
 from pathlib import Path
 from typing import Any, Literal
 
@@ -8,50 +8,52 @@ from pandas import (
     Series,
     Timedelta,
     concat,
+    cut,
     date_range,
     read_csv,
     to_datetime,
 )
 
-from garmin.utils.misc import (
-    calculate_bins_from_min_max_value,
-    calculate_ticker_values,
-    categorize_df_column,
-)
+from garmin.utils.bucketing import create_bins_by_series
+from garmin.utils.misc import create_label_pairs_from_values
 from garmin.utils.pace_calculations import transform_pace_float_to_pace
 
 
 def bin_label_heartbeat(
-    df: DataFrame, number_of_bins: int, trg_column: str
+    values: list[float], number_of_bins: int
 ) -> tuple[list[int], list[str]]:
-    values = df[trg_column].tolist()
     bin_values = [
-        int(value) for value in calculate_ticker_values(values, number_of_bins)
+        int(value)
+        for value in create_bins_by_series(
+            values, number_of_bins=number_of_bins, bin_size=5
+        )
     ]
-    labels = [
-        f"{current_value}-{next_value}"
-        for current_value, next_value in pairwise(bin_values)
-    ]
+    labels = create_label_pairs_from_values(bin_values)
     return (bin_values, labels)
 
 
-def calculate_bins_values_dataframe(
-    df: DataFrame, number_of_bins: int, column: str
-) -> list[float]:
-    min_value, max_value = max(df[column].min() - 0.2, 0), df[column].max() + 0.2
-    return calculate_bins_from_min_max_value(min_value, max_value, number_of_bins)
-
-
 def get_pace_bins_labels_for_dataframe(
-    df: DataFrame, number_of_bins: int, pace_float_column: str
+    values: list[float], number_of_bins: int
 ) -> tuple[list[float], list[str]]:
-    bins = calculate_bins_values_dataframe(df, number_of_bins, pace_float_column)
-    pace_str_bins = [transform_pace_float_to_pace(bin) for bin in bins]
-    labels = [
-        f"{current_pace}-{next_pace}"
-        for current_pace, next_pace in pairwise(pace_str_bins)
-    ]
+    bins = create_bins_by_series(
+        values, number_of_bins=number_of_bins, bin_size=0.1, enhancer=0.01
+    )
+    pace_bins = [transform_pace_float_to_pace(bin) for bin in bins]
+    labels = create_label_pairs_from_values(pace_bins)
     return (bins, labels)
+
+
+def categorize_df_column(
+    df: DataFrame,
+    trg_column: str,
+    number_of_bins: int,
+    bins_labels_func: Callable[[list[float], int], tuple[list, list]],
+) -> DataFrame:
+    bins, labels = bins_labels_func(df[trg_column].tolist(), number_of_bins)
+    df = df.copy()
+    df.loc[:, f"new_{trg_column}"] = cut(df[trg_column], bins=bins, labels=labels)
+    df[trg_column] = df[f"new_{trg_column}"]
+    return df
 
 
 def create_df_pivot_hpm_pace(df: DataFrame) -> DataFrame:
@@ -92,7 +94,7 @@ def filter_dataframe(df: DataFrame, filter_kwargs: dict[str, Any]) -> DataFrame:
             mask &= df[col].isin(val)
         else:
             mask &= df[col] == val
-    return df[mask].copy()
+    return df[mask]
 
 
 def get_gantt_df(df: DataFrame, date_column: str) -> DataFrame:
@@ -129,33 +131,33 @@ def aggregate_df_named_column(
     sort_asc: bool | None = None,
 ) -> DataFrame:
     col_name = col_name if col_name else value_col
-    agg_dict = {col_name: (value_col, agg_func)}
-    df = aggregrate_df_by_dict(df, groupby_col, agg_dict)
+    aggregation_mapping = {col_name: (value_col, agg_func)}
+    df = aggregrate_df_by_dict(df, groupby_col, aggregation_mapping)
     return df if sort_asc is None else df.sort_values(by=col_name, ascending=sort_asc)
 
 
 def aggregrate_df_by_dict(
     df: DataFrame,
     groupby_col: str,
-    agg_dict: dict[str, tuple[str, str]],
+    aggregation_mapping: dict[str, tuple[str, str]],
 ) -> DataFrame:
-    return df.groupby(by=groupby_col, as_index=False).agg(**agg_dict)
+    return df.groupby(by=groupby_col, as_index=False).agg(**aggregation_mapping)
 
 
-def update_data(df_existing: DataFrame, df_new: DataFrame) -> DataFrame:
-    df_difference = df_new.merge(df_existing, how="left", indicator=True)
-    df_difference = df_difference[df_difference["_merge"] == "left_only"].drop(
+def extend_df_by_columns(base_df: DataFrame, current_df: DataFrame) -> DataFrame:
+    missing_data_df = current_df.merge(base_df, how="left", indicator=True)
+    missing_data_df = missing_data_df[missing_data_df["_merge"] == "left_only"].drop(
         columns="_merge"
     )
-    return concat([df_difference, df_existing], ignore_index=True)
+    return concat([missing_data_df, base_df], ignore_index=True)
 
 
-def update_data_on_column(
-    df_existing: DataFrame, df_new: DataFrame, column: str
+def extend_df_by_id(
+    base_df: DataFrame, current_df: DataFrame, column: str
 ) -> DataFrame:
-    ids = df_new[column].tolist()
-    df_base = df_existing[~df_existing[column].isin(ids)]
-    return concat([df_new, df_base], ignore_index=True)
+    ids = current_df[column].tolist()
+    missing_data_df = base_df[~base_df[column].isin(ids)]
+    return concat([current_df, missing_data_df], ignore_index=True)
 
 
 def save_df_to_csv(

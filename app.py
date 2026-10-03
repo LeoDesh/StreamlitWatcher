@@ -1,6 +1,18 @@
-from streamlit_utils.nagivation import define_sidebar, get_navigation, render_logo
+import streamlit as st
 
-render_logo()
-define_sidebar()
-nav = get_navigation()
-nav.run()
+from garmin.streamlit_helpers.nagivation import (
+    define_sidebar,
+    get_navigation,
+    render_logo,
+)
+
+
+def run_app() -> None:
+    st.set_page_config(layout="wide")
+    render_logo()
+    define_sidebar()
+    nav = get_navigation()
+    nav.run()
+
+
+run_app()

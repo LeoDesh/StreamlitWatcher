@@ -1,6 +1,6 @@
 [project]
 name = "ActivityDiary"
-version = "0.3.0"
+version = "0.3.6"
 description = "Monitoring activities and showing highlights"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -12,8 +12,8 @@ dependencies = [
     "pytest>=9.0.2",
     "python-dotenv>=1.2.2",
     "ruff>=0.16.1",
-    "streamlit>=1.53.0",
-    "garth==0.5.21"
+    "streamlit>=1.63.0",
+    "garth==0.5.21",
 ]
 
 
@@ -25,3 +25,18 @@ where = [""]
 
 [tool.ruff.format]
 line-ending = "lf"
+
+[tool.pytest.ini_options]
+pythonpath=["."]
+testpaths=["tests"]
+markers =[
+    "pace: tests for pace utils",
+    "misc: tests for ordinary utils",
+    "duration_parsing: tests for parsing utilities",
+    "bucketing: tests for interval creation",
+    "time_utils: tests for date functions",
+    "path_utils: test for path related functions",
+    "etl: tests for data loading, validation",
+    "pandas_helpers: tests for dataframe utilities",
+    "streamlit: tests for streamlit pages",
+]

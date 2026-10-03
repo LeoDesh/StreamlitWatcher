@@ -1,0 +1,49 @@
+from typing import Any
+
+import streamlit as st
+from pandas import DataFrame
+
+from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
+from garmin.streamlit_helpers.load import load_records_df
+from garmin.streamlit_helpers.model import create_metrics_container
+from garmin.streamlit_helpers.nagivation import breadcrumbs
+from garmin.utils.misc import filter_mapping
+
+
+def construct_activity_header(activity: dict[str, Any]) -> str:
+    date_str = activity["date"].date().strftime("%d.%m.%Y")
+    value = activity["formatted_value"]
+    return f"{date_str}, {value}"
+
+
+def show_records(df: DataFrame) -> None:
+    activity_records = df.to_dict(orient="records")
+    for activity in activity_records:
+        activity_title = construct_activity_header(activity)
+        activity = filter_mapping(activity, ACTIVITY_ATTR_COLUMNS)
+        create_metrics_container(activity_title, activity)
+
+
+@st.dialog("Description")
+def show_description() -> None:
+    st.markdown(
+        """  
+        In the following individuel personal running records on different *timeframes* and the corresponding activity will be shown.  
+        In each container the date, the record type and the achieved time can be seen.  
+        Further in the brackets the pace for the corresponding distance is computed in min/km.
+        """
+    )
+
+
+def main() -> None:
+    breadcrumbs(__file__)
+    title_col, _, info_col = st.columns([10, 1, 1])
+    title_col.header("Personal Records")
+    btn = info_col.button(label="Info", icon=":material/info:", type="secondary")
+    if btn:
+        show_description()
+    df = load_records_df()
+    show_records(df)
+
+
+main()

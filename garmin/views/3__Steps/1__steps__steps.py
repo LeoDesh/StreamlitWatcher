@@ -1,0 +1,76 @@
+import streamlit as st
+from pandas import DataFrame
+
+from garmin.streamlit_helpers.components import construct_year_statistics
+from garmin.streamlit_helpers.load import load_steps_df
+from garmin.streamlit_helpers.model import Metric, stream_metrics
+from garmin.streamlit_helpers.nagivation import breadcrumbs
+from garmin.utils.pandas_helpers import aggregrate_df_by_dict, filter_dataframe
+from garmin.utils.time_utils import get_current_year
+
+
+def get_year_overview_table(df: DataFrame) -> DataFrame:
+    aggregation_mapping = {
+        "Distance": ("Distance", "sum"),
+        "Steps": ("Steps", "sum"),
+        "Daily Steps": ("Steps", "mean"),
+        "Total": ("Distance", "count"),
+        "Goal Reached": ("goal_reached", "sum"),
+        "Daily Goal": ("Goal", "mean"),
+    }
+    df = aggregrate_df_by_dict(df, "year", aggregation_mapping)
+    df["Distance"] = df["Distance"] / 1000
+    df["Goal Conversion"] = df["Goal Reached"] / df["Total"]
+    df["Goal Conversion"] = df["Goal Conversion"].apply(lambda x: round(x * 100, 2))
+    return df
+
+
+def render_metrics(df: DataFrame) -> None:
+    current_year = get_current_year()
+    df = filter_dataframe(df, {"year": current_year})
+    step_record = df.to_dict(orient="records")[0]
+    description_mapping = {
+        "Steps": ("Total Steps", "Steps", ",.0f"),
+        "Distance": ("Distance Covered by Steps", "km", ".1f"),
+        "Goal Conversion": ("Step Goal Conversion Rate", "%", ".2f"),
+    }
+    metrics = [
+        Metric(
+            label=f"{description} in {current_year}",
+            value=f"{step_record[attr]:{formatter}} {suffix}",
+        )
+        for attr, (description, suffix, formatter) in description_mapping.items()
+    ]
+    stream_metrics(metrics, num_cols=3)
+
+
+def render_year_statistics(df: DataFrame) -> None:
+    mapping = {
+        "Steps": ("Total Steps", "%{y:,.0f} Steps"),
+        "Distance": ("Distance Covered", "%{y:.2f} km covered"),
+        "Daily Steps": (
+            "Average Daily Steps",
+            "%{y:.0f} Steps per day on average",
+        ),
+        "Goal Conversion": (
+            "Daily Step Goal Reached",
+            "%{y:.2f} % of daily Step Goal reached",
+        ),
+        "Daily Goal": (
+            "Average Daily Step Goal",
+            "%{y:.0f} Steps on average required to fulfill the daily goal",
+        ),
+    }
+    construct_year_statistics(df, mapping, "Steps")
+
+
+def main() -> None:
+    breadcrumbs(__file__)
+    st.header("Overview")
+    df = load_steps_df()
+    overview_df = get_year_overview_table(df)
+    render_metrics(overview_df)
+    render_year_statistics(overview_df)
+
+
+main()

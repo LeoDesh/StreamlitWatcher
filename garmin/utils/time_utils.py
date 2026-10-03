@@ -1,10 +1,10 @@
 import calendar
-from datetime import date, datetime
+from datetime import date, datetime, time
 from zoneinfo import ZoneInfo
 
 
-def parse_date(date_str: str, src_format: str) -> datetime:
-    return datetime.strptime(date_str, src_format).replace(tzinfo=ZoneInfo("UTC"))
+def parse_str_date(date_str: str, date_format: str) -> datetime:
+    return datetime.strptime(date_str, date_format).replace(tzinfo=ZoneInfo("UTC"))
 
 
 def get_current_date() -> date:
@@ -42,3 +42,17 @@ def get_first_of_given_year(yr: int) -> date:
 def get_last_day_of_date(given_date: date) -> date:
     _, last_day = calendar.monthrange(given_date.year, given_date.month)
     return given_date.replace(day=last_day)
+
+
+def transform_date_to_datetime(date_value: date) -> datetime:
+    return datetime.combine(date_value, time.min)
+
+
+def parse_value_to_datetime(
+    date_value: str | date | datetime, date_format: str = "%Y-%m-%d %H:%M:%S"
+) -> datetime:
+    if isinstance(date_value, datetime):
+        return date_value
+    elif isinstance(date_value, date):
+        return transform_date_to_datetime(date_value)
+    return parse_str_date(date_value, date_format)
