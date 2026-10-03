@@ -47,12 +47,15 @@ def test_transform_activity_minutes_to_duration_format(get_duration_str):
 @pytest.mark.parametrize(
     "title,expected",
     [
-        ("24,5 km", 24.5),
-        ("23 km", 23),
-        ("km", ""),
-        ("27.5 KM", 27.5),
-        ("Something Else", ""),
-        ("Something 28", ""),
+        ("24,5 km", 24.5),  # ',' parsing
+        ("23 km", 23),  # int parsing
+        ("km", ""),  # no number found
+        ("27.5 KM", 27.5),  # upper case handled
+        ("Something Else", ""),  # incorrect unit
+        ("Something 28", ""),  # incorrect unit + number
+        ("km 24.25", ""),  # wrong order
+        ("18.75 kilometres", ""),  # only 'km','KM' considered
+        ("18.75 Km", 18.75),  # mixed case
     ],
 )
 def test_parse_indoor_cycling_title(title: str, expected: str | float):

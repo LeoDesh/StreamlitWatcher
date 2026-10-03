@@ -6,7 +6,6 @@ from pandas import DataFrame, to_datetime
 from garmin.etl.client import DataClient
 from garmin.etl.config import (
     ACTIVITY_FILE_PATH,
-    ARCHIVE_PATH,
     DATA_PATH,
     STEPS_DATA_FILE,
 )
@@ -104,12 +103,6 @@ def refine_activities(activities: dict[str, Any]) -> DataFrame:
     return DataFrame(translated_activities)
 
 
-def archive_activities(df: DataFrame) -> None:
-    date_stamp = get_current_date_str()
-    filename = ARCHIVE_PATH / f"{date_stamp}_activities.csv"
-    save_df_to_csv(df, filename)
-
-
 def update_garmin_activities(client: DataClient) -> None:
     activities = client.get_activities(0, ACTIVITY_COUNT_THRESHOLD)
     extend_garmin_activities(activities)
@@ -117,7 +110,6 @@ def update_garmin_activities(client: DataClient) -> None:
 
 def extend_garmin_activities(activities: dict[str, Any]) -> None:
     df = refine_activities(activities)
-    archive_activities(df)
     current_activities_df = read_file(ACTIVITY_FILE_PATH)
     updated_activities_df = extend_df_by_columns(current_activities_df, df)
     save_df_to_csv(updated_activities_df, ACTIVITY_FILE_PATH)

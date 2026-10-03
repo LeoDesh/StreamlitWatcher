@@ -65,7 +65,7 @@ def test_get_all_regex_match(pattern: str, expected: list[str]):
             4,
             None,
             pytest.raises(IndexError),
-        ),  # not enough matched values
+        ),  # out of range, only 3 matches
     ],
 )
 def test_find_regex_match(
@@ -164,6 +164,11 @@ def test_prettify(txt: str, expected: bool):
         ({"Activity": "Running", "Time": "45"}, [], {}),
         ({"Activity": "Running", "Time": "45"}, ["Activity"], {"Activity": "Running"}),
         ({"Activity": "Running", "Time": "45"}, [1], {}),
+        (
+            {"Activity": "Running", "Time": "45"},
+            ["Activity", "Time"],
+            {"Activity": "Running", "Time": "45"},
+        ),
     ],
 )
 def test_filter_mapping(

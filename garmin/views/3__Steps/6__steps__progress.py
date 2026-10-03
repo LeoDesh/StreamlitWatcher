@@ -70,7 +70,7 @@ def main() -> None:
     with grid[0][0]:
         render_monthly_progression(monthly_df, "steps")
     with grid[0][1]:
-        setup_heatmap(df, "Steps")
+        setup_heatmap(df, "Steps", "Steps", ",.0f")
 
 
 main()

@@ -16,12 +16,11 @@ from garmin.utils.bucketing import (
     "start,step,intervals,expected",
     [
         (1, 2, 4, list(range(1, 11, 2))),
-        (1, 1, 0, [1, 2]),
+        (1, 1, 0, [1, 2]),  # no intervals
+        (1, 1, 1, [1, 2]),
         (1, 1, 4, list(range(1, 6, 1))),
         (1, 1.5, 4, [1, 2.5, 4, 5.5, 7.0]),
-        (1, 0, 3, [1]),
-        (1, 4, 0, [1, 5]),
-        (1, 4, 1, [1, 5]),
+        (1, 0, 3, [1]),  # no steps
     ],
 )
 def test_build_bins(start: int, step: int, intervals: int, expected: list[int]) -> None:
@@ -36,6 +35,7 @@ def test_build_bins(start: int, step: int, intervals: int, expected: list[int]) 
         (1, 2, 1, [1, 1, 1]),
         (1, 13, 8, [1, 1.5, 8]),
         (1, 1, 1, [1, 0, 1]),
+        (1, 4, 4, [1, 0.75, 4]),
     ],
 )
 def test_calculate_bins_by_number(
@@ -54,6 +54,13 @@ def test_calculate_bins_by_number(
         (0, 10, 3.5, [0, 3.5, 3]),
         (0, 1, 3.5, [0, 3.5, 1]),
     ],
+    ids=[
+        "overlap_max_value",
+        "exact_match",
+        "float_exact_match",
+        "float_overlap_max_value",
+        "size_exceeds_max_value",
+    ],
 )
 def test_calculate_bins_by_size(
     min_value: int, max_value: int, size: float, expected: list[int]
@@ -65,11 +72,11 @@ def test_calculate_bins_by_size(
 @pytest.mark.parametrize(
     "min_value,max_value,number_of_bins,bin_size,enhancer,interval_start,interval_end,context",
     [
-        (1, 10, 1, None, 0.5, 1, 10, nullcontext()),
-        (5.0, 10.0, 5, None, 0.5, 2.5, 15.0, nullcontext()),
+        (1, 10, 1, None, 0.5, 1, 10, nullcontext()),  # enhancer does not effect ints
+        (5.0, 10.0, 5, None, 0.5, 2.5, 15.0, nullcontext()),  # enhancer effects floats
         (0.0, 10.0, None, 1, 0.5, 0, 15.0, nullcontext()),
-        (0, 10.0, None, 1, -0.5, 0, 15.0, pytest.raises(ValueError)),
-        (5.0, 10.0, None, None, 0.5, 2.5, 15.0, pytest.raises(ValueError)),
+        (0, 10.0, None, 1, -0.5, 0, 15.0, pytest.raises(ValueError)),  # neg. enhancer
+        (5.0, 10.0, None, None, 0.5, 2.5, 15.0, pytest.raises(ValueError)),  # both none
     ],
 )
 def test_bin_planer_initialization(
@@ -94,10 +101,28 @@ def test_bin_planer_initialization(
 @pytest.mark.parametrize(
     "min_value,max_value,number_of_bins,bin_size,strategy",
     [
-        (1, 10, 1, None, BinStrategy.NUMBER),
-        (5.0, 10.0, None, 1, BinStrategy.SIZE),
-        (5, 10.0, 20, 0.5, BinStrategy.SIZE),
-        (5, 10.0, 5, 0.5, BinStrategy.NUMBER),
+        (1, 10, 1, None, BinStrategy.NUMBER),  # Number of bins specified
+        (5.0, 10.0, None, 1, BinStrategy.SIZE),  # Bin size specified
+        (
+            5,
+            10.0,
+            20,
+            0.5,
+            BinStrategy.SIZE,
+        ),  # both specified, bin_size:0.5 > 5/20 = 0.25 number of bins
+        (
+            5,
+            10.0,
+            5,
+            0.5,
+            BinStrategy.NUMBER,
+        ),  # both specified, bin_size: 0.5 < 5/5 = 1.0 Therefore bins
+    ],
+    ids=[
+        "number_of_bins_only",
+        "size_only",
+        "size_larger_than_bins",
+        "size_smaller_than_bins",
     ],
 )
 def test_bin_planer_strategy(

@@ -1,5 +1,12 @@
 ### Changes
 
+#### 0.3.6
+
+- tests documentation for parametrization
+- format option for heatmap
+- removed archive and storage of downloaded activity files
+- moved pytest.ini into pyproject.toml
+
 #### 0.3.5
 
 - heatmap color scale change

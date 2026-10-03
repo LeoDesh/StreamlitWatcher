@@ -61,7 +61,7 @@ class BinPlaner[T]:
 
 def calculate_bins_by_number(
     min_value: float, max_value: float, number_of_bins: int
-) -> list[float]:
+) -> list[float, float, float]:
     step = float(max_value - min_value) / number_of_bins
     return [min_value, step, number_of_bins]
 
@@ -76,7 +76,7 @@ def build_bins[T](start: T, step: T, intervals: int) -> list[T]:
 
 def calculate_bins_by_size(
     min_value: float, max_value: float, bin_size: float
-) -> tuple[float, float, float]:
+) -> list[float, float, float]:
     intervals = ceil(float(max_value - min_value) / bin_size)
     return [min_value, bin_size, intervals]
 
