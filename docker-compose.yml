@@ -1,0 +1,32 @@
+services:
+  # 1. Ihre Streamlit App
+  streamlit-app:
+    build: .
+    container_name: streamlit_app
+    restart: unless-stopped
+    expose:
+      - "8501"
+
+  # 2. Der offizielle Nginx Webserver
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Hier wird Ihre Config aus dem Repo in den Container gemountet
+      - ./nginx/streamlit.conf:/etc/nginx/templates/default.conf.template:ro
+      # Gemeinsame Volumes mit Certbot für Zertifikate und Validierung
+      - ${SSL_PATH}:/etc/nginx/ssl:ro
+      # NEU: Mount für die ACME-Challenge
+      - ${CERTBOT_WWW_PATH}:/var/www/certbot:ro
+    environment:
+      - APP_DOMAIN=${APP_DOMAIN}
+      - SSL_CERT_FILE=${SSL_CERT_FILE}
+      - SSL_KEY_FILE=${SSL_KEY_FILE}
+    #  - NGINX_ENVSUBST_FILTER=APP_DOMAIN SSL_CERT_FILE SSL_KEY_FILE
+    depends_on:
+      - streamlit-app
+

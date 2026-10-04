@@ -19,4 +19,7 @@ validation.py
 report.html
 .garminconnect
 
+certbot
+certs
+
 GoodToKnow.MD
