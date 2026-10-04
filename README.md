@@ -18,12 +18,12 @@
 - uv run ruff check --fix 
 - uv run ruff format .
 
-
-### Docker
-- build image: docker build -t activity-diary .
-- run container DEV: docker run -d -v "$(PWD):/app" -v /app/.venv -p 8501:8501 --name activity-diary activity-diary 
-- run container PROD: docker run -d -p 8501:8501 --name activity-diary activity-diary 
+### Before starting the app
+- rename .env.example to .env
+- create an empty certbot folder
+- create a certs folder and create certificates (localhost.pem, localhost-key.pem) with a tool (e.g. mkcert)
 
 ### Starting the app
-- uv run streamlit run app.py
+- run: docker compose up -d
+
 

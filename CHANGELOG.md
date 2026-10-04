@@ -1,5 +1,10 @@
 ### Changes
 
+#### 0.4.0
+
+- switch to Docker Compose
+- added nginx for deployment
+
 #### 0.3.6
 
 - tests documentation for parametrization
