@@ -1,12 +1,16 @@
 from datetime import date, timedelta
+from math import ceil
+from typing import Any
 
 import streamlit as st
 from pandas import DataFrame
+from plotly.graph_objects import Figure
+from streamlit.typing import PlotlyState
 
 from garmin.charts.tools import create_bar_chart, create_heat_map_monthly_axis
 from garmin.etl import MIN_YEAR
-from garmin.streamlit_helpers.model import Metric
-from garmin.utils.misc import compute_delta, prettify
+from garmin.streamlit_helpers.model import Metric, create_metrics_container
+from garmin.utils.misc import compute_delta, filter_mapping, prettify
 from garmin.utils.pandas_helpers import generate_dates_df
 from garmin.utils.time_utils import (
     get_current_date,
@@ -76,9 +80,9 @@ def construct_year_statistics(
     st.plotly_chart(fig, width="stretch")
 
 
-def render_monthly_progression(
+def get_monthly_progression_figure(
     df: DataFrame, target_column: str, unit: str = ""
-) -> None:
+) -> Figure:
     unit = unit if unit else target_column
     date_df = generate_dates_df(
         df["monthly_date"].min(),
@@ -89,7 +93,7 @@ def render_monthly_progression(
     df = date_df.merge(df, how="left", on="monthly_date").fillna(0)
     df[target_column] = df[target_column].cumsum()
     df["month"] = df["monthly_date"].apply(get_last_day_of_date)
-    fig = create_bar_chart(
+    return create_bar_chart(
         df,
         "month",
         target_column,
@@ -97,6 +101,10 @@ def render_monthly_progression(
         hovertemplate=f"%{{y:,.0f}} {unit} covered up to %{{x}} <extra></extra>",
         show_x_title=False,
     )
+
+
+def render_monthly_progression(df: DataFrame, target_column: str, unit: str) -> None:
+    fig = get_monthly_progression_figure(df, target_column, unit)
     st.plotly_chart(fig, width="stretch")
 
 
@@ -135,3 +143,60 @@ def get_current_month_metric(
         delta=f"{delta} %",
         help=f"Comparison with {previous_year_month.strftime('%b, %Y')}",
     )
+
+
+def validate_streamlit_chart_selection(state: PlotlyState) -> tuple[Any, Any]:
+    if not (state and "selection" in state and "points" in state["selection"]):
+        return None
+    points = state.selection.points
+    if not points:
+        return (None, None)
+    clicked_point = points[0]
+    return (clicked_point.get("x"), clicked_point.get("y"))
+
+
+@st.dialog(title="Monthly Steps Breakdown", width="large")
+def render_steps_dialog(header: str, df: DataFrame, page_size: int = 3) -> None:
+    st.subheader(header)
+    if df.empty:
+        st.info("In the selected timeframe there is no data available.")
+    else:
+        top_days_column, chart_column = st.columns([1, 1])
+        with top_days_column:
+            sorted_df = df.copy().sort_values(by="Steps", ascending=False)
+            records = sorted_df.to_dict(orient="records")
+            for record in get_pagination(records, page_size, "steps_pagination"):
+                record = filter_mapping(record, ["Date", "Steps"])
+                record["Steps"] = int(record["Steps"])
+                record["Date"] = record["Date"].strftime("%d.%m.%Y")
+                create_metrics_container(header="", data=record)
+        with chart_column:
+            fig = create_bar_chart(df, "Date", "Steps", y_title="Steps per")
+            st.plotly_chart(fig)
+
+
+@st.dialog(title="Monthly Runs Breakdown", width="large")
+def render_run_dialog(header: str, df: DataFrame, page_size: int = 3) -> None:
+    st.subheader(header)
+    if df.empty:
+        st.info("In the selected timeframe there is no data available.")
+    else:
+        top_days_column, chart_column = st.columns([1, 1])
+        with top_days_column:
+            sorted_df = df.copy().sort_values(by="distance", ascending=False)
+            sorted_df["day"] = sorted_df["date"].apply(lambda x: x.day)
+            records = sorted_df.to_dict(orient="records")
+            for record in get_pagination(records, page_size, "run_pagination"):
+                record = filter_mapping(
+                    record, ["day", "distance", "average_pace", "time"]
+                )
+                create_metrics_container(header="", data=record, gap="xxsmall")
+        with chart_column:
+            fig = create_bar_chart(df, "date", "distance", y_title="Distance per")
+            st.plotly_chart(fig)
+
+
+def get_pagination(records: list[Any], page_size: int, key: str) -> list:
+    num_pages = ceil(len(records) / page_size)
+    current_page = st.pagination(num_pages=num_pages, key=key)
+    return records[(current_page - 1) * page_size : current_page * page_size]

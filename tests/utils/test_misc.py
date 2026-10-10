@@ -158,20 +158,30 @@ def test_prettify(txt: str, expected: bool):
 
 @pytest.mark.misc
 @pytest.mark.parametrize(
-    "data,columns,expected",
+    "data,columns,expected,context",
     [
-        ({}, [], {}),
-        ({"Activity": "Running", "Time": "45"}, [], {}),
-        ({"Activity": "Running", "Time": "45"}, ["Activity"], {"Activity": "Running"}),
-        ({"Activity": "Running", "Time": "45"}, [1], {}),
+        ({}, [], {}, nullcontext()),
+        ({"Activity": "Running", "Time": "45"}, [], {}, nullcontext()),
+        (
+            {"Activity": "Running", "Time": "45"},
+            ["Activity"],
+            {"Activity": "Running"},
+            nullcontext(),
+        ),
+        ({"Activity": "Running", "Time": "45"}, [1], {}, pytest.raises(KeyError)),
         (
             {"Activity": "Running", "Time": "45"},
             ["Activity", "Time"],
             {"Activity": "Running", "Time": "45"},
+            nullcontext(),
         ),
     ],
 )
 def test_filter_mapping(
-    data: dict[str, Any], columns: list[str], expected: dict[str, Any]
+    data: dict[str, Any],
+    columns: list[str],
+    expected: dict[str, Any],
+    context: AbstractContextManager,
 ):
-    assert filter_mapping(data, columns) == expected
+    with context:
+        assert filter_mapping(data, columns) == expected

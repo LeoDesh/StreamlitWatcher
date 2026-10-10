@@ -3,6 +3,7 @@ from typing import Any
 import streamlit as st
 from pandas import DataFrame
 
+from garmin.streamlit_helpers.components import get_pagination
 from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
 from garmin.streamlit_helpers.load import load_activity_df
 from garmin.streamlit_helpers.model import (
@@ -36,15 +37,21 @@ def get_activities(df: DataFrame) -> list[str]:
     return get_unique_values_per_column(df, ["activity_type"])["activity_type"]
 
 
-def show_latest_activities(df: DataFrame, rows: int = 20) -> None:
-    df = df.head(rows)
+def show_latest_activities(
+    df: DataFrame, page_size: int = 20, number_of_activities: int = 200
+) -> None:
+    df = df.head(number_of_activities)
+    if df.empty:
+        st.info("There are no activities for this selection.")
+        return
     latest_activity_records = df.to_dict(orient="records")
-    for idx, activity in enumerate(latest_activity_records):
+    for activity in get_pagination(
+        latest_activity_records, page_size, "activity_pagination"
+    ):
         clean_up_dict(activity)
         activity_title = construct_activity_header(activity)
-        header = f"{idx + 1}: {activity_title}"
         activity = filter_mapping(activity, ACTIVITY_ATTR_COLUMNS)
-        create_metrics_container(header, activity)
+        create_metrics_container(activity_title, activity)
 
 
 def get_activity_filter(df: DataFrame) -> dict[str, list[str] | None]:

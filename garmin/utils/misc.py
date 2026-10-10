@@ -75,7 +75,7 @@ def compute_delta(src: float, trg: float) -> float:
 
 
 def filter_mapping(data: dict[str, Any], filter_columns: list[str]) -> dict[str, Any]:
-    return {key: value for key, value in data.items() if key in filter_columns}
+    return {col: data[col] for col in filter_columns}
 
 
 def create_label_pairs_from_values(

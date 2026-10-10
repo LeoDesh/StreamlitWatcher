@@ -7,8 +7,10 @@ from pandas import DataFrame, cut
 from garmin.charts.tools import create_histogram
 from garmin.streamlit_helpers.components import (
     get_current_month_metric,
-    render_monthly_progression,
+    get_monthly_progression_figure,
+    render_run_dialog,
     setup_heatmap,
+    validate_streamlit_chart_selection,
 )
 from garmin.streamlit_helpers.load import load_running_df
 from garmin.streamlit_helpers.model import (
@@ -25,11 +27,20 @@ from garmin.utils.time_utils import (
     get_current_month,
     get_last_day_of_date,
     get_month_previous_year,
+    parse_str_date,
 )
 
 
 def construct_header() -> None:
     st.title("Distance Overview")
+
+
+def set_progress_state(value: date | None = None) -> None:
+    st.session_state["run_progress"] = value
+
+
+def get_progress_state() -> date:
+    return st.session_state["run_progress"]
 
 
 def setup_histogram(df: DataFrame) -> None:
@@ -108,16 +119,34 @@ def render_latest_run_metric(df: DataFrame) -> Metric:
     return render_run_metric(run_time, distance)
 
 
+def render_monthly_progress(df: DataFrame, column: str, unit: str) -> None:
+    monthly_df = compute_monthly_distance(df)
+    fig = get_monthly_progression_figure(monthly_df, column, unit)
+    event = st.plotly_chart(
+        fig, width="stretch", selection_mode="points", on_select="rerun"
+    )
+    month, _ = validate_streamlit_chart_selection(event)
+    if not month:
+        return
+    selected_month = parse_str_date(month, "%Y-%m-%d").date().replace(day=1)
+    current_selected_month = get_progress_state()
+    if selected_month != current_selected_month:
+        set_progress_state(selected_month)
+        df = filter_dataframe(df, {"monthly_date": selected_month})
+        header = f"Run Insights for {selected_month.strftime('%b %Y')}"
+        render_run_dialog(header, df, 3)
+
+
 def main() -> None:
     breadcrumbs(__file__)
     construct_header()
+    set_progress_state()
     df = load_running_df()
     render_distance_metrics(df)
     grid_config = [GridConfig(1, height=550), GridConfig(2)]
     grid = create_grid(grid_config)
     with grid[0][0]:
-        monthly_df = compute_monthly_distance(df)
-        render_monthly_progression(monthly_df, "distance", "km")
+        render_monthly_progress(df, "distance", "km")
     with grid[1][0]:
         setup_histogram(df)
     with grid[1][1]:

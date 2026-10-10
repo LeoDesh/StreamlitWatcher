@@ -1,5 +1,10 @@
 ### Changes
 
+#### 0.5.0
+
+- pagination for activities
+- dialog section for distance & step bar chart
+
 #### 0.4.0
 
 - switch to Docker Compose

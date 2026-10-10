@@ -39,13 +39,19 @@ class Metric:
 
     @classmethod
     def create_from_dict(cls, data: dict[str, str]) -> list[Self]:
-        return [cls(label=prettify(key), value=value) for key, value in data.items()]
+        return [
+            cls(label=prettify(key), value=str(value)) for key, value in data.items()
+        ]
 
 
 def stream_metrics(
-    metrics: list[Metric], *, num_cols: int = 4, border: bool = False
+    metrics: list[Metric],
+    *,
+    num_cols: int = 4,
+    border: bool = False,
+    gap: str = "small",
 ) -> None:
-    with st.container(border=border):
+    with st.container(border=border, gap=gap):
         cols = st.columns(num_cols)
         for idx, metric in enumerate(metrics):
             col_idx = idx % num_cols
@@ -53,8 +59,10 @@ def stream_metrics(
                 metric.render_metric()
 
 
-def create_metrics_container(header: str, data: dict[str, str]) -> None:
+def create_metrics_container(
+    header: str, data: dict[str, str], gap: str = "small"
+) -> None:
     with st.container(border=True, horizontal_alignment="center"):
         st.header(header)
         metrics = Metric.create_from_dict(data)
-        stream_metrics(metrics, num_cols=len(metrics))
+        stream_metrics(metrics, num_cols=len(metrics), gap=gap)
