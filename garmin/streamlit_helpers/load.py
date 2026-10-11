@@ -11,7 +11,7 @@ from garmin.etl import (
     load_steps_file,
 )
 
-CACHE_KWARGS = {"ttl": 3600}
+CACHE_KWARGS = {"ttl": 900}
 
 
 @st.cache_data(**CACHE_KWARGS)

@@ -9,6 +9,7 @@ services:
     volumes:
       - ./app.py:/app/app.py
       - ./garmin:/app/garmin
+      - ./pyproject.toml:/app/pyproject.toml
 
   # 2. Der offizielle Nginx Webserver
   nginx:
@@ -22,7 +23,7 @@ services:
       # Hier wird Ihre Config aus dem Repo in den Container gemountet
       - ./nginx/streamlit.conf:/etc/nginx/templates/default.conf.template:ro
       # Gemeinsame Volumes mit Certbot für Zertifikate und Validierung
-      - ${SSL_PATH}:/etc/nginx/ssl:ro
+      - ${SSL_PATH}:${SSL_MOUNT}:ro
       # NEU: Mount für die ACME-Challenge
       - ${CERTBOT_WWW_PATH}:/var/www/certbot:ro
     environment:
