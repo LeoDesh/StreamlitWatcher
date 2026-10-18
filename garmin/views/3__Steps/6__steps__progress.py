@@ -86,8 +86,7 @@ def render_monthly_progress(df: DataFrame, column: str) -> None:
     if selected_month != current_selected_month:
         set_progress_state(selected_month)
         df = filter_dataframe(df, {"monthly_date": selected_month})
-        header = f"Steps Insights for {selected_month.strftime('%b %Y')}"
-        render_steps_dialog(header, df, 3)
+        render_steps_dialog(selected_month, df, 3)
 
 
 def main() -> None:

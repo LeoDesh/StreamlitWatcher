@@ -62,6 +62,7 @@ def load_steps_file(file: Path) -> DataFrame:
     )
     df = df[df["year"] >= MIN_YEAR]
     df["goal_reached"] = df["Steps"] >= df["Goal"]
+    df["Date"] = df["Date"].dt.date
     return df
 
 
@@ -127,6 +128,7 @@ def transform_date_columns(df: DataFrame) -> DataFrame:
     df = apply_date_transformation(df, "date", "%Y-%m-%d %H:%M:%S")
     df["time_in_minutes"] = df["time"].apply(parse_activity_duration_to_minutes)
     df["time_in_hours"] = df["time"].apply(parse_activity_duration_to_hours)
+    df["date"] = df["date"].dt.date
     return df
 
 

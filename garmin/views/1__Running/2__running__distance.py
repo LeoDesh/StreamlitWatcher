@@ -25,7 +25,7 @@ from garmin.utils.misc import compute_delta, create_label_pairs_from_values
 from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
 from garmin.utils.time_utils import (
     get_current_month,
-    get_last_day_of_date,
+    get_last_day_of_month,
     get_month_previous_year,
     parse_str_date,
 )
@@ -84,7 +84,7 @@ def get_current_year_distance_metric(df: DataFrame) -> Metric:
     current_year_km = get_distance_before_given_date(df, get_current_month())
     last_year_km = get_distance_before_given_date(df, get_month_previous_year())
     delta = compute_delta(last_year_km, current_year_km)
-    previous_year_month = get_last_day_of_date(get_month_previous_year())
+    previous_year_month = get_last_day_of_month(get_month_previous_year())
     return Metric(
         label="Distance Covered Year To Date",
         value=f"{round(current_year_km, 2)} km",
@@ -104,7 +104,7 @@ def render_distance_metrics(df: DataFrame) -> None:
 def get_date_distance_of_last_run(df: DataFrame) -> tuple[date, float]:
     df = df.copy().sort_values(by="date", ascending=False)
     run_date, distance = df.loc[0, ["date", "distance"]]
-    return (run_date.date(), distance)
+    return (run_date, distance)
 
 
 def render_run_metric(run_date: date, distance: float) -> Metric:
@@ -134,8 +134,7 @@ def render_monthly_progress(df: DataFrame, column: str, unit: str) -> None:
     if selected_month != current_selected_month:
         set_progress_state(selected_month)
         df = filter_dataframe(df, {"monthly_date": selected_month})
-        header = f"Run Insights for {selected_month.strftime('%b %Y')}"
-        render_run_dialog(header, df, 3)
+        render_run_dialog(selected_month, df, 3)
 
 
 def main() -> None:

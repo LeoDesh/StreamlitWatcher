@@ -11,7 +11,7 @@ from garmin.utils.misc import filter_mapping
 
 
 def construct_activity_header(activity: dict[str, Any]) -> str:
-    date_str = activity["date"].date().strftime("%d.%m.%Y")
+    date_str = activity["date"].strftime("%d.%m.%Y")
     value = activity["formatted_value"]
     return f"{date_str}, {value}"
 

@@ -11,12 +11,12 @@ from garmin.charts.tools import create_bar_chart, create_heat_map_monthly_axis
 from garmin.etl import MIN_YEAR
 from garmin.streamlit_helpers.model import Metric, create_metrics_container
 from garmin.utils.misc import compute_delta, filter_mapping, prettify
-from garmin.utils.pandas_helpers import generate_dates_df
+from garmin.utils.pandas_helpers import generate_daily_dates_df, generate_dates_df
 from garmin.utils.time_utils import (
     get_current_date,
     get_current_month,
     get_first_of_given_year,
-    get_last_day_of_date,
+    get_last_day_of_month,
     get_month_previous_year,
 )
 
@@ -92,7 +92,7 @@ def get_monthly_progression_figure(
     )
     df = date_df.merge(df, how="left", on="monthly_date").fillna(0)
     df[target_column] = df[target_column].cumsum()
-    df["month"] = df["monthly_date"].apply(get_last_day_of_date)
+    df["month"] = df["monthly_date"].apply(get_last_day_of_month)
     return create_bar_chart(
         df,
         "month",
@@ -155,7 +155,10 @@ def validate_streamlit_chart_selection(state: PlotlyState) -> tuple[Any, Any]:
 
 
 @st.dialog(title="Monthly Steps Breakdown", width="large")
-def render_steps_dialog(header: str, df: DataFrame, page_size: int = 3) -> None:
+def render_steps_dialog(
+    selected_month: date, df: DataFrame, page_size: int = 3
+) -> None:
+    header = f"Steps Insights for {selected_month.strftime('%b %Y')}"
     st.subheader(header)
     if df.empty:
         st.info("In the selected timeframe there is no data available.")
@@ -170,12 +173,15 @@ def render_steps_dialog(header: str, df: DataFrame, page_size: int = 3) -> None:
                 record["Date"] = record["Date"].strftime("%d.%m.%Y")
                 create_metrics_container(header="", data=record)
         with chart_column:
-            fig = create_bar_chart(df, "Date", "Steps", y_title="Steps per")
+            daily_df = generate_daily_dates_df(selected_month)
+            chart_df = daily_df.merge(df, how="left").fillna(0)
+            fig = create_bar_chart(chart_df, "Date", "Steps", y_title="Steps per")
             st.plotly_chart(fig)
 
 
 @st.dialog(title="Monthly Runs Breakdown", width="large")
-def render_run_dialog(header: str, df: DataFrame, page_size: int = 3) -> None:
+def render_run_dialog(selected_month: date, df: DataFrame, page_size: int = 3) -> None:
+    header = f"Run Insights for {selected_month.strftime('%b %Y')}"
     st.subheader(header)
     if df.empty:
         st.info("In the selected timeframe there is no data available.")
@@ -191,7 +197,9 @@ def render_run_dialog(header: str, df: DataFrame, page_size: int = 3) -> None:
                 )
                 create_metrics_container(header="", data=record, gap="xxsmall")
         with chart_column:
-            fig = create_bar_chart(df, "date", "distance", y_title="Distance per")
+            daily_df = generate_daily_dates_df(selected_month, date_column="date")
+            chart_df = daily_df.merge(df, how="left").fillna(0)
+            fig = create_bar_chart(chart_df, "date", "distance", y_title="Distance per")
             st.plotly_chart(fig)
 
 

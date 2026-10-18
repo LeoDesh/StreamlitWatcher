@@ -2,7 +2,7 @@ import math
 from datetime import date
 
 import streamlit as st
-from pandas import DataFrame, Timestamp
+from pandas import DataFrame
 from plotly.graph_objects import Figure
 
 from garmin.charts.tools import (
@@ -102,8 +102,8 @@ def filter_dataframe_by_parameters(
     min_pace, max_pace = pace_range
     min_distance, max_distance = distance_range
     df = df[
-        (df["date"] >= Timestamp(start_date).tz_localize("UTC"))
-        & (df["date"] <= Timestamp(end_date).tz_localize("UTC"))
+        (df["date"] >= start_date)
+        & (df["date"] <= end_date)
         & (df["pace_float"] <= max_pace)
         & (df["pace_float"] >= min_pace)
         & (df["distance"] <= max_distance)

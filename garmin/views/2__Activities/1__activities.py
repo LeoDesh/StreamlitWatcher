@@ -27,8 +27,7 @@ def clean_up_dict(data: dict[str, Any]) -> dict[str, Any]:
 
 
 def construct_activity_header(activity: dict[str, Any]) -> str:
-    date = activity["date"].date()
-    date_str = date.strftime("%d.%m.%Y")
+    date_str = activity["date"].strftime("%d.%m.%Y")
     activity_type = activity["activity_type"]
     return f"{date_str} -- {activity_type}"
 

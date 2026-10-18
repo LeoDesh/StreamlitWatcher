@@ -17,6 +17,7 @@ from pandas import (
 from garmin.utils.bucketing import create_bins_by_series
 from garmin.utils.misc import create_label_pairs_from_values
 from garmin.utils.pace_calculations import transform_pace_float_to_pace
+from garmin.utils.time_utils import get_first_day_of_month, get_last_day_of_month
 
 
 def bin_label_heartbeat(
@@ -84,6 +85,12 @@ def generate_dates_df(
     date_column: str = "Date",
 ) -> DataFrame:
     return DataFrame({date_column: date_range(min_date, max_date, freq=freq).date})
+
+
+def generate_daily_dates_df(selected_month: date, date_column: str = "Date"):
+    min_date = get_first_day_of_month(selected_month)
+    max_date = get_last_day_of_month(selected_month)
+    return generate_dates_df(min_date, max_date, freq="D", date_column=date_column)
 
 
 def filter_dataframe(df: DataFrame, filter_kwargs: dict[str, Any]) -> DataFrame:
