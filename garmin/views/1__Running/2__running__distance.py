@@ -9,6 +9,7 @@ from garmin.streamlit_helpers.components import (
     get_current_month_metric,
     get_heatmap,
     get_monthly_progression_figure,
+    render_distance_range_dialog,
     render_run_dialog,
     validate_streamlit_chart_selection,
 )
@@ -20,6 +21,12 @@ from garmin.streamlit_helpers.model import (
     stream_metrics,
 )
 from garmin.streamlit_helpers.nagivation import breadcrumbs
+from garmin.streamlit_helpers.session_states import (
+    ChartEvents,
+    get_event_chart_name,
+    get_event_state,
+    set_event_state,
+)
 from garmin.utils.bucketing import create_bins_by_bounds
 from garmin.utils.misc import compute_delta, create_label_pairs_from_values
 from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
@@ -35,32 +42,47 @@ def construct_header() -> None:
     st.title("Distance Overview")
 
 
-def set_progress_state(value: date | None = None) -> None:
-    st.session_state["run_progress"] = value
-
-
-def get_progress_state() -> date:
-    return st.session_state["run_progress"]
-
-
 def setup_histogram(df: DataFrame) -> None:
-    df = create_histogram_distance_df(df)
+    df = categorize_df(df)
+    chart_df = aggregate_categorization(df)
     fig = create_histogram(
-        df,
+        chart_df,
         "Distribution of kilometres run per unit",
         hovertemplate="%{y} units exercised within range of %{x} km<extra></extra>",
     )
-    st.plotly_chart(fig, width="stretch")
+    event = st.plotly_chart(
+        fig,
+        width="stretch",
+        on_select="rerun",
+        key=get_event_chart_name(ChartEvents.DISTANCE_RANGE_DIALOG),
+        height=450,
+    )
+    distance_range, _ = validate_streamlit_chart_selection(event)
+    if not distance_range:
+        st.caption("Click on a distance range to view the runs.")
+        return
+    previous_selected_distance_range = get_event_state(
+        ChartEvents.DISTANCE_RANGE_DIALOG
+    )
+    if distance_range != previous_selected_distance_range:
+        set_event_state(ChartEvents.DISTANCE_RANGE_DIALOG)
+        df = filter_dataframe(df, {"distance_range": distance_range})
+        header = f"Runs for the distance range {distance_range}"
+        render_distance_range_dialog(header, df, 10)
 
 
-def create_histogram_distance_df(df: DataFrame) -> DataFrame:
+def categorize_df(df: DataFrame) -> DataFrame:
     distance_min = math.floor(df["distance"].min())
     distance_max = math.ceil(df["distance"].max())
     bins = create_bins_by_bounds(distance_min, distance_max, bin_size=2)
     labels = create_label_pairs_from_values(bins, suffix="km")
     df = df.copy()
-    df.loc[:, "binned"] = cut(df["distance"], bins=bins, labels=labels)
-    counts = df["binned"].value_counts().sort_index().reset_index()
+    df.loc[:, "distance_range"] = cut(df["distance"], bins=bins, labels=labels)
+    return df
+
+
+def aggregate_categorization(df: DataFrame) -> DataFrame:
+    counts = df["distance_range"].value_counts().sort_index().reset_index()
     counts.columns = ["km", "Amount"]
     return counts
 
@@ -122,17 +144,22 @@ def render_latest_run_metric(df: DataFrame) -> Metric:
 def render_monthly_progress(df: DataFrame, column: str, unit: str) -> None:
     monthly_df = compute_monthly_distance(df)
     fig = get_monthly_progression_figure(monthly_df, column, unit)
+    st.write(get_event_chart_name(ChartEvents.DISTANCE_DIALOG))
     event = st.plotly_chart(
-        fig, width="stretch", selection_mode="points", on_select="rerun"
+        fig,
+        width="stretch",
+        selection_mode="points",
+        on_select="rerun",
+        key=get_event_chart_name(ChartEvents.DISTANCE_DIALOG),
     )
     month, _ = validate_streamlit_chart_selection(event)
     if not month:
         st.caption("Click on a month to view the details.")
         return
     selected_month = parse_str_date(month, "%Y-%m-%d").date().replace(day=1)
-    current_selected_month = get_progress_state()
-    if selected_month != current_selected_month:
-        set_progress_state(selected_month)
+    previous_selected_month = get_event_state(ChartEvents.DISTANCE_DIALOG)
+    if selected_month != previous_selected_month:
+        set_event_state(ChartEvents.DISTANCE_DIALOG, selected_month)
         df = filter_dataframe(df, {"monthly_date": selected_month})
         render_run_dialog(selected_month, df, 3)
 
@@ -140,7 +167,8 @@ def render_monthly_progress(df: DataFrame, column: str, unit: str) -> None:
 def main() -> None:
     breadcrumbs(__file__)
     construct_header()
-    set_progress_state()
+    set_event_state(ChartEvents.DISTANCE_RANGE_DIALOG)
+    set_event_state(ChartEvents.DISTANCE_DIALOG)
     df = load_running_df()
     render_distance_metrics(df)
     grid_config = [GridConfig(1, height=550), GridConfig(2)]
@@ -151,7 +179,7 @@ def main() -> None:
         setup_histogram(df)
     with grid[1][1]:
         fig = get_heatmap(df, "Distance", "km")
-        st.plotly_chart(fig, width="stretch")
+        st.plotly_chart(fig, width="stretch", height=485)
 
 
 if __name__ == "__main__":

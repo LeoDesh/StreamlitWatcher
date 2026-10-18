@@ -10,6 +10,11 @@ from streamlit.typing import PlotlyState
 from garmin.charts.tools import create_bar_chart, create_heat_map_monthly_axis
 from garmin.etl import MIN_YEAR
 from garmin.streamlit_helpers.model import Metric, create_metrics_container
+from garmin.streamlit_helpers.session_states import (
+    ChartEvents,
+    get_event_chart_name,
+    reset_event_state,
+)
 from garmin.utils.misc import compute_delta, filter_mapping, prettify
 from garmin.utils.pandas_helpers import generate_daily_dates_df, generate_dates_df
 from garmin.utils.time_utils import (
@@ -154,7 +159,11 @@ def validate_streamlit_chart_selection(state: PlotlyState) -> tuple[Any, Any]:
     return (clicked_point.get("x"), clicked_point.get("y"))
 
 
-@st.dialog(title="Monthly Steps Breakdown", width="large")
+@st.dialog(
+    title="Monthly Steps Breakdown",
+    width="large",
+    on_dismiss=lambda: reset_event_state(event=ChartEvents.STEPS_DIALOG),
+)
 def render_steps_dialog(
     selected_month: date, df: DataFrame, page_size: int = 3
 ) -> None:
@@ -179,8 +188,13 @@ def render_steps_dialog(
             st.plotly_chart(fig)
 
 
-@st.dialog(title="Monthly Runs Breakdown", width="large")
+@st.dialog(
+    title="Monthly Runs Breakdown",
+    width="large",
+    on_dismiss=lambda: reset_event_state(event=ChartEvents.DISTANCE_DIALOG),
+)
 def render_run_dialog(selected_month: date, df: DataFrame, page_size: int = 3) -> None:
+    st.write(get_event_chart_name(ChartEvents.DISTANCE_DIALOG))
     header = f"Run Insights for {selected_month.strftime('%b %Y')}"
     st.subheader(header)
     if df.empty:
@@ -201,6 +215,56 @@ def render_run_dialog(selected_month: date, df: DataFrame, page_size: int = 3) -
             chart_df = daily_df.merge(df, how="left").fillna(0)
             fig = create_bar_chart(chart_df, "date", "distance", y_title="Distance per")
             st.plotly_chart(fig)
+
+
+@st.dialog(
+    title="Runs within selected range",
+    width="large",
+    on_dismiss=lambda: reset_event_state(event=ChartEvents.PACE_RANGE_DIALOG),
+)
+def render_pace_range_dialog(header: str, df: DataFrame, page_size: int = 10) -> None:
+    st.subheader(header)
+    if df.empty:
+        st.info("In the selected timeframe there is no data available.")
+    else:
+        render_runs_on_page(df, page_size, "pace_pagination", "date", ascending=False)
+
+
+@st.dialog(
+    title="Runs within selected range",
+    width="large",
+    on_dismiss=lambda: reset_event_state(event=ChartEvents.DISTANCE_RANGE_DIALOG),
+)
+def render_distance_range_dialog(
+    header: str, df: DataFrame, page_size: int = 10
+) -> None:
+    st.subheader(header)
+    if df.empty:
+        st.info("In the selected timeframe there is no data available.")
+    else:
+        render_runs_on_page(
+            df, page_size, "distance_pagination", "date", ascending=False
+        )
+
+
+def render_runs_on_page(
+    df: DataFrame, page_size: int, key: str, sort_key: str, ascending: bool
+) -> None:
+    sorted_df = df.copy().sort_values(by=sort_key, ascending=ascending)
+    records = sorted_df.to_dict(orient="records")
+    for record in get_pagination(records, page_size, key):
+        record = filter_mapping(
+            record,
+            [
+                "date",
+                "distance",
+                "average_pace",
+                "speed",
+                "time",
+                "average_heart_rate",
+            ],
+        )
+        create_metrics_container(header="", data=record, gap="xxsmall")
 
 
 def get_pagination(records: list[Any], page_size: int, key: str) -> list:

@@ -1,5 +1,3 @@
-from datetime import date
-
 import streamlit as st
 from pandas import DataFrame
 
@@ -18,16 +16,14 @@ from garmin.streamlit_helpers.model import (
     stream_metrics,
 )
 from garmin.streamlit_helpers.nagivation import breadcrumbs
+from garmin.streamlit_helpers.session_states import (
+    ChartEvents,
+    get_event_chart_name,
+    get_event_state,
+    set_event_state,
+)
 from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
 from garmin.utils.time_utils import get_current_year, parse_str_date
-
-
-def set_progress_state(value: date | None = None) -> None:
-    st.session_state["steps_progress"] = value
-
-
-def get_progress_state() -> date:
-    return st.session_state["steps_progress"]
 
 
 def render_metrics(df: DataFrame) -> None:
@@ -75,16 +71,21 @@ def render_monthly_progress(df: DataFrame, column: str) -> None:
     monthly_df = compute_monthly_steps(df)
     fig = get_monthly_progression_figure(monthly_df, column)
     event = st.plotly_chart(
-        fig, width="stretch", selection_mode="points", on_select="rerun", height=450
+        fig,
+        width="stretch",
+        selection_mode="points",
+        on_select="rerun",
+        height=450,
+        key=get_event_chart_name(ChartEvents.STEPS_DIALOG),
     )
     month, _ = validate_streamlit_chart_selection(event)
     if not month:
         st.caption("Click on a month to view the details.")
         return
     selected_month = parse_str_date(month, "%Y-%m-%d").date().replace(day=1)
-    current_selected_month = get_progress_state()
-    if selected_month != current_selected_month:
-        set_progress_state(selected_month)
+    previous_selected_month = get_event_state(ChartEvents.STEPS_DIALOG)
+    if selected_month != previous_selected_month:
+        set_event_state(ChartEvents.STEPS_DIALOG, selected_month)
         df = filter_dataframe(df, {"monthly_date": selected_month})
         render_steps_dialog(selected_month, df, 3)
 
@@ -92,7 +93,7 @@ def render_monthly_progress(df: DataFrame, column: str) -> None:
 def main() -> None:
     breadcrumbs(__file__)
     st.header("Monthly Steps Progress")
-    set_progress_state()
+    set_event_state(ChartEvents.STEPS_DIALOG)
     df = load_steps_df()
     monthly_df = compute_monthly_steps(df)
     render_metrics(monthly_df)

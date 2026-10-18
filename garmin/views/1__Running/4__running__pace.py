@@ -11,7 +11,11 @@ from garmin.charts.tools import (
     create_pace_chart,
     get_empty_figure,
 )
-from garmin.streamlit_helpers.components import time_options_provider
+from garmin.streamlit_helpers.components import (
+    render_pace_range_dialog,
+    time_options_provider,
+    validate_streamlit_chart_selection,
+)
 from garmin.streamlit_helpers.load import load_running_df
 from garmin.streamlit_helpers.model import (
     GridConfig,
@@ -20,6 +24,12 @@ from garmin.streamlit_helpers.model import (
     stream_metrics,
 )
 from garmin.streamlit_helpers.nagivation import breadcrumbs
+from garmin.streamlit_helpers.session_states import (
+    ChartEvents,
+    get_event_chart_name,
+    get_event_state,
+    set_event_state,
+)
 from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
 from garmin.utils.pandas_helpers import (
     categorize_df_column,
@@ -58,12 +68,14 @@ def setup_distance_range_selection(df: DataFrame) -> tuple[int, int]:
     return (chosen_distance_min, chosen_distance_max)
 
 
-def create_pace_histogram_df(df: DataFrame, number_of_bins: int) -> DataFrame:
-    column = "pace_float"
-    df = categorize_df_column(
-        df, column, number_of_bins, get_pace_bins_labels_for_dataframe
+def categorize_df(df: DataFrame, number_of_bins: int) -> DataFrame:
+    return categorize_df_column(
+        df, "pace_float", number_of_bins, get_pace_bins_labels_for_dataframe
     )
-    counts_df = df[column].value_counts().sort_index().reset_index()
+
+
+def aggregate_categorization(df: DataFrame) -> DataFrame:
+    counts_df = df["pace_float"].value_counts().sort_index().reset_index()
     counts_df.columns = ["Minute per km", "Amount"]
     return counts_df
 
@@ -72,13 +84,26 @@ def setup_pace_histogram(df: DataFrame, number_of_bins: int) -> Figure:
     if df.empty:
         fig = get_empty_figure()
     else:
-        df = create_pace_histogram_df(df, number_of_bins)
+        df = categorize_df(df, number_of_bins)
+        chart_df = aggregate_categorization(df)
         fig = create_histogram(
-            df,
+            chart_df,
             "Pace Distribution",
             hovertemplate="%{y} units exercised within pace of %{x} min/km<extra></extra>",
         )
-    return fig
+    event = st.plotly_chart(
+        fig, on_select="rerun", key=get_event_chart_name(ChartEvents.PACE_RANGE_DIALOG)
+    )
+    pace, _ = validate_streamlit_chart_selection(event)
+    if not pace:
+        st.caption("Click on a pace range to view the runs.")
+        return
+    previous_selected_pace = get_event_state(ChartEvents.PACE_RANGE_DIALOG)
+    if pace != previous_selected_pace:
+        set_event_state(ChartEvents.PACE_RANGE_DIALOG, pace)
+        df = filter_dataframe(df, {"pace_float": pace})
+        header = f"Runs for the pace range {pace}"
+        render_pace_range_dialog(header, df)
 
 
 def render_filter_parameters(
@@ -160,6 +185,7 @@ def main() -> None:
     breadcrumbs(__file__)
     st.title("Pace Overview")
     render_pace_metrics(df)
+    set_event_state(ChartEvents.PACE_RANGE_DIALOG)
     filters = render_filter_parameters(df)
     df = filter_dataframe_by_parameters(df, filters)
     if has_df_too_few_rows(df):
@@ -169,8 +195,7 @@ def main() -> None:
         st.stop()
     grid = create_grid([GridConfig(columns=2), GridConfig(columns=1)])
     with grid[0][0]:
-        fig = setup_pace_histogram(df, 15)
-        st.plotly_chart(fig)
+        setup_pace_histogram(df, 15)
     with grid[1][0]:
         fig = create_pace_chart(df)
         st.plotly_chart(fig)
