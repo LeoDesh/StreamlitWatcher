@@ -1,17 +1,24 @@
 from pathlib import Path
 
 
-def get_relative_file_path(file_dunder: str, relative_folder_path: Path) -> Path:
-    """Returns path of given file, relative to the project, if it is found within the views folder
+def get_relative_file_path(
+    file_dunder: str, relative_folder_path: Path, idx_shift: int = 0
+) -> Path:
+    """Returns path of given file, relative to the project, if it is found within the provided folder
     Args:
         str: dunder file (__file__)
         path: relative_folder_path
+        idx_shift: skip folders within path
     Returns:
         Path: abbrevated file path
     Example:
-        relative_folder_path: views: ...projects/python/garmin/views/1__Running/1__running.py ->  garmin/views/1__Running/1__running.py
-        relative_folder_path: views: ...projects/python/garmin/charts/config.py ->  ...projects/python/garmin/charts/config.py
-        relative_folder_path: garmin: ...projects/python/garmin/charts/config.py ->  ...python/garmin/charts/config.py
+        relative_folder_path: views, idx_shift: 0: ...projects/python/garmin/views/1__Running/1__running.py ->  garmin/views/1__Running/1__running.py
+
+        relative_folder_path: views: idx_shift: 0 ...projects/python/garmin/charts/config.py ->  ...projects/python/garmin/charts/config.py
+
+        relative_folder_path: garmin: idx_shift: 0 ...projects/python/garmin/charts/config.py ->  python/garmin/charts/config.py
+
+        relative_folder_path: garmin: idx_shift: 2 ...projects/python/garmin/charts/config.py ->  charts/config.py
     """
     path = Path(file_dunder).resolve()
     path_parts = path.parts
@@ -19,7 +26,7 @@ def get_relative_file_path(file_dunder: str, relative_folder_path: Path) -> Path
     project_folder_name = relative_folder_path.parent.name
     if view_folder_name in path_parts and project_folder_name in path_parts:
         idx = path_parts.index(project_folder_name)
-        return Path(*path_parts[idx:])
+        return Path(*path_parts[idx + idx_shift :])
     return path
 
 
@@ -72,6 +79,15 @@ def get_section_folder_mapping(view_folder: Path) -> dict[str, Path]:
         section_name: folder_path
         for (section_name, folder_path) in sorted_folder_dict.values()
     }
+
+
+def get_url_path(
+    file: Path, relative_folder: Path, shift_idx: int = 2, use_hyphen: bool = True
+) -> str:
+    """Converts provided file path and the folder to abbrevate the path into a url str"""
+    raw_url_path = get_relative_file_path(str(file), relative_folder, shift_idx)
+    url_path = f"{raw_url_path.parent.stem}/{raw_url_path.stem}"
+    return url_path.replace("/", "-") if use_hyphen else url_path
 
 
 def extract_order_number_from_page(file: Path) -> int:

@@ -1,5 +1,11 @@
 ### Changes
 
+#### 0.5.1
+
+- refactored dialog, reset after exiting the dialog
+- added dialog for pace and distance range histogram
+- adjusted paths in url, created separate function
+
 #### 0.5.0
 
 - pagination for activities

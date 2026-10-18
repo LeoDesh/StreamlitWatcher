@@ -12,7 +12,6 @@ from garmin.etl import MIN_YEAR
 from garmin.streamlit_helpers.model import Metric, create_metrics_container
 from garmin.streamlit_helpers.session_states import (
     ChartEvents,
-    get_event_chart_name,
     reset_event_state,
 )
 from garmin.utils.misc import compute_delta, filter_mapping, prettify
@@ -194,7 +193,6 @@ def render_steps_dialog(
     on_dismiss=lambda: reset_event_state(event=ChartEvents.DISTANCE_DIALOG),
 )
 def render_run_dialog(selected_month: date, df: DataFrame, page_size: int = 3) -> None:
-    st.write(get_event_chart_name(ChartEvents.DISTANCE_DIALOG))
     header = f"Run Insights for {selected_month.strftime('%b %Y')}"
     st.subheader(header)
     if df.empty:

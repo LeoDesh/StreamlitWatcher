@@ -23,6 +23,7 @@ from garmin.utils.path_utils import (
     get_page_name,
     get_relative_file_path,
     get_section_folder_mapping,
+    get_url_path,
     look_for_page_in_folder,
 )
 
@@ -33,11 +34,11 @@ def generate_page_from_file_path(file: Path, parent_folder: str = "") -> Streaml
     page_name = " ".join(file.capitalize() for file in file_name.split("_"))
     parent_folder = get_page_name(parent_folder) if parent_folder else ""
     page_config = PAGE_CONFIG.get(parent_folder).get(file_name)
-    initial_config = {"icon": Icons.MONITORING} if not page_config else page_config
+    initial_config = page_config if page_config else {"icon": Icons.MONITORING}
     config = initial_config | {
         "title": page_name,
         "page": file,
-        "url_path": str(file).replace("/", "-"),
+        "url_path": get_url_path(file, VIEW_FOLDER),
     }
     return st.Page(**config)
 

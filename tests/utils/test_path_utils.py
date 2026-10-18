@@ -6,6 +6,7 @@ from garmin.utils.path_utils import (
     get_folders,
     get_relative_file_path,
     get_section_folder_mapping,
+    get_url_path,
     look_for_page_in_folder,
     split_page_name,
 )
@@ -27,6 +28,24 @@ def test_get_relative_file_path_shortened_path(get_test_path: Path):
         get_relative_file_path(full_file_path, view_path)
         == Path(*view_path.parts[-2:]) / "1__Running" / "1__running.py"
     )
+
+
+@pytest.mark.path_utils
+def test_get_relative_file_path_use_index(get_test_path: Path):
+    view_path = get_test_path / "views"
+    file = view_path / "1__Running" / "1__running.py"
+    full_file_path = file.resolve()
+    assert get_relative_file_path(full_file_path, view_path, 2) == Path(
+        "1__Running/1__running.py"
+    )
+
+
+@pytest.mark.path_utils
+def test_get_relative_file_path_index_issue(get_test_path: Path):
+    view_path = get_test_path / "views" / "1__Running"
+    file = view_path / "1__Running" / "1__running.py"
+    full_file_path = file.resolve()
+    assert get_relative_file_path(full_file_path, view_path, 6) == Path(".")
 
 
 @pytest.mark.path_utils
@@ -90,3 +109,17 @@ def test_get_section_folder_mapping(get_test_path: Path):
         "Running": get_test_path / "views" / "1__Running",
         "Steps": get_test_path / "views" / "2__Steps",
     }
+
+
+@pytest.mark.path_utils
+def test_get_url_path_hyphen(get_test_path: Path):
+    view_path = get_test_path / "views"
+    file = view_path / "1__Running" / "1__running.py"
+    assert get_url_path(file, view_path) == "1__Running-1__running"
+
+
+@pytest.mark.path_utils
+def test_get_url_path_non_hyphen(get_test_path: Path):
+    view_path = get_test_path / "views"
+    file = view_path / "1__Running" / "1__running.py"
+    assert get_url_path(file, view_path, use_hyphen=False) == "1__Running/1__running"

@@ -144,7 +144,6 @@ def render_latest_run_metric(df: DataFrame) -> Metric:
 def render_monthly_progress(df: DataFrame, column: str, unit: str) -> None:
     monthly_df = compute_monthly_distance(df)
     fig = get_monthly_progression_figure(monthly_df, column, unit)
-    st.write(get_event_chart_name(ChartEvents.DISTANCE_DIALOG))
     event = st.plotly_chart(
         fig,
         width="stretch",
