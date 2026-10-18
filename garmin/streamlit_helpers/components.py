@@ -108,9 +108,9 @@ def render_monthly_progression(df: DataFrame, target_column: str, unit: str) -> 
     st.plotly_chart(fig, width="stretch")
 
 
-def setup_heatmap(
+def get_heatmap(
     df: DataFrame, target_column: str, unit: str = "", formatting: str = ".02f"
-) -> None:
+) -> Figure:
     df = df.copy()
     df.columns = [prettify(col) for col in df.columns]
     pivot_df = df.pivot_table(
@@ -118,12 +118,11 @@ def setup_heatmap(
     ).fillna(0)
     column_details = f" in {unit}" if unit else ""
     template_details = unit if unit else ""
-    fig = create_heat_map_monthly_axis(
+    return create_heat_map_monthly_axis(
         pivot_df,
         f"{target_column}{column_details} per month over years",
         hovertemplate=f"%{{y}}, %{{x}}: %{{z:{formatting}}} {template_details} <extra></extra>",
     )
-    st.plotly_chart(fig, width="stretch")
 
 
 def get_current_month_metric(

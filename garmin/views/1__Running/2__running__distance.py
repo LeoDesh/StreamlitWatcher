@@ -7,9 +7,9 @@ from pandas import DataFrame, cut
 from garmin.charts.tools import create_histogram
 from garmin.streamlit_helpers.components import (
     get_current_month_metric,
+    get_heatmap,
     get_monthly_progression_figure,
     render_run_dialog,
-    setup_heatmap,
     validate_streamlit_chart_selection,
 )
 from garmin.streamlit_helpers.load import load_running_df
@@ -127,6 +127,7 @@ def render_monthly_progress(df: DataFrame, column: str, unit: str) -> None:
     )
     month, _ = validate_streamlit_chart_selection(event)
     if not month:
+        st.caption("Click on a month to view the details.")
         return
     selected_month = parse_str_date(month, "%Y-%m-%d").date().replace(day=1)
     current_selected_month = get_progress_state()
@@ -150,7 +151,8 @@ def main() -> None:
     with grid[1][0]:
         setup_histogram(df)
     with grid[1][1]:
-        setup_heatmap(df, "Distance", "km")
+        fig = get_heatmap(df, "Distance", "km")
+        st.plotly_chart(fig, width="stretch")
 
 
 if __name__ == "__main__":

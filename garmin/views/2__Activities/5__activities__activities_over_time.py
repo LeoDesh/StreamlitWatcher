@@ -70,7 +70,7 @@ def get_gantt_filters(df: DataFrame) -> dict[str, Any]:
 def show_activities_timeline(df: DataFrame) -> None:
     gantt_df = get_gantt_df(df, "date")
     fig = create_gantt_chart(gantt_df, "date", "date_end", "activity_type")
-    st.plotly_chart(fig, width="stretch")
+    st.plotly_chart(fig, width="stretch", height=300)
 
 
 def prepare_heatmap_df(df: DataFrame, category: str | list[str]) -> DataFrame:
@@ -109,11 +109,11 @@ def show_heat_map(df: DataFrame, category: str | list[str], unit_choice: bool) -
         title,
         hovertemplate="%{y}, %{x}: " + template + " <extra></extra>",
     )
-    st.plotly_chart(fig, width="stretch")
+    st.plotly_chart(fig, width="stretch", height=300)
 
 
 def heatmap_filter(df: DataFrame) -> tuple[list[str], bool]:
-    metric_col, selection_col = st.columns([1, 3], gap="large")
+    metric_col, selection_col, _ = st.columns([1, 1, 2], gap="large")
     activity_options = get_activities(df)
     selection = selection_col.multiselect(
         "Category",
@@ -171,12 +171,12 @@ def main() -> None:
     st.header("Activities over time", text_alignment="center")
     df = load_activity_df()
     render_activities_metrics(df)
-    grid = create_grid([GridConfig(columns=2)])
+    grid = create_grid([GridConfig(columns=1), GridConfig(columns=1)])
     with grid[0][0]:
         gantt_filters = get_gantt_filters(df)
         gantt_df = filter_dataframe(df, gantt_filters)
         show_activities_timeline(gantt_df)
-    with grid[0][1]:
+    with grid[1][0]:
         category, unit_choice = heatmap_filter(df)
         show_heat_map(df, category, unit_choice)
 

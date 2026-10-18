@@ -130,7 +130,7 @@ def create_gantt_chart(
     fig.update_layout(
         height=400,
         bargap=0.2,
-        yaxis_title=None,
+        yaxis={"title": None, "showticklabels": False},
         legend_title_text=prettify(category_col),
     )
     return fig
@@ -150,7 +150,7 @@ def create_heat_map(
     fig.update_layout(
         title=title,
         xaxis=x_axis_kwargs | {"title": columns_name},
-        yaxis_title=index_name,
+        yaxis={"title": index_name, "type": "category", "dtick": 1},
         template="plotly_white",
         width=1200,
     )

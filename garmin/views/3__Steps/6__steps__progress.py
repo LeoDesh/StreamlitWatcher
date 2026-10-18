@@ -5,9 +5,9 @@ from pandas import DataFrame
 
 from garmin.streamlit_helpers.components import (
     get_current_month_metric,
+    get_heatmap,
     get_monthly_progression_figure,
     render_steps_dialog,
-    setup_heatmap,
     validate_streamlit_chart_selection,
 )
 from garmin.streamlit_helpers.load import load_steps_df
@@ -75,10 +75,11 @@ def render_monthly_progress(df: DataFrame, column: str) -> None:
     monthly_df = compute_monthly_steps(df)
     fig = get_monthly_progression_figure(monthly_df, column)
     event = st.plotly_chart(
-        fig, width="stretch", selection_mode="points", on_select="rerun"
+        fig, width="stretch", selection_mode="points", on_select="rerun", height=450
     )
     month, _ = validate_streamlit_chart_selection(event)
     if not month:
+        st.caption("Click on a month to view the details.")
         return
     selected_month = parse_str_date(month, "%Y-%m-%d").date().replace(day=1)
     current_selected_month = get_progress_state()
@@ -100,7 +101,8 @@ def main() -> None:
     with grid[0][0]:
         render_monthly_progress(df, "steps")
     with grid[0][1]:
-        setup_heatmap(df, "Steps", "Steps", ",.0f")
+        fig = get_heatmap(df, "Steps", "Steps", ",.0f")
+        st.plotly_chart(fig, width="stretch", height=490)
 
 
 main()

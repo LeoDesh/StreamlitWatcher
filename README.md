@@ -1,12 +1,12 @@
 ### Overall Structure
 
 ### Streamlit
-- starting point in app
-- pages are in views
-- organized through navigation
+- starting point in app.py
+- pages are in garmin/view folder
+- organized through garmin/streamlit_helpers/navigation.py
 
 ### Handling data
-- garmin folder
+- garmin/etl/data folder
 - loads, translates and operates on the data
 
 ### Running checks
@@ -18,12 +18,19 @@
 - uv run ruff check --fix 
 - uv run ruff format .
 
-### Before starting the app
+### Start the App
+
+#### Via uv
+- uv run streamlit run app.py
+
+#### Via Docker
+
+##### Requirements
 - rename .env.example to .env
 - create an empty certbot folder
 - create a certs folder and create certificates (localhost.pem, localhost-key.pem) with a tool (e.g. mkcert)
 
-### Starting the app
+##### Starting the app
 - run: docker compose up -d
 
 
