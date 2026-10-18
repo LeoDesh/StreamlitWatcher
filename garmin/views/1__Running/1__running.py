@@ -73,7 +73,7 @@ def render_year_statistics(df: DataFrame) -> None:
             "Average of %{y:.2f} km per run",
         ),
     }
-    construct_year_statistics(df, mapping, "Units")
+    construct_year_statistics(df, mapping, "Units", get_year_overview_table)
 
 
 def main() -> None:
@@ -89,7 +89,7 @@ def main() -> None:
         ]
     )
     with home_tab:
-        render_year_statistics(overview_df)
+        render_year_statistics(df)
     with distance_tab:
         construct_column_highlights(df, "distance", 5)
     with speed_tab:

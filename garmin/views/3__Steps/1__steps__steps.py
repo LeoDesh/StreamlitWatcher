@@ -61,7 +61,7 @@ def render_year_statistics(df: DataFrame) -> None:
             "%{y:.0f} Steps on average required to fulfill the daily goal",
         ),
     }
-    construct_year_statistics(df, mapping, "Steps")
+    construct_year_statistics(df, mapping, "Steps", get_year_overview_table)
 
 
 def main() -> None:
@@ -70,7 +70,7 @@ def main() -> None:
     df = load_steps_df()
     overview_df = get_year_overview_table(df)
     render_metrics(overview_df)
-    render_year_statistics(overview_df)
+    render_year_statistics(df)
 
 
 main()

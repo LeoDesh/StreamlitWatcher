@@ -50,6 +50,39 @@ def create_bar_chart(
     return fig
 
 
+def create_steps_bar_chart(df: DataFrame) -> Figure:
+    fig = Figure()
+    df["color"] = df["color"].apply(lambda x: THEME.__getattribute__(x))
+    fig.add_bar(
+        x=df["Date"],
+        y=df["Steps"],
+        marker_color=df["color"],
+        hovertemplate=(
+            "<b>Date:</b> %{x}<br>"
+            "<b>Steps:</b> %{y}<br>"
+            "<extra></extra>"  # Blendet den standardmäßigen Trace-Namen aus
+        ),
+    )
+    fig.add_scatter(
+        x=df["Date"],
+        y=df["Goal"],
+        mode="lines",
+        line={"color": THEME.black, "width": 3, "dash": "solid"},
+        hovertemplate=(
+            "<b>Daily Goal:</b> %{y}<br>"
+            "<extra></extra>"  # Blendet den standardmäßigen Trace-Namen aus
+        ),
+    )
+    fig.update_layout(
+        xaxis=X_AXIS_BASE_CONFIG | {"title": "Date"},
+        yaxis_title="Amount",
+        title={"text": "Daily Steps in detail", "font": {"size": 20}},
+        hovermode="x unified",
+        showlegend=False,
+    )
+    return fig
+
+
 def create_pace_chart(df: DataFrame) -> Figure:
     date_col, speed_col, pace_col, hpm_col = (
         "date",

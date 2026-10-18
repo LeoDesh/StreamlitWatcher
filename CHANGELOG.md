@@ -5,6 +5,8 @@
 - refactored dialog, reset after exiting the dialog
 - added dialog for pace and distance range histogram
 - adjusted paths in url, created separate function
+- added ytd toggle for overview pages
+- added *step bar chart* to show more details
 
 #### 0.5.0
 

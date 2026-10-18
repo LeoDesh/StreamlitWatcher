@@ -13,7 +13,8 @@ class Theme:
     primary_blue: str = Palette.BLUE_500
     bright_blue: str = Palette.BLUE_300
     purple: str = Palette.PURPLE_500
-    amber: str = Palette.AMBER_500
+    primary_amber: str = Palette.AMBER_500
+    bright_amber: str = Palette.AMBER_300
     magenta: str = Palette.MAGENTA_500
     teal: str = Palette.TEAL_500
     coral: str = Palette.CORAL_500
@@ -28,6 +29,6 @@ class Theme:
 class LightTheme(Theme):
     name: str = "Light"
     purple: str = Palette.PURPLE_300
-    amber: str = Palette.AMBER_300
+    primary_amber: str = Palette.AMBER_300
     teal: str = Palette.TEAL_300
     coral: str = Palette.CORAL_300

@@ -1,10 +1,12 @@
 import pytest
 from pandas import DataFrame
 
+from garmin.etl.config import STEPS_DATA_FILE
 from garmin.etl.load import (
     add_distance_to_indoor_cycling,
     add_pace_to_indoor_cycling,
     load_activity_file,
+    load_steps_file,
     rename_activity_df_columns,
     transform_activity,
     transform_dataframe,
@@ -98,3 +100,13 @@ def test_add_pace(
 )
 def test_add_distance(activity: str, title: str, distance: float, expected: float):
     assert add_distance_to_indoor_cycling(activity, title, distance) == expected
+
+
+@pytest.mark.etl
+def test_steps_df_dates_are_unique() -> None:
+    df = load_steps_file(STEPS_DATA_FILE)
+    agg_df = df.groupby(by="Date", as_index=False).agg(total=("Date", "count"))
+    agg_df = agg_df[agg_df["total"] > 1]
+    assert agg_df.empty, (
+        f"Expected 0 cases, but {len(agg_df)} cases occured ({agg_df['Date'].tolist()})"
+    )

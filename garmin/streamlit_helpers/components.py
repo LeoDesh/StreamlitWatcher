@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from datetime import date, timedelta
 from math import ceil
 from typing import Any
@@ -7,7 +8,11 @@ from pandas import DataFrame
 from plotly.graph_objects import Figure
 from streamlit.typing import PlotlyState
 
-from garmin.charts.tools import create_bar_chart, create_heat_map_monthly_axis
+from garmin.charts.tools import (
+    create_bar_chart,
+    create_heat_map_monthly_axis,
+    create_steps_bar_chart,
+)
 from garmin.etl import MIN_YEAR
 from garmin.streamlit_helpers.model import Metric, create_metrics_container
 from garmin.streamlit_helpers.session_states import (
@@ -64,19 +69,49 @@ def time_options_provider() -> tuple[date, date]:
             st.stop()
 
 
-def construct_year_statistics(
-    df: DataFrame, config: dict[str, tuple[str, str]], default: str
-) -> None:
-    category_col, _ = st.columns([1, 2])
+def get_selection_params(categories: list[str], default: str) -> tuple[str, bool]:
+    category_col, to_date_toggle_col, _ = st.columns([1, 1, 1])
     category = category_col.selectbox(
         label="Category",
         index=None,
-        options=list(config.keys()),
+        options=categories,
         placeholder="Choose your Category",
         label_visibility="collapsed",
     )
     category = category if category else default
+    filter_to_current_month = to_date_toggle_col.toggle(
+        label="Filter To Current Month",
+        value=False,
+        help="Excludes runs of previous years in months, which are yet to come",
+    )
+    return (category, filter_to_current_month)
+
+
+def filter_prior_months(
+    df: DataFrame, month: int, month_col: str = "month"
+) -> DataFrame:
+    return df[df[month_col] <= month]
+
+
+def construct_year_statistics(
+    df: DataFrame,
+    config: dict[str, tuple[str, str]],
+    default: str,
+    aggregation_func: Callable[[DataFrame], DataFrame],
+) -> None:
+    category, filter_to_current_month = get_selection_params(
+        list(config.keys()), default
+    )
+    month = get_current_month().month
+    df = filter_prior_months(df, month) if filter_to_current_month else df
+    df = aggregation_func(df)
     header, template = config.get(category)
+    render_year_bar_chart(df, category, header, template)
+
+
+def render_year_bar_chart(
+    df: DataFrame, category: str, header: str, template: str
+) -> None:
     hovertemplate = f"{template} in %{{x}} <extra></extra>"
     fig = create_bar_chart(
         df, "year", category, y_title=f"{header} per", hovertemplate=hovertemplate
@@ -158,6 +193,23 @@ def validate_streamlit_chart_selection(state: PlotlyState) -> tuple[Any, Any]:
     return (clicked_point.get("x"), clicked_point.get("y"))
 
 
+def enrich_steps_df(df: DataFrame) -> DataFrame:
+    def color_by_steps_and_goal(steps: int, goal: int) -> str:
+        if goal <= 0:
+            return "bright_red"
+        ratio = float(steps) / goal
+        if ratio < 0.7:
+            return "bright_red"
+        elif ratio < 1.0:
+            return "bright_amber"
+        return "bright_green"
+
+    df["color"] = df.apply(
+        lambda row: color_by_steps_and_goal(row["Steps"], row["Goal"]), axis=1
+    )
+    return df
+
+
 @st.dialog(
     title="Monthly Steps Breakdown",
     width="large",
@@ -174,16 +226,19 @@ def render_steps_dialog(
         top_days_column, chart_column = st.columns([1, 1])
         with top_days_column:
             sorted_df = df.copy().sort_values(by="Steps", ascending=False)
+            sorted_df["Day"] = sorted_df["Date"].apply(lambda x: x.day)
             records = sorted_df.to_dict(orient="records")
+            filter_cols = ["Day", "Steps", "Goal", "Distance"]
             for record in get_pagination(records, page_size, "steps_pagination"):
-                record = filter_mapping(record, ["Date", "Steps"])
-                record["Steps"] = int(record["Steps"])
-                record["Date"] = record["Date"].strftime("%d.%m.%Y")
+                record = filter_mapping(record, filter_cols)
+                for col in filter_cols:
+                    record[col] = int(record[col])
                 create_metrics_container(header="", data=record)
         with chart_column:
             daily_df = generate_daily_dates_df(selected_month)
             chart_df = daily_df.merge(df, how="left").fillna(0)
-            fig = create_bar_chart(chart_df, "Date", "Steps", y_title="Steps per")
+            chart_df = enrich_steps_df(chart_df)
+            fig = create_steps_bar_chart(chart_df)
             st.plotly_chart(fig)
 
 
