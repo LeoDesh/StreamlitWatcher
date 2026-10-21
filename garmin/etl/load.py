@@ -118,6 +118,7 @@ def apply_date_transformation(
         lambda x: parse_value_to_datetime(x, format)
     )
     df["hour"] = df[date_column].apply(lambda x: x.hour)
+    df["day"] = df[date_column].apply(lambda x: x.day)
     df["month"] = df[date_column].apply(lambda x: x.month)
     df["year"] = df[date_column].apply(lambda x: x.year)
     df["monthly_date"] = df[date_column].apply(lambda x: date(x.year, x.month, 1))

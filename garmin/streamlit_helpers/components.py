@@ -235,8 +235,11 @@ def render_steps_dialog(
                     record[col] = int(record[col])
                 create_metrics_container(header="", data=record)
         with chart_column:
-            daily_df = generate_daily_dates_df(selected_month)
-            chart_df = daily_df.merge(df, how="left").fillna(0)
+            if selected_month != get_current_month():
+                daily_df = generate_daily_dates_df(selected_month)
+                chart_df = daily_df.merge(df, how="left").fillna(0)
+            else:
+                chart_df = df
             chart_df = enrich_steps_df(chart_df)
             fig = create_steps_bar_chart(chart_df)
             st.plotly_chart(fig)
@@ -248,7 +251,7 @@ def render_steps_dialog(
     on_dismiss=lambda: reset_event_state(event=ChartEvents.DISTANCE_DIALOG),
 )
 def render_run_dialog(selected_month: date, df: DataFrame, page_size: int = 3) -> None:
-    header = f"Run Insights for {selected_month.strftime('%b %Y')}"
+    header = f"Run Insights for {selected_month.strftime('%B %Y')}"
     st.subheader(header)
     if df.empty:
         st.info("In the selected timeframe there is no data available.")
@@ -256,7 +259,6 @@ def render_run_dialog(selected_month: date, df: DataFrame, page_size: int = 3) -
         top_days_column, chart_column = st.columns([1, 1])
         with top_days_column:
             sorted_df = df.copy().sort_values(by="distance", ascending=False)
-            sorted_df["day"] = sorted_df["date"].apply(lambda x: x.day)
             records = sorted_df.to_dict(orient="records")
             for record in get_pagination(records, page_size, "run_pagination"):
                 record = filter_mapping(
@@ -280,7 +282,18 @@ def render_pace_range_dialog(header: str, df: DataFrame, page_size: int = 10) ->
     if df.empty:
         st.info("In the selected timeframe there is no data available.")
     else:
-        render_runs_on_page(df, page_size, "pace_pagination", "date", ascending=False)
+        attribute_list = [
+            "date",
+            "distance",
+            "average_pace",
+            "speed",
+            "time",
+            "average_heart_rate",
+        ]
+        sort_list = ["date", "distance"]
+        render_runs_on_page(
+            df, page_size, "distance_pagination", attribute_list, sort_list
+        )
 
 
 @st.dialog(
@@ -295,28 +308,52 @@ def render_distance_range_dialog(
     if df.empty:
         st.info("In the selected timeframe there is no data available.")
     else:
+        attribute_list = [
+            "date",
+            "distance",
+            "average_pace",
+            "speed",
+            "time",
+            "average_heart_rate",
+        ]
+        sort_list = ["date", "distance"]
         render_runs_on_page(
-            df, page_size, "distance_pagination", "date", ascending=False
+            df, page_size, "distance_pagination", attribute_list, sort_list
         )
 
 
 def render_runs_on_page(
-    df: DataFrame, page_size: int, key: str, sort_key: str, ascending: bool
+    df: DataFrame,
+    page_size: int,
+    pagination_key: str,
+    attribute_list: list[str],
+    sort_selection: dict[str, str] | list[str],
+    sort_index: int = 0,
 ) -> None:
-    sorted_df = df.copy().sort_values(by=sort_key, ascending=ascending)
-    records = sorted_df.to_dict(orient="records")
-    for record in get_pagination(records, page_size, key):
-        record = filter_mapping(
-            record,
-            [
-                "date",
-                "distance",
-                "average_pace",
-                "speed",
-                "time",
-                "average_heart_rate",
-            ],
-        )
+    sort_mapping = (
+        sort_selection
+        if isinstance(sort_selection, dict)
+        else {item: item for item in sort_selection}
+    )
+    sort_list = list(sort_mapping.keys())
+    pagination_col, sort_col, order_col = st.columns([2, 1, 1])
+    sort_key = sort_col.selectbox(
+        label="Sort By",
+        options=sort_list,
+        index=None,
+        placeholder="Sort By",
+        label_visibility="collapsed",
+        format_func=prettify,
+    )
+    sort_key = sort_key if sort_key else sort_list[sort_index]
+    sort_item = sort_mapping[sort_key]
+    sort_order = order_col.toggle(label="Order Ascending", value=True)
+    sorted_df = df.copy().sort_values(by=sort_item, ascending=sort_order)
+    with pagination_col:
+        records = sorted_df.to_dict(orient="records")
+        chosen_records = get_pagination(records, page_size, pagination_key)
+    for record in chosen_records:
+        record = filter_mapping(record, attribute_list)
         create_metrics_container(header="", data=record, gap="xxsmall")
 
 

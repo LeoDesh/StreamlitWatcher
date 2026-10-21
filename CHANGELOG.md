@@ -1,5 +1,10 @@
 ### Changes
 
+#### 0.5.2
+
+- added sort item and order for dialog boxes
+- removed duplicate st.set_page_layout
+
 #### 0.5.1
 
 - refactored dialog, reset after exiting the dialog
