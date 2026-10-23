@@ -225,15 +225,15 @@ def render_steps_dialog(
     else:
         top_days_column, chart_column = st.columns([1, 1])
         with top_days_column:
-            sorted_df = df.copy().sort_values(by="Steps", ascending=False)
-            sorted_df["Day"] = sorted_df["Date"].apply(lambda x: x.day)
-            records = sorted_df.to_dict(orient="records")
-            filter_cols = ["Day", "Steps", "Goal", "Distance"]
-            for record in get_pagination(records, page_size, "steps_pagination"):
-                record = filter_mapping(record, filter_cols)
-                for col in filter_cols:
-                    record[col] = int(record[col])
-                create_metrics_container(header="", data=record)
+            attributes = ["day", "Steps", "Goal", "Distance"]
+            render_runs_in_dialog(
+                df,
+                page_size,
+                "monthly_steps_pagination",
+                attribute_list=attributes,
+                sort_selection=attributes,
+                sort_index=1,
+            )
         with chart_column:
             if selected_month != get_current_month():
                 daily_df = generate_daily_dates_df(selected_month)
@@ -258,13 +258,20 @@ def render_run_dialog(selected_month: date, df: DataFrame, page_size: int = 3) -
     else:
         top_days_column, chart_column = st.columns([1, 1])
         with top_days_column:
-            sorted_df = df.copy().sort_values(by="distance", ascending=False)
-            records = sorted_df.to_dict(orient="records")
-            for record in get_pagination(records, page_size, "run_pagination"):
-                record = filter_mapping(
-                    record, ["day", "distance", "average_pace", "time"]
-                )
-                create_metrics_container(header="", data=record, gap="xxsmall")
+            sort_selection = {
+                "day": "day",
+                "distance": "distance",
+                "average_pace": "speed",
+                "time": "time_in_minutes",
+            }
+            render_runs_in_dialog(
+                df,
+                page_size,
+                "monthly_run_pagination",
+                attribute_list=list(sort_selection.keys()),
+                sort_selection=sort_selection,
+                sort_index=1,
+            )
         with chart_column:
             daily_df = generate_daily_dates_df(selected_month, date_column="date")
             chart_df = daily_df.merge(df, how="left").fillna(0)
@@ -278,22 +285,7 @@ def render_run_dialog(selected_month: date, df: DataFrame, page_size: int = 3) -
     on_dismiss=lambda: reset_event_state(event=ChartEvents.PACE_RANGE_DIALOG),
 )
 def render_pace_range_dialog(header: str, df: DataFrame, page_size: int = 10) -> None:
-    st.subheader(header)
-    if df.empty:
-        st.info("In the selected timeframe there is no data available.")
-    else:
-        attribute_list = [
-            "date",
-            "distance",
-            "average_pace",
-            "speed",
-            "time",
-            "average_heart_rate",
-        ]
-        sort_list = ["date", "distance"]
-        render_runs_on_page(
-            df, page_size, "distance_pagination", attribute_list, sort_list
-        )
+    render_default_runs(header, df, page_size, "pace_pagination")
 
 
 @st.dialog(
@@ -303,6 +295,12 @@ def render_pace_range_dialog(header: str, df: DataFrame, page_size: int = 10) ->
 )
 def render_distance_range_dialog(
     header: str, df: DataFrame, page_size: int = 10
+) -> None:
+    render_default_runs(header, df, page_size, "distance_pagination")
+
+
+def render_default_runs(
+    header: str, df: DataFrame, page_size: int, pagination_name: str
 ) -> None:
     st.subheader(header)
     if df.empty:
@@ -316,19 +314,18 @@ def render_distance_range_dialog(
             "time",
             "average_heart_rate",
         ]
-        sort_list = ["date", "distance"]
-        render_runs_on_page(
-            df, page_size, "distance_pagination", attribute_list, sort_list
-        )
+        sort_list = ["date", "distance", "speed"]
+        render_runs_in_dialog(df, page_size, pagination_name, attribute_list, sort_list)
 
 
-def render_runs_on_page(
+def render_runs_in_dialog(
     df: DataFrame,
     page_size: int,
     pagination_key: str,
     attribute_list: list[str],
     sort_selection: dict[str, str] | list[str],
     sort_index: int = 0,
+    order_ascending: bool = False,
 ) -> None:
     sort_mapping = (
         sort_selection
@@ -347,7 +344,7 @@ def render_runs_on_page(
     )
     sort_key = sort_key if sort_key else sort_list[sort_index]
     sort_item = sort_mapping[sort_key]
-    sort_order = order_col.toggle(label="Order Ascending", value=True)
+    sort_order = order_col.toggle(label="Order Ascending", value=order_ascending)
     sorted_df = df.copy().sort_values(by=sort_item, ascending=sort_order)
     with pagination_col:
         records = sorted_df.to_dict(orient="records")
