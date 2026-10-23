@@ -27,4 +27,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 # Port freigeben und Anwendung starten
 EXPOSE 8501
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.fileWatcherType=poll"]
+

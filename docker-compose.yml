@@ -2,6 +2,13 @@ services:
   # 1. Ihre Streamlit App
   streamlit-app:
     build: .
+    command:
+      [
+        "python", "app.py", "streamlit",
+        "--server.port=8501",
+        "--server.address=0.0.0.0",
+        "--server.fileWatcherType=poll"
+      ]
     container_name: streamlit_app
     restart: unless-stopped
     expose:
@@ -33,4 +40,28 @@ services:
     #  - NGINX_ENVSUBST_FILTER=APP_DOMAIN SSL_CERT_FILE SSL_KEY_FILE
     depends_on:
       - streamlit-app
+
+  # 3. The Redis Broker
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  worker:
+    build: .
+    command: ["python", "app.py", "worker"]
+    environment:
+      REDIS_URL: ${REDIS_URL}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  scheduler:
+    build: .
+    command: ["python", "app.py", "schedule"]
+    environment:
+      REDIS_URL: ${REDIS_URL}
+    depends_on:
+      - redis
+    restart: unless-stopped
 
