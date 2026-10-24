@@ -2,9 +2,9 @@ name: Run Pytest with uv
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 jobs:
   test:
@@ -49,3 +49,20 @@ jobs:
       run: |
         uv run ruff check
         uv run ruff format --check
+
+  deploy:
+    needs: [test,lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH into EC2 and Rebuild App
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/app/StreamlitWatcher/
+            git pull origin main
+            docker compose build
+            docker compose up -d --remove-orphans
+            docker image prune -f
