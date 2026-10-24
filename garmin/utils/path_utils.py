@@ -12,13 +12,17 @@ def get_relative_file_path(
     Returns:
         Path: abbrevated file path
     Example:
-        relative_folder_path: views, idx_shift: 0: ...projects/python/garmin/views/1__Running/1__running.py ->  garmin/views/1__Running/1__running.py
+        >>> get_relative_file_path("projects/python/garmin/views/1__Running/1__running.py",Path("views")):
+        Path("garmin/views/1__Running/1__running.py")
 
-        relative_folder_path: views: idx_shift: 0 ...projects/python/garmin/charts/config.py ->  ...projects/python/garmin/charts/config.py
+        >>> get_relative_file_path("projects/python/garmin/charts/config.py",Path("views")):
+        Path("projects/python/garmin/charts/config.py")
 
-        relative_folder_path: garmin: idx_shift: 0 ...projects/python/garmin/charts/config.py ->  python/garmin/charts/config.py
+        >>> get_relative_file_path("projects/python/garmin/charts/config.py",Path("garmin")):
+        Path("python/garmin/charts/config.py")
 
-        relative_folder_path: garmin: idx_shift: 2 ...projects/python/garmin/charts/config.py ->  charts/config.py
+        >>> get_relative_file_path("projects/python/garmin/charts/config.py",Path("garmin"),idx_shift=2):
+        Path("charts/config.py")
     """
     path = Path(file_dunder).resolve()
     path_parts = path.parts
@@ -41,16 +45,16 @@ def look_for_page_in_folder(folder: Path, searched_page: str) -> Path | None:
 
 def split_page_name(file: str | Path) -> tuple[int, str]:
     """Splits file into index and page name
+    Args:
+        file (str): The path or name of the file to be split.
     Returns:
-            tuple[int,str]: Index and Page Name of provided file
+        tuple[int,str]: Index and Page Name of provided file
     Example:
-        Path("1__running.py") -> [1,"running"]
+        >>> split_page_name("1__running.py")
+        (1,"running")
 
-        "1__running" -> [1,"running"]
-
-        Path("2__running__distance.py") -> [2,"distance"]
-
-        "2__running__distance.py" -> [2,"distance"]
+        >>> split_page_name(Path("2__running__distance.py"))
+        (2,"distance")
     """
     file_name = file if isinstance(file, str) else file.stem
     idx, *_, page_name = file_name.split("__")
@@ -58,7 +62,16 @@ def split_page_name(file: str | Path) -> tuple[int, str]:
 
 
 def get_page_name(file_path: Path) -> str:
-    """Returns Page Name of given file"""
+    """Returns the page name for the provided path
+
+    Args:
+        file_path (Path): path to the streamlit page
+    Returns:
+        str: page name
+    Example:
+        >>> get_page_name(Path("1__running.py"))
+        "running"
+    """
     _, page_name = split_page_name(file_path)
     return page_name
 
