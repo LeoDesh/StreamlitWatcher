@@ -13,7 +13,9 @@ page_files = [p for folder in FOLDERS for p in folder.glob("*.py")]
     "page_file", page_files, ids=lambda p: str(p.relative_to(VIEW_FOLDER))
 )
 def test_streamlit_pages(page_file: str):
-    at = AppTest.from_file("../../app.py").run()
+    at = AppTest.from_file("../../app.py")
+    at.session_state["is_automated_test"] = True
+    at.run()
     at.switch_page(page_file)
     at.run()
     assert not at.exception, f"Error on '{page_file}': {at.exception}"

@@ -1,6 +1,9 @@
+import inspect
 from collections.abc import Callable
 from datetime import date, timedelta
+from functools import wraps
 from math import ceil
+from pathlib import Path
 from typing import Any
 
 import streamlit as st
@@ -14,13 +17,12 @@ from garmin.charts.tools import (
     create_steps_bar_chart,
 )
 from garmin.etl import MIN_YEAR
+from garmin.logger.constants import LOGGER
 from garmin.streamlit_helpers.model import Metric, create_metrics_container
-from garmin.streamlit_helpers.session_states import (
-    ChartEvents,
-    reset_event_state,
-)
+from garmin.streamlit_helpers.session_states import ChartEvents, reset_event_state
 from garmin.utils.misc import compute_delta, filter_mapping, prettify
 from garmin.utils.pandas_helpers import generate_daily_dates_df, generate_dates_df
+from garmin.utils.path_utils import get_page_name
 from garmin.utils.time_utils import (
     get_current_date,
     get_current_month,
@@ -28,6 +30,58 @@ from garmin.utils.time_utils import (
     get_last_day_of_month,
     get_month_previous_year,
 )
+
+
+def extract_ip_address() -> str:
+    return st.context.headers.get("X-Forwarded-For", st.context.ip_address) or ""
+
+
+def extract_covered_ip_address() -> str:
+    ip = extract_ip_address()
+
+    if not ip and "." not in ip and ":" not in ip:
+        return "0.0.0.0"
+
+    if "." in ip:
+        parts = ip.split(".")
+        parts[-1] = "XXX"
+        return ".".join(parts)
+
+    if ":" in ip:
+        parts = ip.split(":")
+        parts[-1] = "XXXX"
+        return ":".join(parts)
+
+
+def log_page_visit(page_name: str):
+    masked_ip = extract_covered_ip_address()
+    user_agent = st.context.headers.get("User-Agent", "Unknown-Agent")
+    delimiter = "||"
+    LOGGER.info(
+        f"LOGGED VISIT {delimiter} Page: {page_name} {delimiter} IP: {masked_ip} {delimiter} Agent: {user_agent}"
+    )
+
+
+def track_visit(func: Callable[[], None]):
+    """
+    Decorator to automatically log unique page views based on the filename.
+    """
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+
+        if not st.runtime.exists() or st.session_state.get("is_automated_test", False):
+            return func(*args, **kwargs)
+        file_path = Path(inspect.getfile(func))
+        page_name = get_page_name(file_path)
+        state_key = f"logged_{page_name}"
+        if state_key not in st.session_state:
+            log_page_visit(page_name)
+            st.session_state[state_key] = True
+
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 def time_options_provider() -> tuple[date, date]:

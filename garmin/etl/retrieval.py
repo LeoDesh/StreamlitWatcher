@@ -60,6 +60,7 @@ ACTIVITY_COUNT_THRESHOLD = 50
 RECORD_CONFIG_FILE = DATA_PATH / "PersonalRecordsConfig.json"
 RECORD_DATA_FILE = DATA_PATH / "PersonalRecords.csv"
 
+
 ### Activities
 
 

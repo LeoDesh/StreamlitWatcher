@@ -1,4 +1,4 @@
-name: Run Pytest with uv
+name: Streamlit Pipeline
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     steps:
     # 1. Code aus dem GitHub-Repository auschecken
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     # 2. uv installieren und Python-Version aus pyproject.toml lesen
     - name: Set up uv
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up uv
       uses: astral-sh/setup-uv@v7

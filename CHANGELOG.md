@@ -1,5 +1,11 @@
 ### Changes
 
+#### 0.5.3
+
+- workflow update
+- added anonymous logging
+- decorated corresponding functions
+
 #### 0.5.2
 
 - added sort item and order for dialog boxes

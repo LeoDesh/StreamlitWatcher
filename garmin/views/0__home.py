@@ -1,6 +1,7 @@
 import streamlit as st
 from pandas import DataFrame
 
+from garmin.streamlit_helpers.components import track_visit
 from garmin.streamlit_helpers.load import (
     load_activity_df,
     load_running_df,
@@ -84,6 +85,7 @@ def render_cards() -> None:
             st.page_link(page, label=f"Go to {section}")
 
 
+@track_visit
 def main() -> None:
     st.header("Activity Diary")
     running_df, activity_df, steps_df = (

@@ -94,3 +94,7 @@ def extract_order_number_from_page(file: Path) -> int:
     """Returns Sort Number for given file"""
     index, _ = split_page_name(file)
     return index
+
+
+def create_folder_if_not_exists(folder: Path) -> None:
+    folder.mkdir(exist_ok=True)
