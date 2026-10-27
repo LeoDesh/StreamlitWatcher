@@ -18,7 +18,7 @@ workaround.py
 validation.py
 report.html
 .garminconnect
-
+garmin/logger/logs
 certbot
 certs
 

@@ -3,7 +3,7 @@ from typing import Any
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.streamlit_helpers.components import get_pagination
+from garmin.streamlit_helpers.components import get_pagination, track_visit
 from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
 from garmin.streamlit_helpers.load import load_activity_df
 from garmin.streamlit_helpers.model import (
@@ -116,6 +116,7 @@ def render_activities_metrics(df: DataFrame) -> None:
     )
 
 
+@track_visit
 def main() -> None:
     breadcrumbs(__file__)
     st.header("Overview", text_alignment="center")

@@ -1,7 +1,7 @@
 import streamlit as st
 from pandas import DataFrame
 
-from garmin.streamlit_helpers.components import construct_year_statistics
+from garmin.streamlit_helpers.components import construct_year_statistics, track_visit
 from garmin.streamlit_helpers.config import Icons
 from garmin.streamlit_helpers.constants import ACTIVITY_ATTR_COLUMNS
 from garmin.streamlit_helpers.load import load_running_df
@@ -76,6 +76,7 @@ def render_year_statistics(df: DataFrame) -> None:
     construct_year_statistics(df, mapping, "Units", get_year_overview_table)
 
 
+@track_visit
 def main() -> None:
     breadcrumbs(__file__)
     df = load_running_df()

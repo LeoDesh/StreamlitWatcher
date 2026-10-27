@@ -11,6 +11,7 @@ from garmin.streamlit_helpers.components import (
     get_monthly_progression_figure,
     render_distance_range_dialog,
     render_run_dialog,
+    track_visit,
     validate_streamlit_chart_selection,
 )
 from garmin.streamlit_helpers.load import load_running_df
@@ -163,6 +164,7 @@ def render_monthly_progress(df: DataFrame, column: str, unit: str) -> None:
         render_run_dialog(selected_month, df, 3)
 
 
+@track_visit
 def main() -> None:
     breadcrumbs(__file__)
     construct_header()
