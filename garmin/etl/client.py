@@ -6,6 +6,8 @@ from garminconnect import Garmin
 
 load_dotenv()
 GARMIN_FOLDER = os.getenv("GARMIN_TOKEN_DIR")
+USER = os.getenv("GARMIN_USER")
+PASSWORD = os.getenv("GARMIN_PASSWORD")
 
 
 class DataClient(Protocol):
@@ -16,8 +18,6 @@ class DataClient(Protocol):
 
 
 def get_garmin_client() -> Garmin:
-    user = os.getenv("GARMIN_USER")
-    password = os.getenv("GARMIN_PASSWORD")
-    client = Garmin(user, password)
+    client = Garmin(USER, PASSWORD)
     client.login(tokenstore=GARMIN_FOLDER)
     return client

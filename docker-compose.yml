@@ -53,6 +53,8 @@ services:
   worker:
     build: .
     command: ["python", "app.py", "worker"]
+    env_file:
+      - .env
     environment:
       REDIS_URL: ${REDIS_URL}
     depends_on:
@@ -61,6 +63,8 @@ services:
     volumes:
       - ./app.py:/app/app.py
       - ./garmin:/app/garmin
+      - ./${GARMIN_TOKEN_DIR}:/app/${GARMIN_TOKEN_DIR}
+      
   scheduler:
     build: .
     command: ["python", "app.py", "schedule"]

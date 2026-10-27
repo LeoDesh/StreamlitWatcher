@@ -26,7 +26,8 @@
 #### Via Docker
 
 ##### Requirements
-- rename .env.example to .env 
+- rename .env.example to .env
+- rename .garminconnect_example to .garminconnect
 - create an empty certbot folder
 - create a certs folder and create certificates (localhost.pem, localhost-key.pem) with a tool (e.g. mkcert)
 
