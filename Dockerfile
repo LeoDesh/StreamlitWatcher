@@ -25,6 +25,4 @@ COPY . .
 # Den Pfad zur virtuellen Umgebung standardmäßig nutzen
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Port freigeben und Anwendung starten
-EXPOSE 8501
 

@@ -12,18 +12,30 @@
         }
     },
     "handlers": {
-        "rotation_file": {
+        "app_rotation_file": {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "INFO",
             "formatter": "simple",
             "filename": "garmin/logger/logs/messages.log",
             "maxBytes": 10000,
             "backupCount": 3
+        },
+        "job_rotation_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "level": "INFO",
+            "formatter": "simple",
+            "filename": "garmin/logger/logs/jobs.log",
+            "maxBytes": 10000,
+            "backupCount": 3
         }
     },
     "loggers": {
         "app": {
-            "handlers": ["rotation_file"],
+            "handlers": ["app_rotation_file"],
+            "level": "INFO"
+        },
+        "jobs": {
+            "handlers": ["job_rotation_file"],
             "level": "INFO"
         }
     }

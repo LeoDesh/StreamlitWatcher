@@ -1,6 +1,6 @@
 from rq import Queue, Worker
 
-from jobs.config import get_redis_conn
+from garmin.jobs.config import get_redis_conn
 
 
 def run_worker():

@@ -9,4 +9,5 @@ LOG_DIR = BASE_DIR / "logs"
 create_folder_if_not_exists(LOG_DIR)
 logging_config = load_json(BASE_DIR / "config.json")
 logging.config.dictConfig(config=logging_config)
-LOGGER = logging.getLogger("app")
+APP_LOGGER = logging.getLogger("app")
+JOBS_LOGGER = logging.getLogger("jobs")

@@ -1,13 +1,11 @@
 import os
 from typing import Any, Protocol
 
-import garth
 from dotenv import load_dotenv
 from garminconnect import Garmin
 
 load_dotenv()
-GARTH_FOLDER = ".garth"
-GARMIN_FOLDER = ".garminconnect"
+GARMIN_FOLDER = os.getenv("GARMIN_TOKEN_DIR")
 
 
 class DataClient(Protocol):
@@ -15,14 +13,6 @@ class DataClient(Protocol):
     def connectapi(request_str: str) -> list[dict[str, Any]]: ...
     def get_activities(start: int, limit: int) -> list[dict[str, Any]]: ...
     def get_personal_record() -> dict[str, Any]: ...
-
-
-def get_garth_client() -> Garmin:
-    client = Garmin()
-    garth.resume(GARTH_FOLDER)
-    client.garth = garth.client
-    client.display_name = garth.client.profile["displayName"]
-    return client
 
 
 def get_garmin_client() -> Garmin:

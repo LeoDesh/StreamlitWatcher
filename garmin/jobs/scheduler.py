@@ -2,11 +2,12 @@ from datetime import datetime
 
 from rq.cron import CronScheduler
 
-from jobs.config import get_redis_conn
+from garmin.jobs.config import get_redis_conn
+from garmin.logger import JOBS_LOGGER
 
 
 def exec_job() -> None:
-    print(f"done. {datetime.now()}")
+    JOBS_LOGGER.info(f"DONE. {datetime.now()}")
 
 
 def run_scheduler():

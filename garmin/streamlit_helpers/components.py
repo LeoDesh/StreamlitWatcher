@@ -17,7 +17,7 @@ from garmin.charts.tools import (
     create_steps_bar_chart,
 )
 from garmin.etl import MIN_YEAR
-from garmin.logger.constants import LOGGER
+from garmin.logger.constants import APP_LOGGER
 from garmin.streamlit_helpers.model import Metric, create_metrics_container
 from garmin.streamlit_helpers.session_states import ChartEvents, reset_event_state
 from garmin.utils.misc import compute_delta, filter_mapping, prettify
@@ -57,7 +57,7 @@ def log_page_visit(page_name: str):
     masked_ip = extract_covered_ip_address()
     user_agent = st.context.headers.get("User-Agent", "Unknown-Agent")
     delimiter = "||"
-    LOGGER.info(
+    APP_LOGGER.info(
         f"LOGGED VISIT {delimiter} Page: {page_name} {delimiter} IP: {masked_ip} {delimiter} Agent: {user_agent}"
     )
 

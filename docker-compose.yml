@@ -4,7 +4,7 @@ services:
     build: .
     command:
       [
-        "python", "app.py", "streamlit",
+       "python","-m", "streamlit","run", "app.py", "streamlit",
         "--server.port=8501",
         "--server.address=0.0.0.0",
         "--server.fileWatcherType=poll"
@@ -14,6 +14,7 @@ services:
     expose:
       - "8501"
     volumes:
+      - ./${GARMIN_TOKEN_DIR}:/app/${GARMIN_TOKEN_DIR}
       - ./app.py:/app/app.py
       - ./garmin:/app/garmin
       - ./pyproject.toml:/app/pyproject.toml
@@ -44,8 +45,10 @@ services:
   # 3. The Redis Broker
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
 
   worker:
     build: .
@@ -55,7 +58,9 @@ services:
     depends_on:
       - redis
     restart: unless-stopped
-
+    volumes:
+      - ./app.py:/app/app.py
+      - ./garmin:/app/garmin
   scheduler:
     build: .
     command: ["python", "app.py", "schedule"]
@@ -64,4 +69,9 @@ services:
     depends_on:
       - redis
     restart: unless-stopped
+    volumes:
+      - ./app.py:/app/app.py
+      - ./garmin:/app/garmin
 
+volumes:
+  redis_data:
