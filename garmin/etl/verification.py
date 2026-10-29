@@ -30,5 +30,5 @@ def validate_activities_file(file: Path) -> bool:
     ]
     for validator, err_msg in validators:
         if not validator(file):
-            raise ValueError(err_msg)
+            raise ValueError(f"{err_msg}. {file}")
     return True
