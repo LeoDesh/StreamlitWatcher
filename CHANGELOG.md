@@ -1,5 +1,11 @@
 ### Changes
 
+#### 0.6.0
+
+- using redis to refresh data
+- removed files from data
+- updated README.md and .env.example
+
 #### 0.5.3
 
 - workflow update
