@@ -5,6 +5,7 @@ from garmin.etl.config import (
     STEPS_DATA_FILE,
 )
 from garmin.etl.load import (
+    initialize_data,
     load_activity_file,
     load_records_file,
     load_running_data,
@@ -16,6 +17,7 @@ __all__ = [
     "MIN_YEAR",
     "RECORDS_DATA_FILE",
     "STEPS_DATA_FILE",
+    "initialize_data",
     "load_activity_file",
     "load_records_file",
     "load_running_data",

@@ -1,6 +1,7 @@
 import json
 from datetime import date
 from pathlib import Path
+from shutil import copy
 from typing import Any
 
 from pandas import DataFrame
@@ -8,6 +9,8 @@ from pandas import DataFrame
 from garmin.etl.config import (
     ACTIVITY_TRANSLATION_MAPPING,
     ACTIVITY_TYPE_MAPPING,
+    DATA_PATH,
+    EXAMPLE_PATH,
     GARMIN_COLUMNS,
     MIN_DISTANCE,
     MIN_YEAR,
@@ -182,3 +185,12 @@ def save_as_json(filename: Path, data: dict[str, Any]) -> None:
 def load_json(filename: Path) -> dict[str, Any]:
     with open(filename) as f:
         return json.load(f)
+
+
+def initialize_data() -> None:
+    files = ["Activities.csv", "Steps.csv", "PersonalRecords.csv"]
+    for file in files:
+        trg_file = DATA_PATH / file
+        src_file = EXAMPLE_PATH / file
+        if not trg_file.exists() and src_file.exists():
+            copy(src_file, trg_file)

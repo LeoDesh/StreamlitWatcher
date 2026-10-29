@@ -1,5 +1,6 @@
 import sys
 
+from garmin.etl import initialize_data
 from garmin.jobs import run_scheduler, run_worker
 from garmin.streamlit_helpers.nagivation import (
     define_sidebar,
@@ -25,6 +26,8 @@ def main():
             run_worker()
         case "schedule":
             run_scheduler()
+        case "setup":
+            initialize_data()
         case _:
             raise ValueError(f"Unknown application mode: {mode}")
 

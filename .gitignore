@@ -23,3 +23,6 @@ certbot
 certs
 
 GoodToKnow.MD
+garmin/etl/data/Activities.csv
+garmin/etl/data/Steps.csv
+garmin/etl/data/PersonalRecords.csv
