@@ -104,7 +104,7 @@ def test_add_distance(activity: str, title: str, distance: float, expected: floa
 
 @pytest.mark.etl
 def test_steps_df_dates_are_unique() -> None:
-    df = load_steps_file(EXAMPLE_PATH / "steps.csv")
+    df = load_steps_file(EXAMPLE_PATH / "Steps.csv")
     agg_df = df.groupby(by="Date", as_index=False).agg(total=("Date", "count"))
     agg_df = agg_df[agg_df["total"] > 1]
     assert agg_df.empty, (
