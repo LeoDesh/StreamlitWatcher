@@ -21,7 +21,7 @@ def track_func(func: Callable[[DataClient], None], *args):
     try:
         result = func(*args)
         JOBS_LOGGER.info(f"[{func.__name__}] succeded.")
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         JOBS_LOGGER.info(f"[{func.__name__}] failed. {exc!s}")
         result = None
     end = time.perf_counter()
