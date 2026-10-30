@@ -12,8 +12,7 @@ from garmin.etl.retrieval import (
 from garmin.jobs.config import get_redis_conn
 from garmin.logger import JOBS_LOGGER
 
-CRON_SCHEDULE = "* * * * *"
-CRON_SCHEDULE = "0 8-20/4 * * *"
+CRON_SCHEDULE = "0 8-23/5 * * *"
 
 
 def track_func(func: Callable[[DataClient], None], *args):

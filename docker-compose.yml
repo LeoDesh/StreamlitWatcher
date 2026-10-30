@@ -7,12 +7,13 @@ services:
        "python","-m", "streamlit","run", "app.py", "streamlit",
         "--server.port=8501",
         "--server.address=0.0.0.0",
-        "--server.fileWatcherType=poll"
       ]
     container_name: streamlit_app
     restart: unless-stopped
     expose:
       - "8501"
+    environment:
+      - STREAMLIT_SERVER_WATCH_VARIABLE_FILES=${STREAMLIT_SERVER_WATCH_VARIABLE_FILES}
     volumes:
       - ./${GARMIN_TOKEN_DIR}:/app/${GARMIN_TOKEN_DIR}
       - ./app.py:/app/app.py
