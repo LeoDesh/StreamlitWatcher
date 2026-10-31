@@ -18,6 +18,7 @@ from garmin.etl.transformation import (
     scale_steps,
     scale_streak,
 )
+from garmin.logger import JOBS_LOGGER
 from garmin.utils.misc import prettify_by_sep
 from garmin.utils.pace_calculations import (
     transform_seconds_to_hour_minutes_seconds_format,
@@ -192,5 +193,8 @@ def update_garmin_steps(garmin: DataClient) -> None:
         start = start_date.strftime("%Y-%m-%d")
     steps_data = get_daily_steps(garmin, start=start)
     new_steps_df = transform_daily_steps(steps_data)
+    JOBS_LOGGER.info(
+        f"Data Length {len(steps_data)}. Latest Date. {new_steps_df['Date'].max()}"
+    )
     df = extend_df_by_id(new_steps_df, steps_df, "Date")
     save_df_to_csv(df, STEPS_DATA_FILE)
