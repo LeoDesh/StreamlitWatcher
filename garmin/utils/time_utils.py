@@ -1,5 +1,5 @@
 import calendar
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 
@@ -30,6 +30,11 @@ def get_current_year() -> int:
     return today.year
 
 
+def get_first_of_current_year() -> date:
+    yr = get_current_year()
+    return get_first_of_given_year(yr)
+
+
 def get_month_previous_year() -> date:
     current_month = get_current_month()
     return current_month.replace(year=current_month.year - 1)
@@ -46,6 +51,12 @@ def get_last_day_of_month(given_date: date) -> date:
 
 def get_first_day_of_month(given_date: date) -> date:
     return given_date.replace(day=1)
+
+
+def get_previous_month() -> date:
+    current_month = get_current_month()
+    last_day_of_previous_month = current_month - timedelta(days=1)
+    return get_first_day_of_month(last_day_of_previous_month)
 
 
 def transform_date_to_datetime(date_value: date) -> datetime:

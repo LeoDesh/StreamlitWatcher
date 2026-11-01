@@ -1,5 +1,11 @@
 ### Changes
 
+#### 0.6.1
+
+- month to day restriction in comparisons (metrics in steps and distance)
+- redis cronjob schedule adaption
+- added monthly pace chart
+
 #### 0.6.0
 
 - using redis to refresh data

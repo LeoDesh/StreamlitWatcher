@@ -21,7 +21,11 @@ from garmin.logger.constants import APP_LOGGER
 from garmin.streamlit_helpers.model import Metric, create_metrics_container
 from garmin.streamlit_helpers.session_states import ChartEvents, reset_event_state
 from garmin.utils.misc import compute_delta, filter_mapping, prettify
-from garmin.utils.pandas_helpers import generate_daily_dates_df, generate_dates_df
+from garmin.utils.pandas_helpers import (
+    aggregate_df_named_column,
+    generate_daily_dates_df,
+    generate_dates_df,
+)
 from garmin.utils.path_utils import get_page_name
 from garmin.utils.time_utils import (
     get_current_date,
@@ -223,17 +227,21 @@ def get_current_month_metric(
 ) -> Metric:
     current_month = get_current_month()
     previous_year_month = get_month_previous_year()
-    date_km_dict = dict(zip(df["monthly_date"], df[column]))
-    current_km, previous_km = (
-        date_km_dict.get(current_month, 0),
-        date_km_dict.get(previous_year_month, 0),
+    current_day = get_current_date().day
+    df = df[df["day"] <= current_day]
+    df = aggregate_df_named_column(df, "monthly_date", column)
+    month_unit_mapping = dict(zip(df["monthly_date"], df[column]))
+    current_unit, previous_unit = (
+        month_unit_mapping.get(current_month, 0),
+        month_unit_mapping.get(previous_year_month, 0),
     )
-    delta = compute_delta(previous_km, current_km)
+    delta = compute_delta(previous_unit, current_unit)
+    text_day_range = f"1.-{current_day}." if current_day > 1 else "1."
     return Metric(
-        label="Distance Covered Current Month",
-        value=f"{current_km:{format}} {unit}",
+        label=f"{unit} Covered Current Month",
+        value=f"{current_unit:{format}}",
         delta=f"{delta} %",
-        help=f"Comparison with {previous_year_month.strftime('%b, %Y')}",
+        help=f"Comparison with {text_day_range} {previous_year_month.strftime('%b, %Y')}",
     )
 
 

@@ -8,6 +8,7 @@ from plotly.graph_objects import Figure
 from garmin.charts.tools import (
     create_histogram,
     create_hpm_heatmap,
+    create_hpm_pace_chart,
     create_pace_chart,
     get_empty_figure,
 )
@@ -32,12 +33,13 @@ from garmin.streamlit_helpers.session_states import (
 )
 from garmin.utils.pace_calculations import transform_speed_to_pace_prettified
 from garmin.utils.pandas_helpers import (
+    aggregrate_df_by_dict,
     categorize_df_column,
     create_df_pivot_hpm_pace,
     filter_dataframe,
     get_pace_bins_labels_for_dataframe,
 )
-from garmin.utils.time_utils import get_current_year
+from garmin.utils.time_utils import get_current_year, get_month_previous_year
 
 type FilterParameters = list[
     tuple[date, date], tuple[float, float], tuple[float, float]
@@ -180,6 +182,27 @@ def has_df_too_few_rows(df: DataFrame) -> bool:
     return len(df) <= 3
 
 
+def render_pace_hpm_chart(df: DataFrame) -> None:
+    month_previous_year = get_month_previous_year()
+    latest_runs_df = df.copy()[df["monthly_date"] >= month_previous_year]
+    fig = create_hpm_pace_chart(latest_runs_df, title="Pace and HPM Latest 12 Months")
+    st.plotly_chart(fig)
+
+
+def render_pace_metrics_chart(df: DataFrame) -> None:
+    df = aggregrate_df_by_dict(
+        df,
+        "monthly_date",
+        {
+            "median_pace": ("speed", "median"),
+            "max_pace": ("speed", "max"),
+            "min_pace": ("speed", "min"),
+        },
+    )
+    fig = create_pace_chart(df)
+    st.plotly_chart(fig)
+
+
 def main() -> None:
     df = load_running_df()
     breadcrumbs(__file__)
@@ -193,17 +216,18 @@ def main() -> None:
             f"In the chosen time range must be at least 4 runs! There are {len(df)} runs."
         )
         st.stop()
-    grid = create_grid([GridConfig(columns=2), GridConfig(columns=1)])
+    grid = create_grid([GridConfig(columns=2), GridConfig(columns=2)])
     with grid[0][0]:
         setup_pace_histogram(df, 15)
-    with grid[1][0]:
-        fig = create_pace_chart(df)
-        st.plotly_chart(fig)
     with grid[0][1]:
         pivot_df = create_df_pivot_hpm_pace(df)
         pivot_df.columns.name = "Pace min/km"
         fig = create_hpm_heatmap(pivot_df, "Pace & HPM Correlation in %")
         st.plotly_chart(fig)
+    with grid[1][0]:
+        render_pace_metrics_chart(df)
+    with grid[1][1]:
+        render_pace_hpm_chart(df)
 
 
 if __name__ == "__main__":

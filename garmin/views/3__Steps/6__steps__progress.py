@@ -23,7 +23,11 @@ from garmin.streamlit_helpers.session_states import (
     set_event_state,
 )
 from garmin.utils.pandas_helpers import aggregate_df_named_column, filter_dataframe
-from garmin.utils.time_utils import get_current_year, parse_str_date
+from garmin.utils.time_utils import (
+    get_first_of_current_year,
+    get_previous_month,
+    parse_str_date,
+)
 
 
 def render_metrics(df: DataFrame) -> None:
@@ -32,8 +36,8 @@ def render_metrics(df: DataFrame) -> None:
         get_month_with_highest_steps_metric,
         get_current_month_steps_metric,
     ]
-    metrics = [func(df) for func in metric_funcs]
-    stream_metrics(metrics, num_cols=3)
+    metrics = [func(df) for func in metric_funcs if func(df)]
+    stream_metrics(metrics, num_cols=len(metrics))
 
 
 def compute_monthly_steps(df: DataFrame) -> DataFrame:
@@ -42,20 +46,33 @@ def compute_monthly_steps(df: DataFrame) -> DataFrame:
     )
 
 
-def get_average_monthly_steps_metric(df: DataFrame) -> Metric:
-    df = df.copy()
-    current_year = get_current_year()
-    df["year"] = df["monthly_date"].apply(lambda x: x.year)
-    current_year_df = filter_dataframe(df, {"year": current_year})
-    average_steps_per_month = current_year_df["steps"].mean()
-    return Metric(
-        label=f"Average Steps per month in {current_year}",
-        value=f"{average_steps_per_month:,.0f}",
+def get_average_monthly_steps_metric(df: DataFrame) -> Metric | None:
+    df = compute_monthly_steps(df)
+    previous_month = get_previous_month()
+    first_month_of_year = get_first_of_current_year()
+    current_year = first_month_of_year.year
+    filter_mask = (df["monthly_date"] >= first_month_of_year) & (
+        df["monthly_date"] <= previous_month
+    )
+    filtered_df = df[filter_mask]
+    average_steps_per_month = (
+        filtered_df["steps"].mean() if not filtered_df.empty else 0
+    )
+    time_label = f"{first_month_of_year.strftime('%b')}-{previous_month.strftime('%b')}, {current_year}"
+    return (
+        Metric(
+            label=f"Average Steps Per Month {time_label}",
+            value=f"{average_steps_per_month:,.0f}",
+        )
+        if previous_month.year == first_month_of_year.year
+        else None
     )
 
 
 def get_month_with_highest_steps_metric(df: DataFrame) -> Metric:
-    df = df.copy().sort_values(by="steps", ascending=False).reset_index()
+    df = (
+        compute_monthly_steps(df).sort_values(by="steps", ascending=False).reset_index()
+    )
     value, date = df.loc[0, ["steps", "monthly_date"]]
     return Metric(
         label=f"Month with most Steps covered: {date.strftime('%b, %Y')}",
@@ -64,7 +81,7 @@ def get_month_with_highest_steps_metric(df: DataFrame) -> Metric:
 
 
 def get_current_month_steps_metric(df: DataFrame) -> Metric:
-    return get_current_month_metric(df, "steps", ",.0f", "Steps")
+    return get_current_month_metric(df, "Steps", ",.0f", "Steps")
 
 
 def render_monthly_progress(df: DataFrame, column: str) -> None:
@@ -95,8 +112,7 @@ def main() -> None:
     st.header("Monthly Steps Progress")
     set_event_state(ChartEvents.STEPS_DIALOG)
     df = load_steps_df()
-    monthly_df = compute_monthly_steps(df)
-    render_metrics(monthly_df)
+    render_metrics(df)
     grid = create_grid([GridConfig(columns=2)])
     with grid[0][0]:
         render_monthly_progress(df, "steps")
