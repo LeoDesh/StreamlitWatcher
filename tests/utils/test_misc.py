@@ -9,6 +9,7 @@ from garmin.utils.misc import (
     compute_delta,
     filter_mapping,
     find_regex_match,
+    float_convertable,
     get_all_regex_matches,
     parse_steps_number,
     prettify,
@@ -185,3 +186,14 @@ def test_filter_mapping(
 ):
     with context:
         assert filter_mapping(data, columns) == expected
+
+
+@pytest.mark.misc
+@pytest.mark.parametrize(
+    "value,expected", [(0.05, False), (1.00, True), (155.00, True), (0.0001, True)]
+)
+def test_float_convertable(
+    value: float,
+    expected: dict[str, Any],
+):
+    assert float_convertable(value) is expected

@@ -164,14 +164,13 @@ def refresh_personal_record_ids_mapping(client: DataClient) -> list[dict[str, An
     save_as_json(RECORD_CONFIG_FILE, refined_mapping)
 
 
-### Steps
-
-
 def get_daily_steps(
     client: DataClient,
     start: str = "2020-01-01",
-    end: str = get_current_date_str("%Y-%m-%d"),
+    end: str | None = None,
 ) -> list[dict[str, str | float]]:
+    end = end or get_current_date_str("%Y-%m-%d")
+    JOBS_LOGGER.info(f"Fetching data for {start}-{end}")
     return client.get_daily_steps(start, end)
 
 

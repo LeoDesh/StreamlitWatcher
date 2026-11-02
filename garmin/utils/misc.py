@@ -1,6 +1,7 @@
 import re
 import tomllib
 from itertools import pairwise
+from math import isclose
 from typing import Any
 
 
@@ -28,6 +29,16 @@ def find_regex_match(regex_pattern: str, target_str: str, idx: int = 0) -> str:
 def check_prettified(text: str) -> bool:
     text_parts = text.split(" ")
     return all(part == part.capitalize() for part in text_parts)
+
+
+def prettify_metric(value: Any) -> str:
+    if isinstance(value, str):
+        return prettify(value)
+    elif isinstance(value, int):
+        return f"{value:,.0f}"
+    elif isinstance(value, float):
+        return f"{value:,.0f}" if float_convertable(value) else f"{value:,.2f}"
+    return str(value)
 
 
 def prettify(text: str) -> str:
@@ -72,6 +83,10 @@ def compute_delta(src: float, trg: float) -> float:
     if trg:
         return 100
     return 0
+
+
+def float_convertable(value: float) -> bool:
+    return isclose(value, int(value), abs_tol=0.001)
 
 
 def filter_mapping(data: dict[str, Any], filter_columns: list[str]) -> dict[str, Any]:

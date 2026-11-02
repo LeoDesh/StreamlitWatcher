@@ -3,8 +3,10 @@
 #### 0.6.1
 
 - month to day restriction in comparisons (metrics in steps and distance)
-- redis cronjob schedule adaption
+- redis cronjob schedule & logger adaption
 - added monthly pace chart
+- prettified values for dialog
+- pace charts legends adapted
 
 #### 0.6.0
 

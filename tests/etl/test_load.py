@@ -61,6 +61,7 @@ def test_import_file_fail(get_missing_value_garmin_csv_file):
         ("Cardio", "Heute Tenis", "Cardio"),
         ("Cardio", "Tennis", "Tennis"),
         ("Cardio", "Padel Tennis", "Padel Tennis"),
+        ("Cardio", "Badminton", "Badminton"),
     ],
 )
 def test_transform_activity(activity: str, title: str, expected: str):

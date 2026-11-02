@@ -6,7 +6,7 @@ from plotly.graph_objects import Box, Figure, Scatter
 
 from garmin.charts.config import X_AXIS_BASE_CONFIG, X_AXIS_MONTH_CONFIG
 from garmin.themes import THEME
-from garmin.utils.bucketing import create_bins_by_bounds, create_bins_by_series
+from garmin.utils.bucketing import create_bins_by_series
 from garmin.utils.misc import prettify
 from garmin.utils.pace_calculations import transform_speed_to_pace
 
@@ -83,14 +83,17 @@ def create_steps_bar_chart(df: DataFrame) -> Figure:
     return fig
 
 
+def get_pace_tick_values_and_text(values: list[float]) -> tuple[list[float], list[str]]:
+    tickvals = create_bins_by_series(values, number_of_bins=7, enhancer=0.05)
+    ticktext = [transform_speed_to_pace(speed) for speed in tickvals]
+    return (tickvals, ticktext)
+
+
 def create_pace_chart(df: DataFrame) -> Figure:
     date_col = "monthly_date"
     metric_cols = [col for col in df.columns if col != date_col]
-    min_value, max_value = df["min_pace"].min(), df["max_pace"].max()
-    tickvals = create_bins_by_bounds(
-        min_value, max_value, number_of_bins=7, enhancer=0.05
-    )
-    ticktext = [transform_speed_to_pace(speed) for speed in tickvals]
+    values = [*df["min_pace"].tolist(), *df["max_pace"].tolist()]
+    tickvals, ticktext = get_pace_tick_values_and_text(values)
     fig = Figure()
     for col in metric_cols:
         fig.add_trace(
@@ -115,13 +118,7 @@ def create_pace_chart(df: DataFrame) -> Figure:
         },
         template="plotly_white",
         hovermode="x unified",
-        legend={
-            "bgcolor": THEME.bright_grey,
-            "bordercolor": THEME.primary_grey,
-            "borderwidth": 1,
-            "x": 0.5,
-            "y": 1.2,
-        },
+        legend={"x": 0.2, "y": 1.05, "orientation": "h"},
         margin={"l": 10, "r": 20, "t": 60, "b": 10},
     )
     return fig
@@ -134,9 +131,7 @@ def create_hpm_pace_chart(df: DataFrame, title: str) -> Figure:
         "average_pace",
         "average_heart_rate",
     )
-    values = df[speed_col].tolist()
-    tickvals = create_bins_by_series(values, number_of_bins=7, enhancer=0.05)
-    ticktext = [transform_speed_to_pace(speed) for speed in tickvals]
+    tickvals, ticktext = get_pace_tick_values_and_text(df[speed_col].tolist())
     fig = Figure()
     fig.add_trace(
         Scatter(
@@ -182,13 +177,7 @@ def create_hpm_pace_chart(df: DataFrame, title: str) -> Figure:
         },
         template="plotly_white",
         hovermode="x unified",
-        legend={
-            "bgcolor": THEME.bright_grey,
-            "bordercolor": THEME.primary_grey,
-            "borderwidth": 1,
-            "x": 0.5,
-            "y": 1.2,
-        },
+        legend={"x": 0.3, "y": 1.05, "orientation": "h"},
         margin={"l": 10, "r": 20, "t": 60, "b": 10},
     )
     return fig

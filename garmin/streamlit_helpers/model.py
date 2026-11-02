@@ -4,7 +4,7 @@ from typing import Any, Self
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 
-from garmin.utils.misc import prettify
+from garmin.utils.misc import prettify, prettify_metric
 
 
 @dataclass
@@ -40,7 +40,8 @@ class Metric:
     @classmethod
     def create_from_dict(cls, data: dict[str, str]) -> list[Self]:
         return [
-            cls(label=prettify(key), value=str(value)) for key, value in data.items()
+            cls(label=prettify(key), value=prettify_metric(value))
+            for key, value in data.items()
         ]
 
 
@@ -60,7 +61,7 @@ def stream_metrics(
 
 
 def create_metrics_container(
-    header: str, data: dict[str, str], gap: str = "small"
+    header: str, data: dict[str, Any], gap: str = "small"
 ) -> None:
     with st.container(border=True, horizontal_alignment="center"):
         st.header(header)

@@ -78,7 +78,7 @@ def categorize_df(df: DataFrame, number_of_bins: int) -> DataFrame:
 
 def aggregate_categorization(df: DataFrame) -> DataFrame:
     counts_df = df["pace_float"].value_counts().sort_index().reset_index()
-    counts_df.columns = ["Minute per km", "Amount"]
+    counts_df.columns = ["Minutes per km", "Amount"]
     return counts_df
 
 
