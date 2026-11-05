@@ -25,7 +25,6 @@ from garmin.utils.pace_calculations import (
     transform_speed_to_pace,
 )
 from garmin.utils.pandas_helpers import (
-    extend_df_by_columns,
     extend_df_by_id,
     read_file,
     save_df_to_csv,
@@ -113,7 +112,9 @@ def update_garmin_activities(client: DataClient) -> None:
 def extend_garmin_activities(activities: dict[str, Any]) -> None:
     df = refine_activities(activities)
     current_activities_df = read_file(ACTIVITY_FILE_PATH)
-    updated_activities_df = extend_df_by_columns(current_activities_df, df)
+    updated_activities_df = extend_df_by_id(
+        current_activities_df, df, column="ID", ascending=False
+    )
     save_df_to_csv(updated_activities_df, ACTIVITY_FILE_PATH)
 
 

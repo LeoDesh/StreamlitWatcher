@@ -60,9 +60,12 @@ def test_extend_df_by_id(get_test_data: DataFrame):
     # 3 Distinct column values (Datum), therefore only 3 rows
     df = get_test_data.copy()
     current_df = filter_dataframe(df, {"ID": [3, 10]})
-    misisng_data_df = filter_dataframe(df, {"ID": [11, 21]})
-    combined_df = extend_df_by_id(current_df, misisng_data_df, column="Datum")
+    missing_data_df = filter_dataframe(df, {"ID": [11, 21]})
+    combined_df = extend_df_by_id(
+        current_df, missing_data_df, column="Datum", ascending=False
+    )
     assert len(combined_df) == 3
+    assert combined_df["Datum"].tolist() == ["2026-01-03", "2026-01-02", "2026-01-01"]
 
 
 @pytest.mark.pandas_helpers
@@ -70,6 +73,6 @@ def test_extend_df_by_columns(get_test_data: DataFrame):
     # 4 Distinct rows, therefore 4 rows
     df = get_test_data.copy()
     current_df = filter_dataframe(df, {"ID": [3, 11]})
-    misisng_data_df = filter_dataframe(df, {"ID": [10, 21]})
-    combined_df = extend_df_by_columns(current_df, misisng_data_df)
+    missing_data_df = filter_dataframe(df, {"ID": [10, 21]})
+    combined_df = extend_df_by_columns(current_df, missing_data_df)
     assert len(combined_df) == 4

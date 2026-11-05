@@ -160,11 +160,13 @@ def extend_df_by_columns(base_df: DataFrame, current_df: DataFrame) -> DataFrame
 
 
 def extend_df_by_id(
-    base_df: DataFrame, current_df: DataFrame, column: str
+    base_df: DataFrame, current_df: DataFrame, column: str, ascending: bool = True
 ) -> DataFrame:
     ids = current_df[column].tolist()
     missing_data_df = base_df[~base_df[column].isin(ids)]
-    return concat([current_df, missing_data_df], ignore_index=True)
+    return concat([current_df, missing_data_df], ignore_index=True).sort_values(
+        by=column, ascending=ascending
+    )
 
 
 def save_df_to_csv(

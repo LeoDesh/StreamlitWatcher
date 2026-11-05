@@ -1,5 +1,10 @@
 ### Changes
 
+### 0.6.2
+
+- fix activity update
+- adjusting extension function (added test)
+
 #### 0.6.1
 
 - month to day restriction in comparisons (metrics in steps and distance)
